@@ -2,12 +2,14 @@ package main
 
 import (
 	"log"
-	"net/http"
+        "fmt"
+        "net/http"
 )
 
 func main() {
 
 	router := NewRouter()
-
-	log.Fatal(http.ListenAndServe(":8383", router))
+        port := 8383
+        fmt.Printf("Listening on %d", port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), router))
 }
