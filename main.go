@@ -1,15 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"log"
-        "fmt"
-        "net/http"
+	"net/http"
 )
 
 func main() {
 
 	router := NewRouter()
-        port := 8383
-        fmt.Printf("Listening on %d", port)
+	port := 8383
+	fmt.Printf("Listening on %d", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), router))
 }

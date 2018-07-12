@@ -1,17 +1,17 @@
 package main
 
 import (
-"github.com/jinzhu/gorm"
-_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 type Product struct {
 	gorm.Model
-	Code string
+	Code  string
 	Price uint
 }
 
-func main() {
+func InitDb() {
 	db, err := gorm.Open("mysql", "root:@/test?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		println("ERRRR connecting")
@@ -27,7 +27,7 @@ func main() {
 
 	// Read
 	var product Product
-	db.First(&product, 1) // find product with id 1
+	db.First(&product, 1)                   // find product with id 1
 	db.First(&product, "code = ?", "L1212") // find product with code l1212
 
 	// Update - update product's price to 2000
