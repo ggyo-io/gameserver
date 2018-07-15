@@ -1,37 +1,40 @@
 package main
 
 import (
+	"encoding/json"
+	"os"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-type Product struct {
-	gorm.Model
-	Code  string
-	Price uint
-}
+var (
+	db *gorm.DB
+)
 
 func InitDb() {
-	db, err := gorm.Open("mysql", "root:@/test?charset=utf8&parseTime=True&loc=Local")
+	var err error
+	db, err = gorm.Open("mysql", "root:@/test?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		println("ERRRR connecting")
 		panic(err)
 	}
-	defer db.Close()
+	db.LogMode(true)
 
 	// Migrate the schema
-	db.AutoMigrate(&Product{})
+	db.AutoMigrate(&Recipe{})
+	db.AutoMigrate(&Ingridient{})
 
+	// Init some data
 	// Create
-	db.Create(&Product{Code: "L1212", Price: 1000})
+	var r1 Recipe
+	db.FirstOrCreate(&r1, Recipe{Name: "Steak", Description: "Fillet Mignion"})
+	var r2 Recipe
+	db.FirstOrCreate(&r2, Recipe{Name: "Noodles", Description: "Pad Thai"})
 
-	// Read
-	var product Product
-	db.First(&product, 1)                   // find product with id 1
-	db.First(&product, "code = ?", "L1212") // find product with code l1212
-
-	// Update - update product's price to 2000
-	db.Model(&product).Update("Price", 2000)
+	var rs []Recipe
+	db.Find(&rs)
+	json.NewEncoder(os.Stdout).Encode(rs)
 
 	// Delete - delete product
 	//db.Delete(&product)

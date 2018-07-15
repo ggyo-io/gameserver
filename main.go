@@ -7,9 +7,11 @@ import (
 )
 
 func main() {
-
 	router := NewRouter()
 	port := 8383
-	fmt.Printf("Listening on %d", port)
+	fmt.Printf("Initializing the database\n")
+	InitDb()
+	defer db.Close()
+	fmt.Printf("Listening on %d\n", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), router))
 }

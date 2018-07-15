@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -15,26 +14,28 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Welcome!\n")
 }
 
-func TodoIndex(w http.ResponseWriter, r *http.Request) {
+func RecipeIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(todos); err != nil {
+	var recipes []Recipe
+	db.Find(&recipes)
+
+	if err := json.NewEncoder(w).Encode(recipes); err != nil {
 		panic(err)
 	}
 }
 
-func TodoShow(w http.ResponseWriter, r *http.Request) {
+func RecipeShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	var todoId int
-	var err error
-	if todoId, err = strconv.Atoi(vars["todoId"]); err != nil {
-		panic(err)
-	}
-	todo := RepoFindTodo(todoId)
-	if todo.Id > 0 {
+	var recipeId string
+	recipeId = vars["recipeId"]
+
+	var recipe Recipe
+	db.Where("id = ?", recipeId).Take(&recipe)
+	if recipe.ID != "" {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(todo); err != nil {
+		if err := json.NewEncoder(w).Encode(recipe); err != nil {
 			panic(err)
 		}
 		return
@@ -52,11 +53,11 @@ func TodoShow(w http.ResponseWriter, r *http.Request) {
 /*
 Test with this curl command:
 
-curl -H "Content-Type: application/json" -d '{"name":"New Todo"}' http://localhost:8080/todos
+curl -H "Content-Type: application/json" -d '{"name":"New Recipe"}' http://localhost:8383/recipes
 
 */
-func TodoCreate(w http.ResponseWriter, r *http.Request) {
-	var todo Todo
+func RecipeCreate(w http.ResponseWriter, r *http.Request) {
+	var recipe Recipe
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -64,7 +65,7 @@ func TodoCreate(w http.ResponseWriter, r *http.Request) {
 	if err := r.Body.Close(); err != nil {
 		panic(err)
 	}
-	if err := json.Unmarshal(body, &todo); err != nil {
+	if err := json.Unmarshal(body, &recipe); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422) // unprocessable entity
 		if err := json.NewEncoder(w).Encode(err); err != nil {
@@ -72,10 +73,10 @@ func TodoCreate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	t := RepoCreateTodo(todo)
+	db.Create(&recipe)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(t); err != nil {
+	if err := json.NewEncoder(w).Encode("ok"); err != nil {
 		panic(err)
 	}
 }
