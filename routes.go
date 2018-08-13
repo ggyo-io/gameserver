@@ -1,9 +1,10 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type Route struct {
-	Name        string
 	Method      string
 	Pattern     string
 	HandlerFunc http.HandlerFunc
@@ -12,8 +13,8 @@ type Route struct {
 type Routes []Route
 
 var routes = Routes{
-	Route{"Index", "GET", "/", Index},
-	Route{"RecipeIndex", "GET", "/recipe", RecipeIndex},
-	Route{"RecipeCreate", "POST", "/recipe", RecipeCreate},
-	Route{"RecipeShow", "GET", "/recipe/{recipeId}", RecipeShow},
+	Route{"GET", "/", Index},
+	Route{"GET", "/game", UserIndex},
+	Route{"POST", "/move", UserCreate},
+	Route{"GET", "/login", UserShow},
 }

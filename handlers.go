@@ -14,28 +14,28 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Welcome!\n")
 }
 
-func RecipeIndex(w http.ResponseWriter, r *http.Request) {
+func UserIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	var recipes []Recipe
-	db.Find(&recipes)
+	var users []User
+	db.Find(&users)
 
-	if err := json.NewEncoder(w).Encode(recipes); err != nil {
+	if err := json.NewEncoder(w).Encode(users); err != nil {
 		panic(err)
 	}
 }
 
-func RecipeShow(w http.ResponseWriter, r *http.Request) {
+func UserShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	var recipeId string
-	recipeId = vars["recipeId"]
+	var userId string
+	userId = vars["userId"]
 
-	var recipe Recipe
-	db.Where("id = ?", recipeId).Take(&recipe)
-	if recipe.ID != "" {
+	var user User
+	db.Where("id = ?", userId).Take(&user)
+	if user.ID != "" {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(recipe); err != nil {
+		if err := json.NewEncoder(w).Encode(user); err != nil {
 			panic(err)
 		}
 		return
@@ -53,11 +53,11 @@ func RecipeShow(w http.ResponseWriter, r *http.Request) {
 /*
 Test with this curl command:
 
-curl -H "Content-Type: application/json" -d '{"name":"New Recipe"}' http://localhost:8383/recipes
+curl -H "Content-Type: application/json" -d '{"name":"New User"}' http://localhost:8383/users
 
 */
-func RecipeCreate(w http.ResponseWriter, r *http.Request) {
-	var recipe Recipe
+func UserCreate(w http.ResponseWriter, r *http.Request) {
+	var user User
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -65,7 +65,7 @@ func RecipeCreate(w http.ResponseWriter, r *http.Request) {
 	if err := r.Body.Close(); err != nil {
 		panic(err)
 	}
-	if err := json.Unmarshal(body, &recipe); err != nil {
+	if err := json.Unmarshal(body, &user); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422) // unprocessable entity
 		if err := json.NewEncoder(w).Encode(err); err != nil {
@@ -73,7 +73,7 @@ func RecipeCreate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	db.Create(&recipe)
+	db.Create(&user)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode("ok"); err != nil {

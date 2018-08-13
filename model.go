@@ -15,13 +15,20 @@ type Model struct {
 	//DeletedAt *time.Time `sql:"index"`
 }
 
-type Recipe struct {
+type Game struct {
 	Model
 	Name        string `sql:"index"`
 	Description string
+	GameModel   string
 }
 
-type Ingridient struct {
+type Player struct {
+	Model
+	Name        string `sql:"index"`
+	PlayerModel string
+}
+
+type User struct {
 	Model
 	Name string `sql:"index"`
 }

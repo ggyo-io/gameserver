@@ -17,18 +17,17 @@ func (lw *LoggingWriter) WriteHeader(h int) {
 	lw.ResponseWriter.WriteHeader(h)
 }
 
-func Logger(inner http.Handler, name string) http.Handler {
+func Logger(inner http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		lw := &LoggingWriter{w, 0}
 		inner.ServeHTTP(lw, r)
 
 		log.Printf(
-			"%d\t%s\t%s\t%s\t%s",
+			"%d\t%s\t%s\t%s",
 			lw.responseCode,
 			r.Method,
 			r.RequestURI,
-			name,
 			time.Since(start),
 		)
 	})
