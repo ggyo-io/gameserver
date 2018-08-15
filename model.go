@@ -34,7 +34,8 @@ type User struct {
 }
 
 func (model *Model) BeforeCreate(scope *gorm.Scope) error {
-	return scope.SetColumn("ID", Str(uuid.NewV4()))
+	uuid, _ := uuid.NewV4();
+	return scope.SetColumn("ID", Str(uuid))
 }
 
 func Str(u uuid.UUID) string {
