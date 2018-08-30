@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -17,7 +16,7 @@ curl -H "Content-Type: application/json" http://localhost:8383/
 
 */
 func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Welcome!\n")
+	http.ServeFile(w, r, "static/home.html")
 }
 
 /*

@@ -14,7 +14,15 @@ func NewRouter() *mux.Router {
 		handler = Logger(handler)
 		router.Methods(route.Method).Path(route.Pattern).Handler(handler)
 	}
+	// Static pages handler
 	staticHandler := Logger(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	router.PathPrefix("/static/").Handler(staticHandler)
+
+	// Websocket handler
+	hub := newHub()
+	go hub.run()
+	router.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		serveWs(hub, w, r)
+	})
 	return router
 }
