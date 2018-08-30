@@ -10,22 +10,41 @@ import (
 	"github.com/gorilla/mux"
 )
 
+/*
+Test with this curl command:
+
+curl -H "Content-Type: application/json" http://localhost:8383/
+
+*/
 func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Welcome!\n")
 }
 
-func UserIndex(w http.ResponseWriter, r *http.Request) {
+/*
+Test with this curl command:
+
+curl -H "Content-Type: application/json" -d '{"name":"New User"}' http://localhost:8383/game
+
+*/
+
+func GameSelect(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	var users []User
-	db.Find(&users)
+	var games []Game
+	db.Find(&games)
 
-	if err := json.NewEncoder(w).Encode(users); err != nil {
+	if err := json.NewEncoder(w).Encode(games); err != nil {
 		panic(err)
 	}
 }
 
-func UserShow(w http.ResponseWriter, r *http.Request) {
+/*
+Test with this curl command:
+
+curl -H "Content-Type: application/json" -d '{"name":"New User"}' http://localhost:8383/move
+
+*/
+func MakeMove(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var userId string
 	userId = vars["userId"]
@@ -53,10 +72,10 @@ func UserShow(w http.ResponseWriter, r *http.Request) {
 /*
 Test with this curl command:
 
-curl -H "Content-Type: application/json" -d '{"name":"New User"}' http://localhost:8383/users
+curl -H "Content-Type: application/json" -d '{"name":"New User"}' http://localhost:8383/login
 
 */
-func UserCreate(w http.ResponseWriter, r *http.Request) {
+func Login(w http.ResponseWriter, r *http.Request) {
 	var user User
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {

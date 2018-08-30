@@ -22,4 +22,12 @@ func InitDb() {
 	db.AutoMigrate(&Game{})
 	db.AutoMigrate(&Player{})
 	db.AutoMigrate(&User{})
+
+	// Init some data
+	// Create
+	var chess, chat, tictactoe, rubik Game
+	db.FirstOrCreate(&chess, Game{Name: "Chess"})
+	db.FirstOrCreate(&chat, Game{Name: "Chat"})
+	db.FirstOrCreate(&tictactoe, Game{Name: "TicTacToe"})
+	db.FirstOrCreate(&rubik, Game{Name: "Rubik"})
 }
