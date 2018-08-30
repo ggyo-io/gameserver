@@ -1,7 +1,6 @@
-# gowebservice
+# Game Server
 
-Boierplate for a web service written in go with REST APIs and db access
-
+Generic game server for turn based games such as chess
 
 docker image build and push:
   eval $(minikube docker-env)
