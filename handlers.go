@@ -16,7 +16,10 @@ curl -H "Content-Type: application/json" http://localhost:8383/
 
 */
 func Index(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "static/home.html")
+	data := IndexData{
+		UserName: "Anonnymous",
+	}
+	templates["index"].Execute(w, data)
 }
 
 /*

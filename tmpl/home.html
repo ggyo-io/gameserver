@@ -6,7 +6,12 @@
   <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>  
-  <h1>Hello</h1>
+  <h1>Hello, {{.UserName}}</h1>
+  <form id="login">
+    <input type="email" id="email"/>
+    <input type="password" id="password"/>
+    <input type="submit" value="Log In"/>
+  </form>
   <ul>
     <li><a href="/static/chat.html">Chat</a></li>
     <li><a href="/static/chess.html">Chess</a></li>
