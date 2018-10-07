@@ -13,4 +13,5 @@ func init() {
 
 type IndexData struct {
 	UserName string
+	IsAnnon  bool
 }

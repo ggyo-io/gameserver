@@ -2,11 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"io"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/securecookie"
 )
 
 /*
@@ -18,6 +17,12 @@ curl -H "Content-Type: application/json" http://localhost:8383/
 func Index(w http.ResponseWriter, r *http.Request) {
 	data := IndexData{
 		UserName: "Anonnymous",
+		IsAnnon:  true,
+	}
+	userName := getUserName(r)
+	if userName != "" {
+		data.UserName = userName
+		data.IsAnnon = false
 	}
 	templates["index"].Execute(w, data)
 }
@@ -78,26 +83,58 @@ curl -H "Content-Type: application/json" -d '{"name":"New User"}' http://localho
 
 */
 func Login(w http.ResponseWriter, r *http.Request) {
-	var user User
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		panic(err)
+	name := r.FormValue("email")
+	pass := r.FormValue("password")
+	redirectTarget := "/"
+	if name != "" && pass != "" {
+		var user User
+		if db.Where("name = ?", name).First(&user).RecordNotFound() {
+			db.Create(&User{Name: name, Password: pass})
+		}
+		setSession(name, w)
 	}
-	if err := r.Body.Close(); err != nil {
-		panic(err)
-	}
-	if err := json.Unmarshal(body, &user); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422) // unprocessable entity
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
+	http.Redirect(w, r, redirectTarget, 302)
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	clearSession(w)
+	http.Redirect(w, r, "/", 302)
+}
+
+// cookie handling
+
+var cookieHandler = securecookie.New(securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32))
+
+func getUserName(request *http.Request) (userName string) {
+	if cookie, err := request.Cookie("session"); err == nil {
+		cookieValue := make(map[string]string)
+		if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
+			userName = cookieValue["name"]
 		}
 	}
+	return userName
+}
 
-	db.Create(&user)
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode("ok"); err != nil {
-		panic(err)
+func setSession(userName string, response http.ResponseWriter) {
+	value := map[string]string{
+		"name": userName,
 	}
+	if encoded, err := cookieHandler.Encode("session", value); err == nil {
+		cookie := &http.Cookie{
+			Name:  "session",
+			Value: encoded,
+			Path:  "/",
+		}
+		http.SetCookie(response, cookie)
+	}
+}
+
+func clearSession(response http.ResponseWriter) {
+	cookie := &http.Cookie{
+		Name:   "session",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	}
+	http.SetCookie(response, cookie)
 }

@@ -30,7 +30,8 @@ type Player struct {
 
 type User struct {
 	Model
-	Name string `sql:"index"`
+	Name     string `sql:"index"`
+	Password string
 }
 
 func (model *Model) BeforeCreate(scope *gorm.Scope) error {

@@ -7,11 +7,16 @@
 </head>
 <body>  
   <h1>Hello, {{.UserName}}</h1>
-  <form id="login">
-    <input type="email" id="email"/>
-    <input type="password" id="password"/>
-    <input type="submit" value="Log In"/>
+  {{if .IsAnnon}}
+  <form id="login" action="/login" method="POST">
+    <input type="email" id="email" name="email"/>
+    <input type="password" id="password" name="password"/>
+    <input type="submit" value="Log In" />
   </form>
+  {{end}}
+  {{if not .IsAnnon}}
+  <a href="/logout">Log out</a>
+  {{end}}
   <ul>
     <li><a href="/static/chat.html">Chat</a></li>
     <li><a href="/static/chess.html">Chess</a></li>

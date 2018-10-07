@@ -16,5 +16,6 @@ var routes = Routes{
 	Route{"GET", "/", Index},
 	Route{"GET", "/game", GameSelect},
 	Route{"POST", "/move", MakeMove},
-	Route{"GET", "/login", Login},
+	Route{"POST", "/login", Login},
+	Route{"GET", "/logout", Logout},
 }
