@@ -5,7 +5,13 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/securecookie"
+	"github.com/gorilla/sessions"
+)
+
+var (
+	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
+	key   = []byte("76e98a932d924ef78d0b6e6ba4456dc0")
+	store = sessions.NewCookieStore(key)
 )
 
 /*
@@ -27,22 +33,33 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	templates["index"].Execute(w, data)
 }
 
-/*
-Test with this curl command:
-
-curl -H "Content-Type: application/json" -d '{"name":"New User"}' http://localhost:8383/game
-
-*/
+func MakeMatch(w http.ResponseWriter, r *http.Request) {
+	id := createGame(w, r)
+	http.Redirect(w, r, "/game/"+id, 302)
+}
 
 func GameSelect(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	var games []Game
-	db.Find(&games)
+	vars := mux.Vars(r)
+	id := vars["id"]
 
-	if err := json.NewEncoder(w).Encode(games); err != nil {
-		panic(err)
+	if id == "" {
+		w.WriteHeader(404)
+		return
 	}
+
+	var game Game
+	if db.Where("id = ?", id).First(&game).RecordNotFound() {
+		w.WriteHeader(404)
+		return
+	}
+
+	http.ServeFile(w, r, "static/chess.html")
+}
+
+func createGame(w http.ResponseWriter, r *http.Request) string {
+	game := Game{}
+	db.Create(&game)
+	return game.ID
 }
 
 /*
@@ -91,50 +108,35 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		if db.Where("name = ?", name).First(&user).RecordNotFound() {
 			db.Create(&User{Name: name, Password: pass})
 		}
-		setSession(name, w)
+		setSession(name, w, r)
 	}
 	http.Redirect(w, r, redirectTarget, 302)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
-	clearSession(w)
+	clearSession(w, r)
 	http.Redirect(w, r, "/", 302)
 }
 
-// cookie handling
+func getUserName(r *http.Request) (userName string) {
+	session, _ := store.Get(r, "cookie-name")
 
-var cookieHandler = securecookie.New(securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32))
-
-func getUserName(request *http.Request) (userName string) {
-	if cookie, err := request.Cookie("session"); err == nil {
-		cookieValue := make(map[string]string)
-		if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
-			userName = cookieValue["name"]
-		}
+	// Check if user is authenticated
+	userRef, ok := session.Values["user"]
+	if !ok {
+		return ""
 	}
-	return userName
+	return userRef.(string)
 }
 
-func setSession(userName string, response http.ResponseWriter) {
-	value := map[string]string{
-		"name": userName,
-	}
-	if encoded, err := cookieHandler.Encode("session", value); err == nil {
-		cookie := &http.Cookie{
-			Name:  "session",
-			Value: encoded,
-			Path:  "/",
-		}
-		http.SetCookie(response, cookie)
-	}
+func setSession(userName string, w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
+	session.Values["user"] = userName
+	session.Save(r, w)
 }
 
-func clearSession(response http.ResponseWriter) {
-	cookie := &http.Cookie{
-		Name:   "session",
-		Value:  "",
-		Path:   "/",
-		MaxAge: -1,
-	}
-	http.SetCookie(response, cookie)
+func clearSession(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
+	delete(session.Values, "user")
+	session.Save(r, w)
 }

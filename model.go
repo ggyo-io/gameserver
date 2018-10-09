@@ -15,11 +15,18 @@ type Model struct {
 	//DeletedAt *time.Time `sql:"index"`
 }
 
-type Game struct {
+type GameType struct {
 	Model
 	Name        string `sql:"index"`
 	Description string
 	GameModel   string
+}
+
+type Game struct {
+	Model
+	Type       GameType
+	GameTypeID string
+	State      string
 }
 
 type Player struct {

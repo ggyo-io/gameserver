@@ -14,7 +14,8 @@ type Routes []Route
 
 var routes = Routes{
 	Route{"GET", "/", Index},
-	Route{"GET", "/game", GameSelect},
+	Route{"GET", "/makematch", MakeMatch},
+	Route{"GET", "/game/{id}", GameSelect},
 	Route{"POST", "/move", MakeMove},
 	Route{"POST", "/login", Login},
 	Route{"GET", "/logout", Logout},
