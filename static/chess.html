@@ -100,7 +100,7 @@ updateStatus();
 $('#startBtn').on('click', function() {
     board.start;
     if (conn)
-        conn.send({cmd: "start"});
+        conn.send(JSON.stringify({Cmd: "start"}));
     else
         statusEl.html("No connection to server");
 });
