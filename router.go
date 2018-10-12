@@ -8,14 +8,17 @@ import (
 
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	for _, route := range routes {
-		var handler http.Handler
-		handler = route.HandlerFunc
-		handler = Logger(handler)
-		router.Methods(route.Method).Path(route.Pattern).Handler(handler)
-	}
+
+	// Normal handlers
+	router.HandleFunc("/", Index)
+	router.HandleFunc("/makematch", MakeMatch)
+	router.HandleFunc("/logout", Logout)
+
+	router.Methods("POST").Path("/login").HandlerFunc(Login)
+	router.Methods("POST").Path("/move").HandlerFunc(MakeMove)
+
 	// Static pages handler
-	staticHandler := Logger(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	staticHandler := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
 	router.PathPrefix("/static/").Handler(staticHandler)
 
 	// Websocket handler

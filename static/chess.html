@@ -97,8 +97,26 @@ board = ChessBoard('board', cfg);
 
 updateStatus();
 
-$('#startBtn').on('click', board.start);
+$('#startBtn').on('click', function() {
+    board.start;
+    if (conn)
+        conn.send({cmd: "start"});
+    else
+        statusEl.html("No connection to server");
+});
 $('#clearBtn').on('click', board.clear);
+
+if (window["WebSocket"]) {
+    conn = new WebSocket("ws://" + document.location.host + "/ws");
+    conn.onclose = function (evt) {
+        statusEl.html("<b>Connection closed.</b>");
+    };
+    conn.onmessage = function (evt) {
+        console.log(evt.data);
+    };
+} else {
+    statusEl.html("<b>Your browser does not support WebSockets.</b>");
+}
 </script>
 </body>
 </html>
