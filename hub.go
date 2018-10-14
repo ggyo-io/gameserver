@@ -4,9 +4,7 @@
 
 package main
 
-import (
-	"log"
-)
+import "log"
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
@@ -26,7 +24,6 @@ type Hub struct {
 
 func newHub() *Hub {
 	return &Hub{
-		broadcast:  make(chan *Message),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
@@ -37,20 +34,25 @@ func (h *Hub) run() {
 	for {
 		select {
 		case client := <-h.register:
-			h.clients[client] = true
+			// _very_ naive matching
+			if len(h.clients) > 0 {
+				for k := range h.clients {
+					if k != client {
+						delete(h.clients, k)
+						log.Printf("Found match creating a game")
+						db.Create(&Game{})
+						client.match <- k
+						k.match <- client
+						break
+					}
+				}
+			} else {
+				h.clients[client] = true
+			}
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
-			}
-		case message := <-h.broadcast:
-			switch message.Cmd {
-			case "start":
-				log.Printf("got start command %s\n", message.Params)
-			case "move":
-				log.Printf("got move command %s\n", message.Params)
-			default:
-				log.Printf("Unknown command %s\n", message)
 			}
 		}
 	}

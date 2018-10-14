@@ -47,6 +47,11 @@ type Client struct {
 
 	// Buffered channel of outbound messages.
 	send chan []byte
+
+	// Channel for when a match was found
+	match chan *Client
+
+	opponent *Client
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -72,8 +77,12 @@ func (c *Client) readPump() {
 		}
 		fmt.Printf("got message %q\n", mb)
 		var message Message
-		json.Unmarshal(mb, &message)
-		c.hub.broadcast <- &message
+		if err := json.Unmarshal(mb, &message); err != nil {
+			log.Print("ERROR: Unsupported message format")
+			continue
+		}
+
+		c.dispatch(&message)
 	}
 }
 
@@ -119,7 +128,10 @@ func (c *Client) writePump() {
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
+		case opp := <-c.match:
+			c.opponent = opp
 		}
+
 	}
 }
 
@@ -130,11 +142,22 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
-	client.hub.register <- client
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), match: make(chan *Client)}
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
 	go client.writePump()
 	go client.readPump()
+}
+
+func (c *Client) dispatch(message *Message) {
+	switch message.Cmd {
+	case "start":
+		c.hub.register <- c
+		log.Printf("got start command %s\n", message.Params)
+	case "move":
+		log.Printf("got move command %s\n", message.Params)
+	default:
+		log.Printf("Unknown command %s\n", message)
+	}
 }
