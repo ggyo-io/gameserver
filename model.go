@@ -27,12 +27,8 @@ type Game struct {
 	Type       GameType
 	GameTypeID string
 	State      string
-}
-
-type Player struct {
-	Model
-	Name        string `sql:"index"`
-	PlayerModel string
+	White      string
+	Black      string
 }
 
 type User struct {

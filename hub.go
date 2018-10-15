@@ -22,6 +22,12 @@ type Hub struct {
 	unregister chan *Client
 }
 
+type GameState struct {
+	game  *Game
+	white *Client
+	black *Client
+}
+
 func newHub() *Hub {
 	return &Hub{
 		register:   make(chan *Client),
@@ -35,25 +41,32 @@ func (h *Hub) run() {
 		select {
 		case client := <-h.register:
 			// _very_ naive matching
-			if len(h.clients) > 0 {
-				for k := range h.clients {
-					if k != client {
-						delete(h.clients, k)
-						log.Printf("Found match creating a game")
-						db.Create(&Game{})
-						client.match <- k
-						k.match <- client
-						break
-					}
-				}
-			} else {
-				h.clients[client] = true
-			}
+			h.match(client)
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
 			}
 		}
+	}
+}
+
+func (h *Hub) match(client *Client) {
+	// _very_ naive matching
+	if len(h.clients) > 0 {
+		for k := range h.clients {
+			if k != client {
+				delete(h.clients, k)
+				log.Printf("Found match creating a game")
+				game := Game{White: k.user, Black: client.user}
+				db.Create(&game)
+				gameState := GameState{game: &game, white: k, black: client}
+				client.match <- &gameState
+				k.match <- &gameState
+				return
+			}
+		}
+	} else {
+		h.clients[client] = true
 	}
 }

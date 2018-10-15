@@ -24,7 +24,6 @@ func InitDb() {
 	// Migrate the schema
 	db.AutoMigrate(&GameType{})
 	db.AutoMigrate(&Game{})
-	db.AutoMigrate(&Player{})
 	db.AutoMigrate(&User{})
 
 	// Init some data

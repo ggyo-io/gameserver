@@ -35,7 +35,9 @@ var upgrader = websocket.Upgrader{
 
 type Message struct {
 	Cmd    string
+	User   string
 	Params string
+	Color  string
 }
 
 // Client is a middleman between the websocket connection and the hub.
@@ -45,13 +47,22 @@ type Client struct {
 	// The websocket connection.
 	conn *websocket.Conn
 
+	user string
+
 	// Buffered channel of outbound messages.
 	send chan []byte
 
 	// Channel for when a match was found
-	match chan *Client
+	match chan *GameState
 
-	opponent *Client
+	gameState *GameState
+}
+
+func (c *Client) foe() *Client {
+	if c.gameState.black == c {
+		return c.gameState.white
+	}
+	return c.gameState.black
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -128,10 +139,18 @@ func (c *Client) writePump() {
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
-		case opp := <-c.match:
-			c.opponent = opp
+		case gameState := <-c.match:
+			c.gameState = gameState
+			var msg Message
+			if gameState.white == c {
+				msg = Message{Cmd: "start", Color: "white", User: gameState.black.user}
+			} else {
+				msg = Message{Cmd: "start", Color: "black", User: gameState.white.user}
+			}
+			if msgb, err := json.Marshal(&msg); err == nil {
+				c.send <- msgb
+			}
 		}
-
 	}
 }
 
@@ -142,7 +161,12 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), match: make(chan *Client)}
+	user := getUserName(r)
+	if user == "" {
+		w.WriteHeader(401)
+		return
+	}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), match: make(chan *GameState), user: user}
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
@@ -156,6 +180,13 @@ func (c *Client) dispatch(message *Message) {
 		c.hub.register <- c
 		log.Printf("got start command %s\n", message.Params)
 	case "move":
+		game := c.gameState.game
+		game.State = message.Params
+		db.Save(game)
+		if msgb, err := json.Marshal(message); err == nil {
+			c.foe().send <- msgb
+		}
+
 		log.Printf("got move command %s\n", message.Params)
 	default:
 		log.Printf("Unknown command %s\n", message)

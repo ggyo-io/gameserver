@@ -25,9 +25,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		UserName: "Anonnymous",
 		IsAnnon:  true,
 	}
-	userName := getUserName(r)
-	if userName != "" {
-		data.UserName = userName
+	user := getUserName(r)
+	if user != "" {
+		data.UserName = user
 		data.IsAnnon = false
 	}
 	templates["index"].Execute(w, data)
@@ -103,7 +103,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if name != "" && pass != "" {
 		var user User
 		if db.Where("name = ?", name).First(&user).RecordNotFound() {
-			db.Create(&User{Name: name, Password: pass})
+			user = User{Name: name, Password: pass}
+			db.Create(&user)
 		}
 		setSession(name, w, r)
 	}
@@ -119,11 +120,12 @@ func getUserName(r *http.Request) (userName string) {
 	session, _ := store.Get(r, "cookie-name")
 
 	// Check if user is authenticated
-	userRef, ok := session.Values["user"]
-	if !ok {
-		return ""
+	userRef, _ := session.Values["user"]
+	switch userRef.(type) {
+	case string:
+		return userRef.(string)
 	}
-	return userRef.(string)
+	return ""
 }
 
 func setSession(userName string, w http.ResponseWriter, r *http.Request) {

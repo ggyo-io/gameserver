@@ -11,6 +11,7 @@
 <p>Status: <span id="status"></span></p>
 <p>FEN: <span id="fen"></span></p>
 <p>PGN: <span id="pgn"></span></p>
+<p>Opponent: <span id="foe"></span></p>
 
 <script src="/static/js/json3.min.js"></script>
 <script src="/static/js/jquery-1.10.1.min.js"></script>
@@ -21,6 +22,7 @@ var board,
   game = new Chess(),
   statusEl = $('#status'),
   fenEl = $('#fen'),
+  foeEl = $('#foe'),
   pgnEl = $('#pgn');
 
 // do not pick up pieces if the game is over
@@ -51,6 +53,8 @@ var onDrop = function(source, target) {
 // for castling, en passant, pawn promotion
 var onSnapEnd = function() {
   board.position(game.fen());
+  if (conn)
+    conn.send(JSON.stringify({Cmd:'move', Params: game.pgn()}));
 };
 
 var updateStatus = function() {
@@ -99,10 +103,12 @@ updateStatus();
 
 $('#startBtn').on('click', function() {
     board.start;
-    if (conn)
+    if (conn) {
+        statusEl.html("Waiting for a match...");
         conn.send(JSON.stringify({Cmd: "start"}));
-    else
+    } else {
         statusEl.html("No connection to server");
+    }
 });
 $('#clearBtn').on('click', board.clear);
 
@@ -113,6 +119,15 @@ if (window["WebSocket"]) {
     };
     conn.onmessage = function (evt) {
         console.log(evt.data);
+        var msg = JSON.parse(evt.data);
+        if (msg.Cmd == "start") {
+            foeEl.html(msg.User);
+            statusEl.html('You are ' + msg.Color)
+        } else if (msg.Cmd == "move") {
+            game.load_pgn(msg.Params);
+            updateStatus();
+            board.position(game.fen());
+        }
     };
 } else {
     statusEl.html("<b>Your browser does not support WebSockets.</b>");
