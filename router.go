@@ -11,11 +11,9 @@ func NewRouter() *mux.Router {
 
 	// Normal handlers
 	router.HandleFunc("/", Index)
-	router.HandleFunc("/makematch", MakeMatch)
-	router.HandleFunc("/logout", Logout)
 
 	router.Methods("POST").Path("/login").HandlerFunc(Login)
-	router.Methods("POST").Path("/move").HandlerFunc(MakeMove)
+	router.HandleFunc("/logout", Logout)
 
 	// Static pages handler
 	staticHandler := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))

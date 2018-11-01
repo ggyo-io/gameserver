@@ -27,6 +27,7 @@ type Game struct {
 	Type       GameType
 	GameTypeID string
 	State      string
+	Active     bool
 	White      string
 	Black      string
 }
