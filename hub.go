@@ -10,27 +10,32 @@ import "log"
 // clients.
 type Hub struct {
 	// Registered clients.
-	clients map[*Client]bool
+	clients map[*Player]bool
 
 	// Register requests from the clients.
-	register chan *Client
+	register chan *Player
 
 	// Unregister requests from clients.
-	unregister chan *Client
+	unregister chan *Player
+
+	moveRequest chan MoveRequest
 }
 
 type GameState struct {
 	game  *Game
-	white *Client
-	black *Client
+	white *Player
+	black *Player
 }
 
 func newHub() *Hub {
-	return &Hub{
-		register:   make(chan *Client),
-		unregister: make(chan *Client),
-		clients:    make(map[*Client]bool),
-	}
+    h := &Hub{
+        register:    make(chan *Player),
+        unregister:  make(chan *Player),
+        clients:     make(map[*Player]bool),
+        moveRequest: make(chan MoveRequest),
+    }
+	go h.run()
+	return h
 }
 
 func (h *Hub) run() {
@@ -38,17 +43,29 @@ func (h *Hub) run() {
 		select {
 		case client := <-h.register:
 			// _very_ naive matching
-			h.match(client)
+			h.matchLeela(client)
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
-				close(client.send)
 			}
+			close(client.send)
 		}
 	}
 }
 
-func (h *Hub) match(client *Client) {
+func (h *Hub) matchLeela(client *Player) {
+    uciPlayer := NewUCIPlayer(h, "Leela via UCI", h.moveRequest)
+	go uciPlayer.writePump()
+	go uciPlayer.readPump()
+
+	game := Game{White: client.user, Black: uciPlayer.user}
+	db.Create(&game)
+	gameState := GameState{game: &game, white: client, black: uciPlayer.Player}
+	uciPlayer.gameState = &gameState
+	client.match <- &gameState
+}
+
+func (h *Hub) matchWs(client *Player) {
 	// _very_ naive matching
 	if len(h.clients) > 0 {
 		for k := range h.clients {

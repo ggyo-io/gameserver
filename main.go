@@ -10,8 +10,12 @@ import (
 )
 
 func main() {
-	router := NewRouter()
+	hub := newHub()
+	router := NewRouter(hub)
+	fmt.Printf("Starting hub\n")
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
+	fmt.Printf("Starting leela\n")
+	leelaStart(hub.moveRequest)
 
 	port := 8383
 	fmt.Printf("Initializing the database\n")

@@ -20,6 +20,7 @@
 <script src="/static/js/chess.min.js"></script>
 <script>
 var board,
+  mv_history = "",
   game = new Chess(),
   statusEl = $('#status'),
   fenEl = $('#fen'),
@@ -49,7 +50,15 @@ var onDrop = function(source, target) {
 
   // illegal move
   if (move === null) return 'snapback';
-
+  if ('promotion' in move) {
+      target += move.promotion;
+  }
+  mv_history += source + target + " ";
+  console.log("my mr begin from: " + source + " to: " + target + " promo: q");
+  console.log(move);
+  console.log("my mr end");
+  console.log("game fen: " + game.fen())
+ 
   updateStatus();
 };
 
@@ -58,7 +67,7 @@ var onDrop = function(source, target) {
 var onSnapEnd = function() {
   board.position(game.fen());
   if (conn)
-    conn.send(JSON.stringify({Cmd:'move', Params: game.pgn()}));
+    conn.send(JSON.stringify({Cmd:'move', Params: game.pgn(), MVH: mv_history}));
 };
 
 var updateStatus = function() {
@@ -96,6 +105,7 @@ var updateStatus = function() {
 
 
 $('#startBtn').on('click', function() {
+    mv_history = "";
     if (board) {
         board.start;
     }
@@ -136,7 +146,28 @@ if (window["WebSocket"]) {
 
             updateStatus();
         } else if (msg.Cmd == "move") {
-            game.load_pgn(msg.Params);
+			var from_sq = msg.Params[0] + msg.Params[1];
+			mv_history  += from_sq;
+            var to_sq   = msg.Params[2] + msg.Params[3];
+			mv_history  += to_sq;
+			var promotePiece = "q";
+			if (msg.Params.length > 4) {
+                if (msg.Params[4] == "=")
+                    promotePiece = msg.Params[5];
+                else
+                    promotePiece = msg.Params[4];
+			    mv_history += "=" + promotePiece
+            }
+			mv_history += " "
+			var mr = game.move({
+               from: from_sq,
+               to: to_sq,
+               promotion: promotePiece
+            });
+            console.log("computa mr begin from: " + from_sq + " to: " + to_sq + " promo: " + promotePiece);
+            console.log(mr);
+            console.log("computa mr end");
+			console.log("game fen: " + game.fen())
             updateStatus();
             board.position(game.fen());
         }

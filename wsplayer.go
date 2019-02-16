@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"errors"
 
 	"github.com/gorilla/websocket"
 )
@@ -33,68 +34,40 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-type Message struct {
-	Cmd    string
-	User   string
-	Params string
-	Color  string
-}
-
 // Client is a middleman between the websocket connection and the hub.
-type Client struct {
-	hub *Hub
+type WSPlayer struct {
+	*Player
 
 	// The websocket connection.
 	conn *websocket.Conn
-
-	user string
-
-	// Buffered channel of outbound messages.
-	send chan []byte
-
-	// Channel for when a match was found
-	match chan *GameState
-
-	gameState *GameState
 }
 
-func (c *Client) foe() *Client {
-	if c.gameState.black == c {
-		return c.gameState.white
-	}
-	return c.gameState.black
-}
-
-// readPump pumps messages from the websocket connection to the hub.
-//
-// The application runs readPump in a per-connection goroutine. The application
-// ensures that there is at most one reader on a connection by executing all
-// reads from this goroutine.
-func (c *Client) readPump() {
-	defer func() {
-		c.hub.unregister <- c
-		c.conn.Close()
-	}()
+func (c *WSPlayer) openConnection() {
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
-	for {
-		_, mb, err := c.conn.ReadMessage()
-		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
-			}
-			break
-		}
-		fmt.Printf("got message %q\n", mb)
-		var message Message
-		if err := json.Unmarshal(mb, &message); err != nil {
-			log.Print("ERROR: Unsupported message format")
-			continue
-		}
+}
 
-		c.dispatch(&message)
+func (c *WSPlayer) closeConnection() {
+		c.conn.Close()
+}
+
+func (c *WSPlayer) makeMove() (*Message, error) {
+	_, mb, err := c.conn.ReadMessage()
+	if err != nil {
+		if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+			log.Printf("error: %v", err)
+		}
+		return nil, errors.New("UnexpectedClose");
 	}
+	fmt.Printf("got message %q\n", mb)
+	var message Message
+	if err := json.Unmarshal(mb, &message); err != nil {
+		log.Print("ERROR: Unsupported message format")
+		return nil, errors.New("Unmarshal");
+	}
+
+	return &message, nil;
 }
 
 // writePump pumps messages from the hub to the websocket connection.
@@ -102,7 +75,7 @@ func (c *Client) readPump() {
 // A goroutine running writePump is started for each connection. The
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
-func (c *Client) writePump() {
+func (c *WSPlayer) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
@@ -122,14 +95,8 @@ func (c *Client) writePump() {
 			if err != nil {
 				return
 			}
+			log.Printf("pumping up the WS, message: %v\n", message);
 			w.Write(message)
-
-			// Add queued chat messages to the current websocket message.
-			// n := len(c.send)
-			// for i := 0; i < n; i++ {
-			// 	w.Write(newline)
-			// 	w.Write(<-c.send)
-			// }
 
 			if err := w.Close(); err != nil {
 				return
@@ -142,7 +109,7 @@ func (c *Client) writePump() {
 		case gameState := <-c.match:
 			c.gameState = gameState
 			var msg Message
-			if gameState.white == c {
+			if gameState.white == c.Player {
 				msg = Message{Cmd: "start", Color: "white", User: gameState.black.user}
 			} else {
 				msg = Message{Cmd: "start", Color: "black", User: gameState.white.user}
@@ -152,6 +119,14 @@ func (c *Client) writePump() {
 			}
 		}
 	}
+}
+
+func NewWSPlayer(hub *Hub, user string, conn *websocket.Conn) *WSPlayer {
+	player := &Player{hub: hub, user: user, send: make(chan []byte, 256), match: make(chan *GameState)}
+	client := &WSPlayer{Player: player, conn: conn}
+	client.PlayerI = client
+
+	return client
 }
 
 // serveWs handles websocket requests from the peer.
@@ -166,29 +141,9 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(401)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), match: make(chan *GameState), user: user}
 
-	// Allow collection of memory referenced by the caller by doing all work in
-	// new goroutines.
-	go client.writePump()
-	go client.readPump()
-}
+	wsplayer := NewWSPlayer(hub, user, conn)
 
-func (c *Client) dispatch(message *Message) {
-	switch message.Cmd {
-	case "start":
-		c.hub.register <- c
-		log.Printf("got start command %s\n", message.Params)
-	case "move":
-		game := c.gameState.game
-		game.State = message.Params
-		db.Save(game)
-		if msgb, err := json.Marshal(message); err == nil {
-			c.foe().send <- msgb
-		}
-
-		log.Printf("got move command %s\n", message.Params)
-	default:
-		log.Printf("Unknown command %s\n", message)
-	}
+	go wsplayer.writePump()
+	go wsplayer.readPump()
 }

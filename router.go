@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewRouter() *mux.Router {
+func NewRouter(hub* Hub) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// Normal handlers
@@ -18,10 +18,6 @@ func NewRouter() *mux.Router {
 	// Static pages handler
 	staticHandler := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
 	router.PathPrefix("/static/").Handler(staticHandler)
-
-	// Websocket handler
-	hub := newHub()
-	go hub.run()
 	router.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r)
 	})
