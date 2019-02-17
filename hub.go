@@ -54,7 +54,7 @@ func (h *Hub) run() {
 }
 
 func (h *Hub) matchLeela(client *Player) {
-    uciPlayer := NewUCIPlayer(h, "Leela via UCI", h.moveRequest)
+    uciPlayer := NewUCIPlayer(h, "Leela via UCI")
 	go uciPlayer.writePump()
 	go uciPlayer.readPump()
 

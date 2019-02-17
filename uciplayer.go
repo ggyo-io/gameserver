@@ -9,7 +9,6 @@ import (
 type UCIPlayer struct {
 	*Player
 
-	moveRequest chan MoveRequest
 	bestMove    chan string
 }
 
@@ -40,7 +39,7 @@ func (c *UCIPlayer) writePump() {
 	        case "move":
 		        log.Printf("uciplayer got move command %v\n", message)
 				mr := MoveRequest{pgn: message.MVH, bestMove: c.bestMove}
-				c.moveRequest <- mr
+				c.hub.moveRequest <- mr
 
 	        default:
 		        log.Printf("Unknown command %s\n", message)
@@ -49,9 +48,9 @@ func (c *UCIPlayer) writePump() {
 	}
 }
 
-func NewUCIPlayer(hub *Hub, user string, moveRequest chan MoveRequest) *UCIPlayer {
+func NewUCIPlayer(hub *Hub, user string) *UCIPlayer {
 	player := &Player{hub: hub, user: user, send: make(chan []byte, 256), match: make(chan *GameState)}
-	client := &UCIPlayer{Player: player, moveRequest: moveRequest, bestMove: make(chan string)}
+	client := &UCIPlayer{Player: player, bestMove: make(chan string)}
 	client.PlayerI = client
 
 	return client

@@ -37,7 +37,6 @@ type CmdWrapper struct {
     Cmd      *exec.Cmd
     Pgn      string
     Input    io.WriteCloser
-    Consumes bool
     replyChannel chan chan string
 }
 
@@ -49,12 +48,9 @@ func (c *CmdWrapper) openInput() {
     }
 }
 
-var p *CmdWrapper = nil
-
 var curNetId uint = 0
 
 func (c *CmdWrapper) launch(networkPath string, args []string, playouts string, moveRequest chan MoveRequest) {
-    c.Consumes = true
     c.replyChannel = make(chan chan string, 256)
     weights := fmt.Sprintf("--weights=%s", networkPath)
     c.Cmd = exec.Command("./lc0", weights)
@@ -101,7 +97,12 @@ func (c *CmdWrapper) launch(networkPath string, args []string, playouts string, 
     io.WriteString(c.Input, "uci\n")
     go func() {
         for mr := range moveRequest {
-            c.replyChannel <- mr.bestMove
+            replyChannel := mr.bestMove
+            if (replyChannel == nil) {
+                log.Printf("Got null reply channel, exiting\n")
+                break
+            }
+            c.replyChannel <- replyChannel
 
             uciCmd := "position startpos"
             if len(mr.pgn) > 1 {
@@ -112,10 +113,6 @@ func (c *CmdWrapper) launch(networkPath string, args []string, playouts string, 
             io.WriteString(c.Input, uciCmd + " \n")
             log.Println("go nodes " + playouts)
             io.WriteString(c.Input, "go nodes " + playouts + " \n")
-
-            if !c.Consumes {
-                break
-            }
         }
         c.Cmd.Process.Kill()
     }()
@@ -176,20 +173,13 @@ func readNetworkSha() string {
 func updateNetwork() (bool, string) {
     nextGame, err := NextGame(httpClient, HOSTNAME, getExtraParams())
     log.Println(nextGame, err)
-    sha := ""
     if err != nil {
         log.Printf("NextGame error %v\n", err)
-        sha = readNetworkSha()
-        if sha == "" {
-            log.Printf("readNetworkSha error\n")
-            return false, ""
-        }
-    } else {
-        // found SHA using NextGame
-        sha = nextGame.Sha
+        return false, ""
     }
+
     if nextGame.Type == "train" {
-        networkPath, newNet, err := getNetwork(sha)
+        networkPath, newNet, err := getNetwork(nextGame.Sha)
         if err != nil {
             log.Printf("getNetwork error %v\n", err)
             return false, ""
@@ -204,12 +194,24 @@ func leelaStart(moveRequest chan MoveRequest) {
     httpClient = &http.Client{}
 
     go func() {
+        var p *CmdWrapper = nil
+
+        sha := readNetworkSha()
+        if sha != "" {
+            path := filepath.Join(networksDir, sha)
+            p = &CmdWrapper{}
+            p.launch(path, nil, "50", moveRequest)
+        } else {
+            log.Printf("Can not find last local lc0 weights network\n")
+        }
+
         for {
             new_net, net_name := updateNetwork()
-            log.Printf("new_net %v net_name %v\n", new_net, net_name)
-            if (!new_net || p == nil) && net_name != "" {
+            log.Printf("updateNetwork: new_net %v net_name %v\n", new_net, net_name)
+            if (new_net || p == nil) && net_name != "" {
                 if p != nil {
-                    p.Consumes = false
+                    mr := MoveRequest{pgn: "", bestMove: nil}
+                    moveRequest <- mr
                 }
                 p = &CmdWrapper{}
                 p.launch(net_name, nil, "50", moveRequest)
