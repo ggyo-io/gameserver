@@ -38,11 +38,7 @@ func (c *Player) foe() *Player {
     return c.gameState.black
 }
 
-// readPump pumps messages from the websocket connection to the hub.
-//
-// The application runs readPump in a per-connection goroutine. The application
-// ensures that there is at most one reader on a connection by executing all
-// reads from this goroutine.
+// readPump reads moves from this player and dispatches those to the foe
 func (c *Player) readPump() {
     c.openConnection()
     for {
@@ -60,17 +56,20 @@ func (c *Player) readPump() {
 func (c *Player) dispatch(message *Message) {
     switch message.Cmd {
     case "start":
+        log.Printf("player '%s' got start command, request to register at hub\n", c.user)
         c.hub.register <- c
-        log.Printf("got start command %s\n", message.Params)
     case "move":
+        chess := c.gameState.chess
+        if err := chess.MoveStr(message.Params); err != nil {
+            log.Fatal(err)
+        }
         game := c.gameState.game
-        game.State = message.Params
+        game.State = chess.String()
         db.Save(game)
         if msgb, err := json.Marshal(message); err == nil {
+            log.Printf("player '%s' sends to '%s' message '%s'\n", c.user, c.foe().user, string(msgb))
             c.foe().send <- msgb
         }
-
-        log.Printf("got move command %s\n", message.Params)
     default:
         log.Printf("Unknown command %s\n", message)
     }

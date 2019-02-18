@@ -6,7 +6,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -60,7 +59,7 @@ func (c *WSPlayer) makeMove() (*Message, error) {
 		}
 		return nil, errors.New("UnexpectedClose");
 	}
-	fmt.Printf("got message %q\n", mb)
+	log.Printf("wsplayer '%s' in makeMove() got message '%s'\n", c.user, string(mb))
 	var message Message
 	if err := json.Unmarshal(mb, &message); err != nil {
 		log.Print("ERROR: Unsupported message format")
@@ -95,7 +94,7 @@ func (c *WSPlayer) writePump() {
 			if err != nil {
 				return
 			}
-			log.Printf("pumping up the WS, message: %v\n", message);
+			log.Printf("pumping up the WS, message: %s\n", string(message));
 			w.Write(message)
 
 			if err := w.Close(); err != nil {

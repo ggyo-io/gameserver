@@ -26,7 +26,7 @@ import (
 var networksDir = "networks"
 
 type MoveRequest struct {
-    pgn      string
+    moves    string
     bestMove chan string
 }
 
@@ -35,7 +35,6 @@ var HOSTNAME = "http://testserver.lczero.org"
 
 type CmdWrapper struct {
     Cmd      *exec.Cmd
-    Pgn      string
     Input    io.WriteCloser
     replyChannel chan chan string
 }
@@ -105,8 +104,8 @@ func (c *CmdWrapper) launch(networkPath string, args []string, playouts string, 
             c.replyChannel <- replyChannel
 
             uciCmd := "position startpos"
-            if len(mr.pgn) > 1 {
-                uciCmd += " moves " + mr.pgn
+            if len(mr.moves) > 1 {
+                uciCmd += " moves " + mr.moves
             }
 
             log.Printf("Sending UCI cmd: '%s'\n", uciCmd)
@@ -210,7 +209,7 @@ func leelaStart(moveRequest chan MoveRequest) {
             log.Printf("updateNetwork: new_net %v net_name %v\n", new_net, net_name)
             if (new_net || p == nil) && net_name != "" {
                 if p != nil {
-                    mr := MoveRequest{pgn: "", bestMove: nil}
+                    mr := MoveRequest{moves: "", bestMove: nil}
                     moveRequest <- mr
                 }
                 p = &CmdWrapper{}
