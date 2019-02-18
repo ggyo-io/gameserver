@@ -2,3 +2,5 @@ gameserver
 debug
 gs.db
 .vscode/
+networks/
+lc0

@@ -12,8 +12,8 @@ var (
 
 func InitDb() {
 	var err error
-	//db, err = gorm.Open("mysql", "root@/test?charset=utf8&parseTime=True&loc=Local")
-	db, err = gorm.Open("mysql", "root:My17SQL8@/test?charset=utf8&parseTime=True&loc=Local")
+	db, err = gorm.Open("mysql", "root@/test?charset=utf8&parseTime=True&loc=Local")
+	// db, err = gorm.Open("mysql", "root:My17SQL8@/test?charset=utf8&parseTime=True&loc=Local")
 	// db, err := gorm.Open("sqlite3", "gs.db")
 
 	if err != nil {
