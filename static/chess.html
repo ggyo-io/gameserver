@@ -6,8 +6,9 @@
 </head>
 <body>
 <div id="board" style="float: left; margin-left: 5px; width: 400px"></div>
-<input type="button" id="startBtn" value="Start" />
-<input type="button" id="clearBtn" value="Clear" />
+<input type="button"   id="startBtn" value="Start" />
+<input type="button"   id="clearBtn" value="Clear" />
+<input type="checkbox" id="leela"    value="leela" checked>Play Leela
 <p>Status: <span id="status"></span></p>
 <p>FEN: <span id="fen"></span></p>
 <p>PGN: <span id="pgn"></span></p>
@@ -112,7 +113,13 @@ $('#startBtn').on('click', function() {
 
     if (conn) {
         statusEl.html("Waiting for a match...");
-        conn.send(JSON.stringify({Cmd: "start"}));
+        var checked = document.getElementById("leela").checked;
+        console.log("leela checkbox: " + checked);
+        if (checked) {
+            conn.send(JSON.stringify({Cmd: "start", Params: "leela"}));
+        } else {
+            conn.send(JSON.stringify({Cmd: "start", Params: ""}));
+        }
     } else {
         statusEl.html("No connection to server");
     }

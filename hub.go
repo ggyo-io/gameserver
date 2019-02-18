@@ -9,6 +9,11 @@ import (
     "github.com/notnil/chess"
 )
 
+type RegisterRequest struct {
+    player *Player
+    params string
+}
+
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
@@ -16,7 +21,7 @@ type Hub struct {
     clients map[*Player]bool
 
     // Register requests from the clients.
-    register chan *Player
+    register chan RegisterRequest
 
     // Unregister requests from clients.
     unregister chan *Player
@@ -33,7 +38,7 @@ type GameState struct {
 
 func newHub() *Hub {
     h := &Hub{
-        register:    make(chan *Player),
+        register:    make(chan RegisterRequest),
         unregister:  make(chan *Player),
         clients:     make(map[*Player]bool),
         moveRequest: make(chan MoveRequest),
@@ -45,9 +50,12 @@ func newHub() *Hub {
 func (h *Hub) run() {
     for {
         select {
-        case client := <-h.register:
-            // _very_ naive matching
-            h.matchLeela(client)
+        case rq := <-h.register:
+            if rq.params == "leela" {
+                h.matchLeela(rq.player)
+            } else {
+                h.matchWs(rq.player)
+            }
         case client := <-h.unregister:
             if _, ok := h.clients[client]; ok {
                 delete(h.clients, client)
@@ -78,7 +86,7 @@ func (h *Hub) matchWs(client *Player) {
                 log.Printf("Found match creating a game")
                 game := Game{White: k.user, Black: client.user}
                 db.Create(&game)
-                gameState := GameState{game: &game, chess: chess.NewGame(), white: k, black: client}
+                gameState := GameState{game: &game, chess: chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})), white: k, black: client}
                 client.match <- &gameState
                 k.match <- &gameState
                 return

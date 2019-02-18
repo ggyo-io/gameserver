@@ -56,8 +56,9 @@ func (c *Player) readPump() {
 func (c *Player) dispatch(message *Message) {
     switch message.Cmd {
     case "start":
-        log.Printf("player '%s' got start command, request to register at hub\n", c.user)
-        c.hub.register <- c
+        log.Printf("player '%s' got start command, params '%s' request to register at hub\n", c.user, message.Params)
+        rr := RegisterRequest{player: c, params: message.Params}
+        c.hub.register <- rr
     case "move":
         chess := c.gameState.chess
         if err := chess.MoveStr(message.Params); err != nil {
