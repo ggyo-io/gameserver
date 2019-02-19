@@ -26,7 +26,7 @@ type Hub struct {
     // Unregister requests from clients.
     unregister chan *Player
 
-    moveRequest chan MoveRequest
+    robots map[string]UciLauncher
 }
 
 type GameState struct {
@@ -36,13 +36,20 @@ type GameState struct {
     black *Player
 }
 
-func newHub() *Hub {
+func newHub(rs ...UciLauncher) *Hub {
     h := &Hub{
         register:    make(chan RegisterRequest),
         unregister:  make(chan *Player),
         clients:     make(map[*Player]bool),
-        moveRequest: make(chan MoveRequest),
+        robots:      make(map[string]UciLauncher),
     }
+
+    for _, r := range rs {
+        log.Printf("Starting %s\n", r.name())
+        h.robots[r.name()] = r
+        r.launch()
+    }
+
     go h.run()
     return h
 }
@@ -51,10 +58,10 @@ func (h *Hub) run() {
     for {
         select {
         case rq := <-h.register:
-            if rq.params == "leela" {
-                h.matchLeela(rq.player)
-            } else {
+            if rq.params == "human" {
                 h.matchWs(rq.player)
+            } else {
+                h.matchUCI(rq.player, rq.params)
             }
         case client := <-h.unregister:
             if _, ok := h.clients[client]; ok {
@@ -65,8 +72,8 @@ func (h *Hub) run() {
     }
 }
 
-func (h *Hub) matchLeela(client *Player) {
-    uciPlayer := NewUCIPlayer(h, "Leela via UCI")
+func (h *Hub) matchUCI(client *Player, robotName string) {
+    uciPlayer := NewUCIPlayer(h, robotName)
     go uciPlayer.writePump()
     go uciPlayer.readPump()
 

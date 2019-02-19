@@ -3,7 +3,7 @@ default: all
 all:
 	go build .
 
-clean: 
+clean:
 	rm gameserver
 
 run:

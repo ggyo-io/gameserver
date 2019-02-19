@@ -3,14 +3,12 @@
 package main
 
 import (
-    "bufio"
     "fmt"
     "io"
     "log"
     "net/http"
     "os"
     "sort"
-    "os/exec"
     "path/filepath"
     "strings"
     "time"
@@ -25,97 +23,10 @@ import (
 
 var networksDir = "networks"
 
-type MoveRequest struct {
-    moves    string
-    bestMove chan string
-}
-
 var httpClient *http.Client
 var HOSTNAME = "http://testserver.lczero.org"
 
-type CmdWrapper struct {
-    Cmd      *exec.Cmd
-    Input    io.WriteCloser
-    replyChannel chan chan string
-}
-
-func (c *CmdWrapper) openInput() {
-    var err error
-    c.Input, err = c.Cmd.StdinPipe()
-    if err != nil {
-        log.Fatal(err)
-    }
-}
-
 var curNetId uint = 0
-
-func (c *CmdWrapper) launch(networkPath string, args []string, playouts string, moveRequest chan MoveRequest) {
-    c.replyChannel = make(chan chan string, 256)
-    weights := fmt.Sprintf("--weights=%s", networkPath)
-    c.Cmd = exec.Command("./lc0", weights)
-    c.Cmd.Args = append(c.Cmd.Args, args...)
-
-    log.Printf("Args: %v\n", c.Cmd.Args)
-
-    stdout, err := c.Cmd.StdoutPipe()
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    stderr, err := c.Cmd.StderrPipe()
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    go func() {
-        stdoutScanner := bufio.NewScanner(stdout)
-        for stdoutScanner.Scan() {
-            line := stdoutScanner.Text()
-            log.Printf("leela[%v] '%s'\n", playouts, line)
-            if strings.HasPrefix(line, "bestmove ") {
-                replyCh := <-c.replyChannel
-                replyCh <- strings.Split(line, " ")[1]
-            }
-        }
-    }()
-
-    go func() {
-        stderrScanner := bufio.NewScanner(stderr)
-        for stderrScanner.Scan() {
-            log.Printf("%s\n", stderrScanner.Text())
-        }
-    }()
-
-    c.openInput()
-
-    err = c.Cmd.Start()
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    io.WriteString(c.Input, "uci\n")
-    go func() {
-        for mr := range moveRequest {
-            replyChannel := mr.bestMove
-            if (replyChannel == nil) {
-                log.Printf("Got null reply channel, exiting\n")
-                break
-            }
-            c.replyChannel <- replyChannel
-
-            uciCmd := "position startpos"
-            if len(mr.moves) > 1 {
-                uciCmd += " moves " + mr.moves
-            }
-
-            log.Printf("Sending UCI cmd: '%s'\n", uciCmd)
-            io.WriteString(c.Input, uciCmd + " \n")
-            log.Println("go nodes " + playouts)
-            io.WriteString(c.Input, "go nodes " + playouts + " \n")
-        }
-        c.Cmd.Process.Kill()
-    }()
-}
 
 func getExtraParams() map[string]string {
     randToken := -17
@@ -178,44 +89,52 @@ func updateNetwork() (bool, string) {
     }
 
     if nextGame.Type == "train" {
-        networkPath, newNet, err := getNetwork(nextGame.Sha)
+        _, newNet, err := getNetwork(nextGame.Sha)
         if err != nil {
             log.Printf("getNetwork error %v\n", err)
             return false, ""
         }
         curNetId = nextGame.NetworkId
-        return newNet, networkPath
+        return newNet, nextGame.Sha
     }
     return false, ""
 }
 
-func leelaStart(moveRequest chan MoveRequest) {
+func launchLc0(p *UciEngine, l UciLauncher, sha string) {
+    path := filepath.Join(networksDir, sha)
+    weights := fmt.Sprintf("--weights=%s", path)
+    args := make([]string, 1)
+    args[0] = weights
+    p.launch(l.name(), args, "50", l.moveRequest())
+}
+
+func leelaStart(l UciLauncher) {
     httpClient = &http.Client{}
 
     go func() {
-        var p *CmdWrapper = nil
+        var p *UciEngine = nil
 
         sha := readNetworkSha()
         if sha != "" {
-            path := filepath.Join(networksDir, sha)
-            p = &CmdWrapper{}
-            p.launch(path, nil, "50", moveRequest)
+            p = &UciEngine{}
+            launchLc0(p, l, sha)
         } else {
             log.Printf("Can not find last local lc0 weights network\n")
         }
 
         for {
-            new_net, net_name := updateNetwork()
-            log.Printf("updateNetwork: new_net %v net_name %v\n", new_net, net_name)
-            if (new_net || p == nil) && net_name != "" {
+            new_net, net_sha := updateNetwork()
+            log.Printf("updateNetwork: new %v sha '%v'\n", new_net, net_sha)
+            if (new_net || p == nil) && net_sha != "" {
                 if p != nil {
                     mr := MoveRequest{moves: "", bestMove: nil}
-                    moveRequest <- mr
+                    l.moveRequest() <- mr
+                    p.Input.Close()
                 }
-                p = &CmdWrapper{}
-                p.launch(net_name, nil, "50", moveRequest)
+                p = &UciEngine{}
+                launchLc0(p, l, net_sha)
 
-                defer p.Input.Close()
+                //defer *p.Input.Close()
             }
             time.Sleep(12000 * time.Second)
         }

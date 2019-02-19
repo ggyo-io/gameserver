@@ -42,7 +42,7 @@ func (c *UCIPlayer) writePump() {
                 }
                 log.Printf("uciplayer '%s' moves '%s'\n", c.user, moves)
                 mr := MoveRequest{moves: moves, bestMove: c.bestMove}
-                c.hub.moveRequest <- mr
+                c.hub.robots[c.user].moveRequest() <- mr
 
             default:
                 log.Printf("uciplayer '%s' got Unknown command '%s'\n", c.user, string(mb))
