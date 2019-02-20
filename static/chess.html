@@ -145,15 +145,14 @@ $('#leftBtn').on('click', function() {
 $('#rightBtn').on('click', function() {
    if (browsing === false) { return; }
    browsingGame.move(game.history()[browsingGame.history().length]);
+   board.position(browsingGame.fen());
+   fenEl.html(browsingGame.fen());
+   pgnEl.html(browsingGame.pgn());
    if (browsingGame.history().length === game.history().length) {
      browsing = false;
      browsingGame = null;
      updateStatus();
-     return;
    }
-   board.position(browsingGame.fen());
-   fenEl.html(browsingGame.fen());
-   pgnEl.html(browsingGame.pgn());
 });
 
 if (window["WebSocket"]) {
