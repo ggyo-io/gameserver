@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -11,8 +14,13 @@ var (
 
 func InitDb() {
 	var err error
-    db, err = gorm.Open("mysql", "root:My17SQL8@/test?charset=utf8&parseTime=True&loc=Local")
+	dbpass := os.Getenv("DB_PASS")
+	connStr := "root@/test?charset=utf8&parseTime=True&loc=Local"
+	if dbpass != "" {
+		connStr = fmt.Sprintf("root:%s@/test?charset=utf8&parseTime=True&loc=Local", dbpass)
+	}
 
+	db, err = gorm.Open("mysql", connStr)
 	if err != nil {
 		println("ERRRR connecting")
 		panic(err)
