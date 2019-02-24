@@ -26,7 +26,7 @@ type Game struct {
 	Model
 	Type       GameType
 	GameTypeID string
-	State      string `sql:"size:1024"`
+	State      string `sql:"size:4096"`
 	Active     bool
 	White      string
 	Black      string
