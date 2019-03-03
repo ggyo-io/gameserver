@@ -1,3 +1,8 @@
+dbpass=
+ifdef DB_PASS
+dbpass=-p$(DB_PASS)
+endif
+
 default: all
 
 all:
@@ -13,5 +18,5 @@ deps:
 	go get -d ./...
 
 db:
-	mysqladmin -u root -f drop test
-	mysqladmin -u root -f create test
+	mysqladmin -u root $(dbpass) -f drop test
+	mysqladmin -u root $(dbpass) -f create test
