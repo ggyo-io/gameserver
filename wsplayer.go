@@ -6,10 +6,11 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
+	"strings"
 	"time"
-	"errors"
 
 	"github.com/gorilla/websocket"
 )
@@ -48,7 +49,7 @@ func (c *WSPlayer) openConnection() {
 }
 
 func (c *WSPlayer) closeConnection() {
-		c.conn.Close()
+	c.conn.Close()
 }
 
 func (c *WSPlayer) makeMove() (*Message, error) {
@@ -57,16 +58,16 @@ func (c *WSPlayer) makeMove() (*Message, error) {
 		if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 			log.Printf("error: %v", err)
 		}
-		return nil, errors.New("UnexpectedClose");
+		return nil, errors.New("UnexpectedClose")
 	}
 	log.Printf("wsplayer '%s' in makeMove() got message '%s'\n", c.user, string(mb))
 	var message Message
 	if err := json.Unmarshal(mb, &message); err != nil {
 		log.Print("ERROR: Unsupported message format")
-		return nil, errors.New("Unmarshal");
+		return nil, errors.New("Unmarshal")
 	}
 
-	return &message, nil;
+	return &message, nil
 }
 
 // writePump pumps messages from the hub to the websocket connection.
@@ -94,7 +95,7 @@ func (c *WSPlayer) writePump() {
 			if err != nil {
 				return
 			}
-			log.Printf("pumping up the WS, message: %s\n", string(message));
+			log.Printf("pumping up the WS, message: %s\n", string(message))
 			w.Write(message)
 
 			if err := w.Close(); err != nil {
@@ -113,11 +114,32 @@ func (c *WSPlayer) writePump() {
 			} else {
 				msg = Message{Cmd: "start", Color: "black", User: gameState.white.user}
 			}
-			if msgb, err := json.Marshal(&msg); err == nil {
-				c.send <- msgb
-			}
+			c.sendMessage(msg)
 		}
 	}
+}
+
+func (c *WSPlayer) sendState() {
+	position := c.gameState.chess.String()
+	// need to remove trailing * cuz it look like diz: \n1.e2e4 d7d5 2.b1c3 c7c6  *
+	position = strings.TrimSuffix(position, " *")
+	position = strings.TrimSpace(position)
+	msg := Message{Cmd: "resume", Color: c.color(), Params: position}
+	c.sendMessage(msg)
+}
+
+func (c *WSPlayer) sendMessage(msg Message) {
+	if msgb, err := json.Marshal(&msg); err == nil {
+		c.send <- msgb
+	}
+}
+
+func (c *WSPlayer) color() string {
+	color := "black"
+	if c.gameState.white == c.Player {
+		color = "white"
+	}
+	return color
 }
 
 func NewWSPlayer(hub *Hub, user string, conn *websocket.Conn) *WSPlayer {
@@ -140,9 +162,5 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(401)
 		return
 	}
-
-	wsplayer := NewWSPlayer(hub, user, conn)
-
-	go wsplayer.writePump()
-	go wsplayer.readPump()
+	hub.WSConnect(user, conn)
 }

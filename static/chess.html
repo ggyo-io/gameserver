@@ -155,7 +155,7 @@ $('#rightBtn').on('click', function() {
    }
 });
 
-if (window["WebSocket"]) {
+if (window["WebSocket"]) {    
     conn = new WebSocket("ws://" + document.location.host + "/ws");
     conn.onclose = function (evt) {
         statusEl.html("<b>Connection closed.</b>");
@@ -175,8 +175,24 @@ if (window["WebSocket"]) {
                 onSnapEnd: onSnapEnd
             };
             board = ChessBoard('board', cfg);
-
             updateStatus();
+        } else if (msg.Cmd == "resume") {
+            colorEl.html('You are ' + msg.Color);
+            console.log("on resume game load_pgn: " + game.load_pgn(msg.Params, {sloppy: true}));
+            var fen = game.fen();
+            console.log("fen is: " + fen);
+
+            var cfg = {
+                draggable: true,
+                position: fen,
+                orientation: msg.Color,
+                onDragStart: onDragStart,
+                onDrop: onDrop,
+                onSnapEnd: onSnapEnd
+            };
+            board = ChessBoard('board', cfg);
+            updateStatus();
+
         } else if (msg.Cmd == "move") {
             var from_sq = msg.Params[0] + msg.Params[1];
             var to_sq   = msg.Params[2] + msg.Params[3];
