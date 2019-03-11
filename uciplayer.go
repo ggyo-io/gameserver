@@ -3,6 +3,7 @@ package main
 import (
     "encoding/json"
     "log"
+    "errors"
 )
 
 type UCIPlayer struct {
@@ -12,7 +13,12 @@ type UCIPlayer struct {
 }
 
 func (c *UCIPlayer) makeMove() (*Message, error) {
-    bm := <-c.bestMove
+    bm, ok := <-c.bestMove
+    if !ok {
+         log.Printf("uciPlayer '%s' in makeMove(), closed besMove channel'\n", c.user)
+         return nil, errors.New("bestMove channel closed");
+    }
+
     log.Printf("uciPlayer '%s' in makeMove() got bestMove '%s'\n", c.user, bm)
     msg := Message{Cmd: "move", Params: bm}
 
@@ -33,6 +39,7 @@ func (c *UCIPlayer) writePump() {
                 log.Printf("uciplayer '%s' ERROR: Unsupported message format '%s'\n", c.user, string(mb))
                 return
             }
+
             switch message.Cmd {
             case "move":
                 moves   := ""
@@ -43,6 +50,11 @@ func (c *UCIPlayer) writePump() {
                 log.Printf("uciplayer '%s' moves '%s'\n", c.user, moves)
                 mr := MoveRequest{moves: moves, bestMove: c.bestMove}
                 c.hub.robots[c.user].moveRequest() <- mr
+
+            case "outcome":
+                log.Printf("uciplayer '%s' outcome '%s', return from writePump(), signal readPump to exit\n", c.user, message.Params)
+                close(c.bestMove)
+                return
 
             default:
                 log.Printf("uciplayer '%s' got Unknown command '%s'\n", c.user, string(mb))

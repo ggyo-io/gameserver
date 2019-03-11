@@ -29,7 +29,7 @@ type Hub struct {
 	unregister chan *Player
 
 	robots map[string]UciLauncher
-	users  map[string]*WSPlayer
+	//users  map[string]*WSPlayer
 }
 
 type GameState struct {
@@ -45,7 +45,7 @@ func newHub(rs ...UciLauncher) *Hub {
 		unregister: make(chan *Player),
 		clients:    make(map[*Player]bool),
 		robots:     make(map[string]UciLauncher),
-		users:      make(map[string]*WSPlayer),
+		//users:      make(map[string]*WSPlayer),
 	}
 
 	for _, r := range rs {
@@ -71,7 +71,7 @@ func (h *Hub) run() {
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 			}
-			//close(client.send)
+			client.onUnregister()
 		}
 	}
 }
@@ -81,7 +81,7 @@ func (h *Hub) matchUCI(client *Player, robotName string) {
 	go uciPlayer.writePump()
 	go uciPlayer.readPump()
 
-	game := Game{White: client.user, Black: uciPlayer.user}
+	game := Game{Active: true, White: client.user, Black: uciPlayer.user}
 	db.Create(&game)
 	gameState := GameState{game: &game, chess: chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})), white: client, black: uciPlayer.Player}
 	uciPlayer.gameState = &gameState
@@ -95,7 +95,7 @@ func (h *Hub) matchWs(client *Player) {
 			if k != client {
 				delete(h.clients, k)
 				log.Printf("Found match creating a game")
-				game := Game{White: k.user, Black: client.user}
+				game := Game{Active: true, White: k.user, Black: client.user}
 				db.Create(&game)
 				gameState := GameState{game: &game, chess: chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})), white: k, black: client}
 				client.match <- &gameState
@@ -110,14 +110,14 @@ func (h *Hub) matchWs(client *Player) {
 
 func (h *Hub) WSConnect(user string, conn *websocket.Conn) {
 	player := NewWSPlayer(h, user, conn)
-	if oldPlayer, ok := h.users[user]; ok {
-		log.Printf("found existing player for user: %s", user)
-		player = oldPlayer
-		player.conn = conn
-		player.sendState()
-	} else {
-		h.users[user] = player
+	//if oldPlayer, ok := h.users[user]; ok {
+	//	log.Printf("found existing player for user: %s", user)
+	//	player = oldPlayer
+	//	player.conn = conn
+	//	player.sendState()
+	//} else {
+		//h.users[user] = player
 		go player.writePump()
-	}
+	//}
 	go player.readPump()
 }

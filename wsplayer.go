@@ -106,7 +106,13 @@ func (c *WSPlayer) writePump() {
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
-		case gameState := <-c.match:
+		case gameState, ok := <-c.match:
+			if !ok {
+				// The hub closed the channel.
+				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				return
+			}
+
 			c.gameState = gameState
 			var msg Message
 			if gameState.white == c.Player {
@@ -132,14 +138,6 @@ func (c *WSPlayer) sendMessage(msg Message) {
 	if msgb, err := json.Marshal(&msg); err == nil {
 		c.send <- msgb
 	}
-}
-
-func (c *WSPlayer) color() string {
-	color := "black"
-	if c.gameState.white == c.Player {
-		color = "white"
-	}
-	return color
 }
 
 func NewWSPlayer(hub *Hub, user string, conn *websocket.Conn) *WSPlayer {

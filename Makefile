@@ -3,15 +3,16 @@ ifdef DB_PASS
 dbpass=-p$(DB_PASS)
 endif
 
-default: all
+.PHONY: all clean run deps db
+all: gameserver
 
-all:
+gameserver:
 	go build .
 
 clean:
-	rm gameserver
+	rm -f gameserver
 
-run:
+run: gameserver
 	./gameserver
 
 deps:
