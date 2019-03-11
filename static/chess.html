@@ -6,9 +6,10 @@
 </head>
 <body>
 <div id="board" style="float: left; margin-left: 5px; width: 400px"></div>
-<input type="button"   id="startBtn" value="Start" />
-<input type="button"   id="leftBtn" value="←" />
-<input type="button"   id="rightBtn" value="→" />
+<input type="button" id="startBtn" value="Start" />
+<input type="button" id="resignBtn" value="Resign" />
+<input type="button" id="leftBtn" value="←" />
+<input type="button" id="rightBtn" value="→" />
 <select id="foeSelection">
   <option value="lc0" selected>lc0</option>
   <option value="stockfish">stockfish</option>
@@ -79,6 +80,16 @@ var onSnapEnd = function() {
   }
 };
 
+var makeBoard = function(position, color) {
+  var cfg = {draggable: true, 
+    position: position,
+    orientation: color,
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onSnapEnd: onSnapEnd};
+  return ChessBoard('board', cfg);
+}
+
 var updateStatus = function() {
   var status = '';
 
@@ -128,6 +139,16 @@ $('#startBtn').on('click', function() {
     }
 });
 
+$('#resignBtn').on('click', function() {
+    if (conn) {
+        statusEl.html("Resign");
+        console.log("Resigned");
+        conn.send(JSON.stringify({Cmd: "resign"}));
+    } else {
+        statusEl.html("No connection to server");
+    }
+});
+
 $('#leftBtn').on('click', function() {
    if (browsing === false) {
      browsing = true;
@@ -166,33 +187,15 @@ if (window["WebSocket"]) {
         if (msg.Cmd == "start") {
             foeEl.html(msg.User);
             colorEl.html('You are ' + msg.Color)
-            var cfg = {
-                draggable: true,
-                position: 'start',
-                orientation: msg.Color,
-                onDragStart: onDragStart,
-                onDrop: onDrop,
-                onSnapEnd: onSnapEnd
-            };
-            board = ChessBoard('board', cfg);
+            board = makeBoard('start', msg.Color);
             updateStatus();
         } else if (msg.Cmd == "resume") {
             colorEl.html('You are ' + msg.Color);
             console.log("on resume game load_pgn: " + game.load_pgn(msg.Params, {sloppy: true}));
             var fen = game.fen();
             console.log("fen is: " + fen);
-
-            var cfg = {
-                draggable: true,
-                position: fen,
-                orientation: msg.Color,
-                onDragStart: onDragStart,
-                onDrop: onDrop,
-                onSnapEnd: onSnapEnd
-            };
-            board = ChessBoard('board', cfg);
+            board = makeBoard(fen, msg.Color);
             updateStatus();
-
         } else if (msg.Cmd == "move") {
             var from_sq = msg.Params[0] + msg.Params[1];
             var to_sq   = msg.Params[2] + msg.Params[3];
