@@ -58,7 +58,12 @@ func getUserName(r *http.Request) (userName string) {
 	userRef, _ := session.Values["user"]
 	switch userRef.(type) {
 	case string:
-		return userRef.(string)
+		var user User
+		name := userRef.(string)
+		if db.Where("name = ?", name).First(&user).RecordNotFound() {
+			return ""
+		}
+		return name
 	}
 	return ""
 }
