@@ -56,6 +56,9 @@ func (c *UCIPlayer) writePump() {
                 close(c.bestMove)
                 return
 
+            case "offer":
+                log.Printf("uciplayer '%s' ignore offer '%s'\n", c.user, message.Params)
+
             default:
                 log.Printf("uciplayer '%s' got Unknown command '%s'\n", c.user, string(mb))
             }

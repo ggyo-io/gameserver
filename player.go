@@ -101,25 +101,34 @@ func (c *Player) dispatch(message *Message) {
         }
 
     case "outcome":
+        chessGame := c.gameState.chess
         switch message.Params {
+        case "draw":
+           chessGame.Draw(chess.DrawOffer)
         case "resign":
-           chessGame := c.gameState.chess
            if c.color() == "black" {
                chessGame.Resign(chess.Black)
            } else {
                chessGame.Resign(chess.White)
            }
-           game := c.gameState.game
-           game.State = chessGame.String()
-           game.Active = false
-           db.Save(game)
-           if msgb, err := json.Marshal(message); err == nil {
-               log.Printf("player '%s' sends to '%s' message '%s'\n", c.user, c.foe().user, string(msgb))
-               c.foe().send <- msgb
-           }
-        default:
+       default:
             log.Printf("Unknown outcome command params %s\n", message)
         } // switch outcome command params
+
+        game := c.gameState.game
+        game.State = chessGame.String()
+        game.Active = false
+        db.Save(game)
+        if msgb, err := json.Marshal(message); err == nil {
+            log.Printf("player '%s' sends to '%s' message '%s'\n", c.user, c.foe().user, string(msgb))
+            c.foe().send <- msgb
+        }
+
+    case "offer":
+        if msgb, err := json.Marshal(message); err == nil {
+            log.Printf("player '%s' sends an offer to '%s' message '%s'\n", c.user, c.foe().user, string(msgb))
+            c.foe().send <- msgb
+        }
 
     default:
         log.Printf("Unknown command %s\n", message)

@@ -3,12 +3,14 @@
 <head>
 <title>Chess</title>
 <link rel="stylesheet" href="/static/css/chessboard-0.3.0.min.css" />
+<link rel="stylesheet" href="/static/css/chessgame.css" />
 </head>
 
 <body>
 <div id="board" style="float: left; margin-left: 5px; width: 400px"></div>
 <input type="button" id="startBtn" value="Start" />
 <input type="button" id="resignBtn" value="Resign" />
+<input type="button" id="drawBtn" value="Draw" />
 <input type="button" id="leftBtn" value="←" />
 <input type="button" id="rightBtn" value="→" />
 <select id="foeSelection">
@@ -22,6 +24,13 @@
 <p>PGN: <span id="pgn"></span></p>
 <p>Opponent: <span id="foe"></span></p>
 <p>Color: <span id="color"></span></p>
+<div id="modalDiv" class="modal">
+  <div class="modal-content">
+    <p>Opponent offer: <span id="offer"></span></p>
+    <span id="offerYes" class="close-yes">✓</span>
+    <span id="offerNo"  class="close-no">×</span>
+  </div>
+</div>
 
 <script src="/static/js/json3.min.js"></script>
 <script src="/static/js/jquery-1.10.1.min.js"></script>

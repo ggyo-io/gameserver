@@ -1,5 +1,16 @@
-var board,
-  game,
+var makeBoard = function(position, color) {
+  var cfg = {draggable: true,
+    position: position,
+    orientation: color,
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onSnapEnd: onSnapEnd};
+  return ChessBoard('board', cfg);
+}
+
+var
+  board = makeBoard('start', 'white'),
+  game = null,
   last_move = ""
   browsing = false,
   browsingGame = new Chess(),
@@ -7,8 +18,12 @@ var board,
   gameIDEl = $('#gameid'),
   fenEl = $('#fen'),
   foeEl = $('#foe'),
-  pgnEl = $('#pgn');
-  colorEl = $('#color');
+  pgnEl = $('#pgn'),
+  colorEl = $('#color'),
+  offerEl = $('#offer');
+
+var offerParams = null;
+var modalEl = document.getElementById('modalDiv');
 
 // do not pick up pieces if the game is over
 // only pick up pieces for the side to move
@@ -52,16 +67,6 @@ var onSnapEnd = function() {
     conn.send(JSON.stringify({Cmd:'move', Params: last_move}));
   }
 };
-
-var makeBoard = function(position, color) {
-  var cfg = {draggable: true, 
-    position: position,
-    orientation: color,
-    onDragStart: onDragStart,
-    onDrop: onDrop,
-    onSnapEnd: onSnapEnd};
-  return ChessBoard('board', cfg);
-}
 
 var updateStatus = function() {
   var status = '';
@@ -128,6 +133,12 @@ $('#resignBtn').on('click', function() {
     }
 });
 
+$('#drawBtn').on('click', function() {
+    statusEl.html("You have offered a draw, waiting for response");
+    console.log("Draw offer");
+    conn.send(JSON.stringify({Cmd: "offer", Params: "draw"}));
+});
+
 $('#leftBtn').on('click', function() {
    if (browsing === false) {
      browsing = true;
@@ -142,6 +153,7 @@ $('#leftBtn').on('click', function() {
    pgnEl.html(browsingGame.pgn());
 
 });
+
 $('#rightBtn').on('click', function() {
    if (browsing === false) { return; }
    browsingGame.move(game.history()[browsingGame.history().length]);
@@ -153,6 +165,19 @@ $('#rightBtn').on('click', function() {
      browsingGame = null;
      updateStatus();
    }
+});
+
+$('#offerYes').on('click', function() {
+   console.log("Offer accepted: " + offerParams);
+   conn.send(JSON.stringify({Cmd: "outcome", Params: offerParams}));
+   statusEl.html("You have accepted '" + offerParams + "', click the Start button for a new game");
+   game = null;
+
+   modalEl.style.display = "none"; // make invisible
+});
+
+$('#offerNo').on('click', function() {
+   modalEl.style.display = "none"; // make invisible
 });
 
 if (window["WebSocket"]) {    
@@ -200,9 +225,13 @@ if (window["WebSocket"]) {
             updateStatus();
             board.position(game.fen());
         } else if (msg.Cmd == "outcome") {
-            statusEl.html("Your opponent set outcome: '" + msg.Params + "', click the Start button for a new game");
+            statusEl.html("Your opponent have accepted: '" + msg.Params + "', click the Start button for a new game");
             console.log("opponent outcome '" + msg.Params + "'");
             game = null;
+        } else if (msg.Cmd == "offer") {
+            offerParams = msg.Params;
+            offerEl.html(offerParams);
+            modalEl.style.display = "block"; // make visible
         } else {
             console.log("Unknown command: '" + msg.Cmd + "'");
         }
