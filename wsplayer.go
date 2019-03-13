@@ -115,12 +115,7 @@ func (c *WSPlayer) writePump() {
 			}
 
 			c.gameState = gameState
-			var msg Message
-			if gameState.white == c.Player {
-				msg = Message{Cmd: "start", Color: "white", User: gameState.black.user}
-			} else {
-				msg = Message{Cmd: "start", Color: "black", User: gameState.white.user}
-			}
+			msg := Message{Cmd: "start", Color: c.color(), User: c.foe().user, Params: c.gameState.game.ID}
 			c.sendMessage(msg)
 		}
 	}

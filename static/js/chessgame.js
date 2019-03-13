@@ -4,6 +4,7 @@ var board,
   browsing = false,
   browsingGame = new Chess(),
   statusEl = $('#status'),
+  gameIDEl = $('#gameid'),
   fenEl = $('#fen'),
   foeEl = $('#foe'),
   pgnEl = $('#pgn');
@@ -164,6 +165,7 @@ if (window["WebSocket"]) {
         var msg = JSON.parse(evt.data);
         if (msg.Cmd == "start") {
             foeEl.html(msg.User);
+            gameIDEl.html(msg.Params);
             colorEl.html('You are ' + msg.Color)
             board = makeBoard('start', msg.Color);
             game  = new Chess();
