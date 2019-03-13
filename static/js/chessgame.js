@@ -13,7 +13,7 @@ var board,
 // do not pick up pieces if the game is over
 // only pick up pieces for the side to move
 var onDragStart = function(source, piece, position, orientation) {
-  if (browsing == true || game.game_over() === true ||
+  if (browsing == true || ( game && game.game_over() === true ) ||
       (game.turn() === 'w' && board.orientation().search(/^b/) !== -1) ||
       (game.turn() === 'b' && board.orientation().search(/^w/) !== -1) ||
       (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
@@ -199,6 +199,12 @@ if (window["WebSocket"]) {
             console.log("game fen: " + game.fen())
             updateStatus();
             board.position(game.fen());
+        } else if (msg.Cmd == "outcome") {
+            statusEl.html("Your opponent set outcome: '" + msg.Params + "', click the Start button for a new game");
+            console.log("opponent outcome '" + msg.Params + "'");
+            game = null;
+        } else {
+            console.log("Unknown command: '" + msg.Cmd + "'");
         }
     };
 } else {
