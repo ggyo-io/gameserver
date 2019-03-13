@@ -58,7 +58,7 @@ func (c *WSPlayer) makeMove() (*Message, error) {
 		if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 			log.Printf("error: %v", err)
 		}
-		return nil, errors.New("UnexpectedClose")
+		return nil, errors.New("UnexpectedClose on WebSocket connection")
 	}
 	log.Printf("wsplayer '%s' in makeMove() got message '%s'\n", c.user, string(mb))
 	var message Message
@@ -80,6 +80,7 @@ func (c *WSPlayer) writePump() {
 	defer func() {
 		ticker.Stop()
 		c.conn.Close()
+		log.Printf("wsplayer '%s' returns from writePump()\n", c.user)
 	}()
 	for {
 		select {
