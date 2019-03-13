@@ -1,7 +1,7 @@
 var board,
+  game,
   last_move = ""
   browsing = false,
-  game = new Chess(),
   browsingGame = new Chess(),
   statusEl = $('#status'),
   fenEl = $('#fen'),
@@ -97,6 +97,11 @@ var updateStatus = function() {
 
 
 $('#startBtn').on('click', function() {
+    if (game && game.game_over() != true) {
+        statusEl.html("Ignore start, Move! The game is not over yet, resign if you'd like...");
+        return;
+    }
+
     if (board) {
         board.start;
     }
@@ -113,9 +118,10 @@ $('#startBtn').on('click', function() {
 
 $('#resignBtn').on('click', function() {
     if (conn) {
-        statusEl.html("Resign");
+        statusEl.html("You have resigned, click the Start button for a new game");
         console.log("Resigned");
         conn.send(JSON.stringify({Cmd: "outcome", Params: "resign"}));
+        game = null;
     } else {
         statusEl.html("No connection to server");
     }
@@ -160,9 +166,11 @@ if (window["WebSocket"]) {
             foeEl.html(msg.User);
             colorEl.html('You are ' + msg.Color)
             board = makeBoard('start', msg.Color);
+            game  = new Chess();
             updateStatus();
         } else if (msg.Cmd == "resume") {
             colorEl.html('You are ' + msg.Color);
+            game  = new Chess();
             console.log("on resume game load_pgn: " + game.load_pgn(msg.Params, {sloppy: true}));
             var fen = game.fen();
             console.log("fen is: " + fen);
