@@ -71,6 +71,7 @@ func (h *Hub) run() {
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 			}
+			client.sendToFoe(&Message{Cmd: "disconnect"})
 			client.onUnregister()
 		}
 	}
@@ -116,8 +117,8 @@ func (h *Hub) WSConnect(user string, conn *websocket.Conn) {
 	//	player.conn = conn
 	//	player.sendState()
 	//} else {
-		//h.users[user] = player
-		go player.writePump()
+	//h.users[user] = player
+	go player.writePump()
 	//}
 	go player.readPump()
 }

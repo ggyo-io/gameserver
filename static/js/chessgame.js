@@ -239,6 +239,8 @@ if (window["WebSocket"]) {
             offerParams = msg.Params;
             offerEl.html(offerParams);
             modalEl.style.display = "block"; // make visible
+        } else if (msg.Cmd == "disconnect") {
+            statusEl.html("Your opponent have disconnected.");
         } else {
             console.log("Unknown command: '" + msg.Cmd + "'");
         }
