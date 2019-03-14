@@ -121,4 +121,8 @@ func (h *Hub) WSConnect(user string, conn *websocket.Conn) {
 	go player.writePump()
 	//}
 	go player.readPump()
+	if user != "" {
+		player.sendMessage(Message{Cmd: "login", User: user})
+	}
+
 }

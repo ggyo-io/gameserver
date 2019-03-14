@@ -241,6 +241,12 @@ if (window["WebSocket"]) {
             modalEl.style.display = "block"; // make visible
         } else if (msg.Cmd == "disconnect") {
             statusEl.html("Your opponent have disconnected.");
+        } else if (msg.Cmd == "must_login") {
+            statusEl.html("<b>Please login first!</b>");
+        } else if (msg.Cmd == "login") {
+            $('#loginHeader').hide();
+            $('#username').html(msg.User);
+            $('#userHeader').show();
         } else {
             console.log("Unknown command: '" + msg.Cmd + "'");
         }

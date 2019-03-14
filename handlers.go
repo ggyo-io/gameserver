@@ -12,29 +12,9 @@ var (
 	store = sessions.NewCookieStore(key)
 )
 
-/*
-Test with this curl command:
-
-curl -H "Content-Type: application/json" http://localhost:8383/
-
-*/
-func Index(w http.ResponseWriter, r *http.Request) {
-	data := IndexData{
-		UserName: "Anonnymous",
-		IsAnnon:  true,
-	}
-	user := getUserName(r)
-	if user != "" {
-		data.UserName = user
-		data.IsAnnon = false
-	}
-	templates["index"].Execute(w, data)
-}
-
 func Login(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("email")
 	pass := r.FormValue("password")
-	redirectTarget := "/"
 	if name != "" && pass != "" {
 		var user User
 		if db.Where("name = ?", name).First(&user).RecordNotFound() {
@@ -43,7 +23,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 		setSession(name, w, r)
 	}
-	http.Redirect(w, r, redirectTarget, 302)
+	http.Redirect(w, r, "/", 302)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {

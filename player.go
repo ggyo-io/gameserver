@@ -61,7 +61,11 @@ func (c *Player) readPump() {
 			log.Printf("player '%s' readPump breaks the loop, makeMove error: '%v'\n", c.user, err)
 			break
 		}
-		err = c.dispatch(message)
+		if c.user == "" {
+			c.sendMessage(Message{Cmd: "must_login"})
+		} else {
+			err = c.dispatch(message)
+		}
 		if err != nil {
 			log.Printf("player '%s' readPump breaks the loop, dispatch error: '%v'\n", c.user, err)
 			break
@@ -174,4 +178,10 @@ func (c *Player) openConnection() {
 }
 
 func (c *Player) closeConnection() {
+}
+
+func (c *Player) sendMessage(msg Message) {
+	if msgb, err := json.Marshal(&msg); err == nil {
+		c.send <- msgb
+	}
 }

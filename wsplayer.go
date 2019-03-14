@@ -46,6 +46,11 @@ func (c *WSPlayer) openConnection() {
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+
+	if c.user != "" {
+		c.sendMessage(Message{Cmd: "login", User: c.user})
+	}
+
 }
 
 func (c *WSPlayer) closeConnection() {
@@ -130,12 +135,6 @@ func (c *WSPlayer) sendState() {
 	c.sendMessage(msg)
 }
 
-func (c *WSPlayer) sendMessage(msg Message) {
-	if msgb, err := json.Marshal(&msg); err == nil {
-		c.send <- msgb
-	}
-}
-
 func NewWSPlayer(hub *Hub, user string, conn *websocket.Conn) *WSPlayer {
 	player := &Player{hub: hub, user: user, send: make(chan []byte, 256), match: make(chan *GameState)}
 	client := &WSPlayer{Player: player, conn: conn}
@@ -152,9 +151,5 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := getUserName(r)
-	if user == "" {
-		w.WriteHeader(401)
-		return
-	}
 	hub.WSConnect(user, conn)
 }

@@ -1,42 +1,58 @@
 <DOCTYPE html>
 <html lang="en">
 <head>
-<title>Chess</title>
-<link rel="stylesheet" href="/static/css/chessboard-0.3.0.min.css" />
-<link rel="stylesheet" href="/static/css/chessgame.css" />
+  <title>Chess</title>
+  <link rel="stylesheet" href="/static/css/chessboard-0.3.0.min.css" />
+  <link rel="stylesheet" href="/static/css/chessgame.css" />
 </head>
-
 <body>
-<div id="board" style="float: left; margin-left: 5px; width: 400px"></div>
-<input type="button" id="startBtn" value="Start" />
-<input type="button" id="resignBtn" value="Resign" />
-<input type="button" id="drawBtn" value="Draw" />
-<input type="button" id="leftBtn" value="←" />
-<input type="button" id="rightBtn" value="→" />
-<select id="foeSelection">
-  <option value="lc0" selected>lc0</option>
-  <option value="stockfish">stockfish</option>
-  <option value="human">human</option>
-</select>
-<p>Status: <span id="status"></span></p>
-<p>Game ID: <span id="gameid"></span></p>
-<p>FEN: <span id="fen"></span></p>
-<p>PGN: <span id="pgn"></span></p>
-<p>Opponent: <span id="foe"></span></p>
-<p>Color: <span id="color"></span></p>
-<div id="modalDiv" class="modal">
-  <div class="modal-content">
-    <p>Opponent offer: <span id="offer"></span></p>
-    <span id="offerYes" class="close-yes">✓</span>
-    <span id="offerNo"  class="close-no">×</span>
+  <div class="box">
+    <h2 id="loginHeader">
+      <form id="login" action="/login" method="POST">
+        <input type="email" id="email" name="email" placeholder="email"/>
+        <input type="password" id="password" name="password" placeholder="password"/>
+        <input type="submit" id="loginBtn" value="Log In" />
+      </form>
+    </h2>
+    <h2 id="userHeader">
+      <span>Hello, <i id="username">Vasia</i>     
+        <form id="logout" action="/logout" method="GET">
+          <input type="submit" id="logoutBtn" value="Sign Out" />
+        </form>
+      </span>
+    </h2>
+    <p>    
+      <div id="board" style="float: left; margin-left: 5px; width: 400px"></div>
+      <input type="button" id="startBtn" value="Start" />
+      <input type="button" id="resignBtn" value="Resign" />
+      <input type="button" id="drawBtn" value="Draw" />
+      <input type="button" id="leftBtn" value="←" />
+      <input type="button" id="rightBtn" value="→" />
+      <select id="foeSelection">
+        <option value="lc0" selected>lc0</option>
+        <option value="stockfish">stockfish</option>
+        <option value="human">human</option>
+      </select>
+      <p>Status: <span id="status"></span></p>
+      <p>Game ID: <span id="gameid"></span></p>
+      <p>FEN: <span id="fen"></span></p>
+      <p>PGN: <span id="pgn"></span></p>
+      <p>Opponent: <span id="foe"></span></p>
+      <p>Color: <span id="color"></span></p>
+      <div id="modalDiv" class="modal">
+        <div class="modal-content">
+          <p>Opponent offer: <span id="offer"></span></p>
+          <span id="offerYes" class="close-yes">✓</span>
+          <span id="offerNo"  class="close-no">×</span>
+        </div>
+      </div>
+    </p>
   </div>
-</div>
-
-<script src="/static/js/json3.min.js"></script>
-<script src="/static/js/jquery-1.10.1.min.js"></script>
-<script src="/static/js/chessboard-0.3.0.min.js"></script>
-<script src="/static/js/chess.min.js"></script>
-<script src="/static/js/chessgame.js"></script>
+  <script src="/static/js/json3.min.js"></script>
+  <script src="/static/js/jquery-1.10.1.min.js"></script>
+  <script src="/static/js/chessboard-0.3.0.min.js"></script>
+  <script src="/static/js/chess.min.js"></script>
+  <script src="/static/js/chessgame.js"></script>
 
 </body>
 </html>
