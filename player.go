@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"errors"
+	"log"
 
 	"github.com/notnil/chess"
 )
@@ -15,7 +15,7 @@ type PlayerI interface {
 	openConnection()
 	closeConnection()
 	makeMove() (*Message, error)
-	dispatch(message *Message) (error)
+	dispatch(message *Message) error
 }
 
 type Player struct {
@@ -35,6 +35,9 @@ type Player struct {
 }
 
 func (c *Player) foe() *Player {
+	if c.gameState == nil {
+		return nil
+	}
 	if c.gameState.black == c {
 		return c.gameState.white
 	}
@@ -80,17 +83,21 @@ func SafeSendBytes(ch chan []byte, value []byte) (closed bool) {
 	return false // <=> closed = false; return
 }
 
-func (c *Player) sendToFoe(message *Message) (bool) {
+func (c *Player) sendToFoe(message *Message) bool {
+	if foe := c.foe(); foe == nil {
+		return true
+	}
+
 	if msgb, err := json.Marshal(message); err == nil {
 		log.Printf("player '%s' sends to '%s' message '%s'\n", c.user, c.foe().user, string(msgb))
-		return SafeSendBytes(c.foe().send,  msgb)
+		return SafeSendBytes(c.foe().send, msgb)
 	}
 
 	return true // json.Marshal error
 }
 
 /* recieve messages from player (web socket or uci) and forward moves to the foe side */
-func (c *Player) dispatch(message *Message) (error){
+func (c *Player) dispatch(message *Message) error {
 	switch message.Cmd {
 	case "start":
 		log.Printf("player '%s' got start command, params '%s' request to register at hub\n", c.user, message.Params)
@@ -122,7 +129,7 @@ func (c *Player) dispatch(message *Message) (error){
 		// Record the move in DB
 		game.State = chessGame.String()
 		db.Save(game)
-		if (c.sendToFoe(message)) {
+		if c.sendToFoe(message) {
 			return errors.New("c.sendToFoe error")
 		}
 	case "outcome":
@@ -144,11 +151,11 @@ func (c *Player) dispatch(message *Message) (error){
 		game.State = chessGame.String()
 		game.Active = false
 		db.Save(game)
-		if (c.sendToFoe(message)) {
+		if c.sendToFoe(message) {
 			return errors.New("c.sendToFoe error")
 		}
 	case "offer":
-		if (c.sendToFoe(message)) {
+		if c.sendToFoe(message) {
 			return errors.New("c.sendToFoe error")
 		}
 	default:
