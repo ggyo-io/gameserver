@@ -31,7 +31,7 @@ func (c *UciEngine) openInput() {
 }
 
 /* see https://go101.org/article/channel-closing.html */
-func SafeSend(ch chan string, value string) (closed bool) {
+func SafeSendString(ch chan string, value string) (closed bool) {
     defer func() {
         if recover() != nil {
             closed = true
@@ -68,7 +68,7 @@ func (c *UciEngine) launch(name string, args []string, playouts string, moveRequ
             if strings.HasPrefix(line, "bestmove ") {
                 replyCh := <-c.replyChannel
                 move := strings.Split(line, " ")[1]
-                if SafeSend(replyCh,  move) {
+                if SafeSendString(replyCh,  move) {
                      log.Printf("%s reply channel was closed for move '%s'\n", name, move);
                 }
             }

@@ -1,34 +1,12 @@
-var makeBoard = function(position, color) {
-  var cfg = {draggable: true,
-    position: position,
-    orientation: color,
-    onDragStart: onDragStart,
-    onDrop: onDrop,
-    onSnapEnd: onSnapEnd};
-  return ChessBoard('board', cfg);
-}
-
-var
-  board = makeBoard('start', 'white'),
-  game = null,
-  last_move = ""
-  browsing = false,
-  browsingGame = new Chess(),
-  statusEl = $('#status'),
-  gameIDEl = $('#gameid'),
-  fenEl = $('#fen'),
-  foeEl = $('#foe'),
-  pgnEl = $('#pgn'),
-  colorEl = $('#color'),
-  offerEl = $('#offer');
-
-var offerParams = null;
-var modalEl = document.getElementById('modalDiv');
 
 // do not pick up pieces if the game is over
 // only pick up pieces for the side to move
 var onDragStart = function(source, piece, position, orientation) {
-  if (browsing == true || ( game && game.game_over() === true ) ||
+  console.log("onDragStart game " + game + " browsing " + browsing);
+  if (game == null) { return false; }
+
+  if ( browsing == true ||
+       game.game_over() === true ||
       (game.turn() === 'w' && board.orientation().search(/^b/) !== -1) ||
       (game.turn() === 'b' && board.orientation().search(/^w/) !== -1) ||
       (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
@@ -101,6 +79,32 @@ var updateStatus = function() {
   pgnEl.html(game.pgn());
 };
 
+var makeBoard = function(position, color) {
+  var cfg = {draggable: true,
+    position: position,
+    orientation: color,
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onSnapEnd: onSnapEnd};
+  return ChessBoard('board', cfg);
+}
+
+var
+  game  = null,
+  board = makeBoard('start', 'white'),
+  last_move = ""
+  browsing = false,
+  browsingGame = new Chess(),
+  statusEl = $('#status'),
+  gameIDEl = $('#gameid'),
+  fenEl = $('#fen'),
+  foeEl = $('#foe'),
+  pgnEl = $('#pgn'),
+  colorEl = $('#color'),
+  offerEl = $('#offer');
+
+var offerParams = null;
+var modalEl = document.getElementById('modalDiv');
 
 $('#startBtn').on('click', function() {
     if (game && game.game_over() != true) {
@@ -140,6 +144,8 @@ $('#drawBtn').on('click', function() {
 });
 
 $('#leftBtn').on('click', function() {
+   if (game == null) { return; }
+
    if (browsing === false) {
      browsing = true;
      statusEl.html("Browsing");
@@ -155,6 +161,7 @@ $('#leftBtn').on('click', function() {
 });
 
 $('#rightBtn').on('click', function() {
+   if (game == null) { return; }
    if (browsing === false) { return; }
    browsingGame.move(game.history()[browsingGame.history().length]);
    board.position(browsingGame.fen());
