@@ -119,9 +119,10 @@ $('#startBtn').on('click', function() {
 
     if (conn) {
         statusEl.html("Waiting for a match...");
-        var e = document.getElementById("foeSelection"); var startParam = e.options[e.selectedIndex].value
-        console.log("foe startParam: " + startParam);
-        conn.send(JSON.stringify({Cmd: "start", Params: startParam}));
+        var el1 = document.getElementById("foeSelection");   var foeParam   = el1.options[el1.selectedIndex].value
+        var el2 = document.getElementById("colorSelection"); var colorParam = el2.options[el2.selectedIndex].value
+        console.log("start with foe : " + foeParam + " color " + colorParam);
+        conn.send(JSON.stringify({Cmd: "start", Params: foeParam, Color: colorParam}));
     } else {
         statusEl.html("No connection to server");
     }

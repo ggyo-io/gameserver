@@ -105,7 +105,7 @@ func (c *Player) dispatch(message *Message) error {
 
 	if message.Cmd == "start" {
 		log.Printf("player '%s' got start command, params '%s' request to register at hub\n", c.user, message.Params)
-		rr := RegisterRequest{player: c, params: message.Params}
+        rr := RegisterRequest{player: c, foe: message.Params, color: message.Color}
 		c.hub.register <- rr
 		return nil
 	}
