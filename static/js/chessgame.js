@@ -248,9 +248,14 @@ if (window["WebSocket"]) {
         } else if (msg.Cmd == "must_login") {
             statusEl.html("<b>Please login first!</b>");
         } else if (msg.Cmd == "login") {
-            $('#loginHeader').hide();
-            $('#username').html(msg.User);
-            $('#userHeader').show();
+            if (msg.User == "") {
+                $('#userHeader').css('display', 'none');
+                $('#loginHeader').css('display', 'inline');
+            } else {
+                $('#loginHeader').css('display', 'none');
+                $('#username').html(msg.User);
+                $('#userHeader').css('display', 'inline');
+            }
         } else {
             console.log("Unknown command: '" + msg.Cmd + "'");
         }

@@ -44,14 +44,10 @@ type WSPlayer struct {
 
 func (c *WSPlayer) openConnection() {
 	log.Printf("func (c *WSPlayer) openConnection()")
+	// TODO: this code never executes
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
-
-	if c.user != "" {
-		c.sendMessage(Message{Cmd: "login", User: c.user})
-	}
-
 }
 
 func (c *WSPlayer) closeConnection() {

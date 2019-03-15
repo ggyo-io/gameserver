@@ -83,53 +83,53 @@ func (h *Hub) matchUCI(rq RegisterRequest) {
 	go uciPlayer.writePump()
 	go uciPlayer.readPump()
 
-    var whitePlayer, blackPlayer *Player
+	var whitePlayer, blackPlayer *Player
 
-    whitePlayer = rq.player
-    blackPlayer = uciPlayer.Player
+	whitePlayer = rq.player
+	blackPlayer = uciPlayer.Player
 
-    if rq.color == "black" {
-        whitePlayer = uciPlayer.Player
-        blackPlayer = rq.player
-    }
+	if rq.color == "black" {
+		whitePlayer = uciPlayer.Player
+		blackPlayer = rq.player
+	}
 
 	game := Game{Active: true, White: whitePlayer.user, Black: blackPlayer.user}
 	db.Create(&game)
-    gameState := GameState{game: &game, chess: chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})), white: whitePlayer, black: blackPlayer}
+	gameState := GameState{game: &game, chess: chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})), white: whitePlayer, black: blackPlayer}
 	uciPlayer.gameState = &gameState
 	rq.player.match <- &gameState
-    if (uciPlayer.Player == whitePlayer) {
-      uciPlayer.sendMessage(Message{Cmd: "move"})
-    }
+	if uciPlayer.Player == whitePlayer {
+		uciPlayer.sendMessage(Message{Cmd: "move"})
+	}
 }
 
 func matchColor(c1, c2 string) bool {
-  if c1 == "any" || c2 == "any" {
-    return true
-  }
+	if c1 == "any" || c2 == "any" {
+		return true
+	}
 
-  if c1 != c2 {
-    return true
-  }
+	if c1 != c2 {
+		return true
+	}
 
-  return false
+	return false
 }
 
 func choosePlayersColors(rq1, rq2 RegisterRequest) (white, black *Player) {
-  if !matchColor(rq1.color, rq2.color) {
-    log.Fatalf("can not match color rq1 '%v' rq2 '%v'\n", rq1, rq2)
-    return nil, nil
-  }
-  if (rq1.color == "any") {
-    return rq2.player, rq1.player
-  }
-  if (rq2.color == "any") {
-    return rq1.player, rq2.player
-  }
-  if (rq2.color == "white") {
-    return rq2.player, rq1.player
-  }
-  return rq1.player, rq2.player
+	if !matchColor(rq1.color, rq2.color) {
+		log.Fatalf("can not match color rq1 '%v' rq2 '%v'\n", rq1, rq2)
+		return nil, nil
+	}
+	if rq1.color == "any" {
+		return rq2.player, rq1.player
+	}
+	if rq2.color == "any" {
+		return rq1.player, rq2.player
+	}
+	if rq2.color == "white" {
+		return rq2.player, rq1.player
+	}
+	return rq1.player, rq2.player
 }
 
 func (h *Hub) matchWs(rq RegisterRequest) {
@@ -138,7 +138,7 @@ func (h *Hub) matchWs(rq RegisterRequest) {
 		for k := range h.clients {
 			if k != rq.player && matchColor(rq.color, h.clients[k].color) {
 				log.Printf("Found match creating a game")
-                white, black := choosePlayersColors(rq, h.clients[k])
+				white, black := choosePlayersColors(rq, h.clients[k])
 				game := Game{Active: true, White: white.user, Black: black.user}
 				db.Create(&game)
 				gameState := GameState{game: &game, chess: chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})), white: white, black: black}
@@ -154,6 +154,7 @@ func (h *Hub) matchWs(rq RegisterRequest) {
 }
 
 func (h *Hub) WSConnect(user string, conn *websocket.Conn) {
+	log.Printf("wsconnect %s\n", user)
 	player := NewWSPlayer(h, user, conn)
 	//if oldPlayer, ok := h.users[user]; ok {
 	//	log.Printf("found existing player for user: %s", user)
@@ -165,8 +166,6 @@ func (h *Hub) WSConnect(user string, conn *websocket.Conn) {
 	go player.writePump()
 	//}
 	go player.readPump()
-	if user != "" {
-		player.sendMessage(Message{Cmd: "login", User: user})
-	}
+	player.sendMessage(Message{Cmd: "login", User: player.user})
 
 }
