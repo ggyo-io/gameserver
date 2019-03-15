@@ -105,6 +105,7 @@ var
 
 var offerParams = null;
 var modalEl = document.getElementById('modalDiv');
+statusEl.html("Choose opponent and click the Start button for a new game");
 
 $('#startBtn').on('click', function() {
     if (game && game.game_over() != true) {
@@ -127,6 +128,7 @@ $('#startBtn').on('click', function() {
 });
 
 $('#resignBtn').on('click', function() {
+    if (game == null) { return; }
     if (conn) {
         statusEl.html("You have resigned, click the Start button for a new game");
         console.log("Resigned");
@@ -138,6 +140,7 @@ $('#resignBtn').on('click', function() {
 });
 
 $('#drawBtn').on('click', function() {
+    if (game == null) { return; }
     statusEl.html("You have offered a draw, waiting for response");
     console.log("Draw offer");
     conn.send(JSON.stringify({Cmd: "offer", Params: "draw"}));

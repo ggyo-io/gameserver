@@ -102,11 +102,20 @@ func (c *Player) sendToFoe(message *Message) bool {
 
 /* recieve messages from player (web socket or uci) and forward moves to the foe side */
 func (c *Player) dispatch(message *Message) error {
-	switch message.Cmd {
-	case "start":
+
+	if message.Cmd == "start" {
 		log.Printf("player '%s' got start command, params '%s' request to register at hub\n", c.user, message.Params)
 		rr := RegisterRequest{player: c, params: message.Params}
 		c.hub.register <- rr
+		return nil
+	}
+
+	if c.gameState == nil {
+		log.Printf("player '%s' ignore '%s' command, gameState == nil\n", c.user, message.Cmd)
+		return nil
+	}
+
+	switch message.Cmd {
 	case "move":
 		chessGame := c.gameState.chess
 		game := c.gameState.game
