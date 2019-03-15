@@ -184,6 +184,7 @@ func (c *Player) onUnregister() {
 }
 
 func (c *Player) openConnection() {
+	log.Printf("func (c *Player) openConnection()")
 }
 
 func (c *Player) closeConnection() {

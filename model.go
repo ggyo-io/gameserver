@@ -15,21 +15,12 @@ type Model struct {
 	//DeletedAt *time.Time `sql:"index"`
 }
 
-type GameType struct {
-	Model
-	Name        string `sql:"index"`
-	Description string
-	GameModel   string
-}
-
 type Game struct {
 	Model
-	Type       GameType
-	GameTypeID string
-	State      string `sql:"size:4096"`
-	Active     bool
-	White      string
-	Black      string
+	State  string `sql:"size:4096"`
+	Active bool
+	White  string
+	Black  string
 }
 
 type User struct {

@@ -28,15 +28,6 @@ func InitDb() {
 	db.LogMode(true)
 
 	// Migrate the schema
-	db.AutoMigrate(&GameType{})
 	db.AutoMigrate(&Game{})
 	db.AutoMigrate(&User{})
-
-	// Init some data
-	// Create
-	var chess, chat, tictactoe, rubik GameType
-	db.FirstOrCreate(&chess, GameType{Name: "Chess"})
-	db.FirstOrCreate(&chat, GameType{Name: "Chat"})
-	db.FirstOrCreate(&tictactoe, GameType{Name: "TicTacToe"})
-	db.FirstOrCreate(&rubik, GameType{Name: "Rubik"})
 }
