@@ -46,6 +46,16 @@ var onSnapEnd = function() {
   }
 };
 
+var updateView = function() {
+    if (game_started) {
+        $('.nogame').css('display', 'none');
+        $('.game').css('display', 'inline');
+    } else {
+        $('.nogame').css('display', 'inline');
+        $('.game').css('display', 'none');
+    }
+}
+
 var updateStatus = function() {
   var status = '';
 
@@ -57,11 +67,13 @@ var updateStatus = function() {
   // checkmate?
   if (game.in_checkmate() === true) {
     status = 'Game over, ' + moveColor + ' is in checkmate.';
+    game_started = false;
   }
 
   // draw?
   else if (game.in_draw() === true) {
     status = 'Game over, drawn position';
+    game_started = false;
   }
 
   // game still on
@@ -77,6 +89,7 @@ var updateStatus = function() {
   statusEl.html(status);
   fenEl.html(game.fen());
   pgnEl.html(game.pgn());
+  updateView();
 };
 
 var makeBoard = function(position, color) {
@@ -101,7 +114,8 @@ var
   foeEl = $('#foe'),
   pgnEl = $('#pgn'),
   colorEl = $('#color'),
-  offerEl = $('#offer');
+  offerEl = $('#offer'),
+  game_started = false;
 
 var offerParams = null;
 var modalEl = document.getElementById('modalDiv');
@@ -135,6 +149,8 @@ $('#resignBtn').on('click', function() {
         console.log("Resigned");
         conn.send(JSON.stringify({Cmd: "outcome", Params: "resign"}));
         game = null;
+        game_started = false;
+        updateView();
     } else {
         statusEl.html("No connection to server");
     }
@@ -191,7 +207,8 @@ $('#offerNo').on('click', function() {
    modalEl.style.display = "none"; // make invisible
 });
 
-if (window["WebSocket"]) {    
+if (window["WebSocket"]) { 
+    updateView();   
     conn = new WebSocket("ws://" + document.location.host + "/ws");
     conn.onclose = function (evt) {
         statusEl.html("<b>Connection closed.</b>");
@@ -205,6 +222,7 @@ if (window["WebSocket"]) {
             colorEl.html('You are ' + msg.Color)
             board = makeBoard('start', msg.Color);
             game  = new Chess();
+            game_started = true;
             updateStatus();
         } else if (msg.Cmd == "resume") {
             colorEl.html('You are ' + msg.Color);
@@ -239,6 +257,8 @@ if (window["WebSocket"]) {
             statusEl.html("Your opponent have accepted: '" + msg.Params + "', click the Start button for a new game");
             console.log("opponent outcome '" + msg.Params + "'");
             game = null;
+            game_started = false;
+            updateView();
         } else if (msg.Cmd == "offer") {
             offerParams = msg.Params;
             offerEl.html(offerParams);
