@@ -148,5 +148,22 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := getUserName(r)
-	hub.WSConnect(user, conn)
+	WSConnect(hub, user, conn)
+}
+
+func WSConnect(hub *Hub, user string, conn *websocket.Conn) {
+	log.Printf("wsconnect %s\n", user)
+	player := NewWSPlayer(hub, user, conn)
+	//if oldPlayer, ok := h.users[user]; ok {
+	//	log.Printf("found existing player for user: %s", user)
+	//	player = oldPlayer
+	//	player.conn = conn
+	//	player.sendState()
+	//} else {
+	//h.users[user] = player
+	go player.writePump()
+	//}
+	go player.readPump()
+	player.sendMessage(Message{Cmd: "login", User: player.user})
+
 }

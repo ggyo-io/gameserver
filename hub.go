@@ -7,7 +7,6 @@ package main
 import (
 	"log"
 
-	"github.com/gorilla/websocket"
 	"github.com/notnil/chess"
 )
 
@@ -151,21 +150,4 @@ func (h *Hub) matchWs(rq RegisterRequest) {
 	} else {
 		h.clients[rq.player] = rq
 	}
-}
-
-func (h *Hub) WSConnect(user string, conn *websocket.Conn) {
-	log.Printf("wsconnect %s\n", user)
-	player := NewWSPlayer(h, user, conn)
-	//if oldPlayer, ok := h.users[user]; ok {
-	//	log.Printf("found existing player for user: %s", user)
-	//	player = oldPlayer
-	//	player.conn = conn
-	//	player.sendState()
-	//} else {
-	//h.users[user] = player
-	go player.writePump()
-	//}
-	go player.readPump()
-	player.sendMessage(Message{Cmd: "login", User: player.user})
-
 }
