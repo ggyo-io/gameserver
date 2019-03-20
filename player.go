@@ -10,13 +10,9 @@ import (
 
 type PlayerI interface {
 	Client
-	readPump()
-	writePump()
-	foe() Client
 	openConnection()
 	closeConnection()
 	makeMove() (*Message, error)
-	dispatch(message *Message) error
 }
 
 type Player struct {
