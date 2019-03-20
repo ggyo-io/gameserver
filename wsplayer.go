@@ -117,7 +117,7 @@ func (c *WSPlayer) writePump() {
 			}
 
 			c.gameState = gameState
-			msg := Message{Cmd: "start", Color: c.color(), User: c.foe().user, Params: c.gameState.game.ID}
+			msg := Message{Cmd: "start", Color: c.color(), User: c.foe().User(), Params: c.gameState.game.ID}
 			c.sendMessage(msg)
 		}
 	}
