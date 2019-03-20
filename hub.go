@@ -10,16 +10,8 @@ import (
 	"github.com/notnil/chess"
 )
 
-type Client interface {
-	sendToFoe(*Message) bool
-	onUnregister()
-	User() string
-	Match() chan *GameState
-	Send() chan []byte
-}
-
 type RegisterRequest struct {
-	player Client
+	player *Player
 	foe    string
 	color  string
 }
@@ -27,25 +19,31 @@ type RegisterRequest struct {
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
-	clients    map[Client]RegisterRequest // open register requests
-	register   chan RegisterRequest       // Register requests from the clients.
-	unregister chan Client                // Unregister requests from clients.
-	robots     map[string]UciLauncher
+	// open register requests
+	clients map[*Player]RegisterRequest
+
+	// Register requests from the clients.
+	register chan RegisterRequest
+
+	// Unregister requests from clients.
+	unregister chan *Player
+
+	robots map[string]UciLauncher
 	//users  map[string]*WSPlayer
 }
 
 type GameState struct {
 	game  *Game
 	chess *chess.Game
-	white Client
-	black Client
+	white *Player
+	black *Player
 }
 
 func newHub(rs ...UciLauncher) *Hub {
 	h := &Hub{
 		register:   make(chan RegisterRequest),
-		unregister: make(chan Client),
-		clients:    make(map[Client]RegisterRequest),
+		unregister: make(chan *Player),
+		clients:    make(map[*Player]RegisterRequest),
 		robots:     make(map[string]UciLauncher),
 		//users:      make(map[string]*WSPlayer),
 	}
@@ -84,22 +82,22 @@ func (h *Hub) matchUCI(rq RegisterRequest) {
 	go uciPlayer.writePump()
 	go uciPlayer.readPump()
 
-	var whitePlayer, blackPlayer Client
+	var whitePlayer, blackPlayer *Player
 
 	whitePlayer = rq.player
-	blackPlayer = uciPlayer
+	blackPlayer = uciPlayer.Player
 
 	if rq.color == "black" {
-		whitePlayer = uciPlayer
+		whitePlayer = uciPlayer.Player
 		blackPlayer = rq.player
 	}
 
-	game := Game{Active: true, White: whitePlayer.User(), Black: blackPlayer.User()}
+	game := Game{Active: true, White: whitePlayer.user, Black: blackPlayer.user}
 	db.Create(&game)
 	gameState := GameState{game: &game, chess: chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})), white: whitePlayer, black: blackPlayer}
 	uciPlayer.gameState = &gameState
-	rq.player.Match() <- &gameState
-	if uciPlayer == whitePlayer {
+	rq.player.match <- &gameState
+	if uciPlayer.Player == whitePlayer {
 		uciPlayer.sendMessage(Message{Cmd: "move"})
 	}
 }
@@ -116,7 +114,7 @@ func matchColor(c1, c2 string) bool {
 	return false
 }
 
-func choosePlayersColors(rq1, rq2 RegisterRequest) (white, black Client) {
+func choosePlayersColors(rq1, rq2 RegisterRequest) (white, black *Player) {
 	if !matchColor(rq1.color, rq2.color) {
 		log.Fatalf("can not match color rq1 '%v' rq2 '%v'\n", rq1, rq2)
 		return nil, nil
@@ -140,12 +138,12 @@ func (h *Hub) matchWs(rq RegisterRequest) {
 			if k != rq.player && matchColor(rq.color, h.clients[k].color) {
 				log.Printf("Found match creating a game")
 				white, black := choosePlayersColors(rq, h.clients[k])
-				game := Game{Active: true, White: white.User(), Black: black.User()}
+				game := Game{Active: true, White: white.user, Black: black.user}
 				db.Create(&game)
 				gameState := GameState{game: &game, chess: chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})), white: white, black: black}
 				delete(h.clients, k)
-				rq.player.Match() <- &gameState
-				k.Match() <- &gameState
+				rq.player.match <- &gameState
+				k.match <- &gameState
 				return
 			}
 		}

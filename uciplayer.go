@@ -71,14 +71,6 @@ func (c *UCIPlayer) writePump() {
 	}
 }
 
-func (c *UCIPlayer) openConnection() {
-	log.Printf("func (c *UCIPlayer) openConnection()")
-}
-
-func (c *UCIPlayer) closeConnection() {
-	log.Printf("func (c *UCIPlayer) openConnection()")
-}
-
 func NewUCIPlayer(hub *Hub, user string) *UCIPlayer {
 	player := &Player{hub: hub, user: user, send: make(chan []byte, 256), match: make(chan *GameState)}
 	client := &UCIPlayer{Player: player, bestMove: make(chan string)}
