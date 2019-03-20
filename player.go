@@ -40,7 +40,6 @@ func (c *Player) foe() Client {
 	if c.gameState == nil {
 		return nil
 	}
-	log.Printf("c.gameState.black = %#v, c.PlayerI = %#v", c.gameState.black, c.PlayerI)
 	if c.gameState.black == c.PlayerI {
 		return c.gameState.white
 	}
