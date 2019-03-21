@@ -3,7 +3,7 @@
 // only pick up pieces for the side to move
 var onDragStart = function(source, piece, position, orientation) {
   console.log("onDragStart game " + game + " browsing " + browsing);
-  if (game == null) { return false; }
+  if (game == null || !game_started) { return false; }
 
   if ( browsing == true ||
        game.game_over() === true ||
@@ -198,8 +198,6 @@ $('#offerYes').on('click', function() {
    console.log("Offer accepted: " + offerParams);
    conn.send(JSON.stringify({Cmd: "outcome", Params: offerParams}));
    statusEl.html("You have accepted '" + offerParams + "', click the Start button for a new game");
-   game = null;
-
    modalEl.style.display = "none"; // make invisible
 });
 
@@ -256,7 +254,6 @@ if (window["WebSocket"]) {
         } else if (msg.Cmd == "outcome") {
             statusEl.html("Your opponent have accepted: '" + msg.Params + "', click the Start button for a new game");
             console.log("opponent outcome '" + msg.Params + "'");
-            game = null;
             game_started = false;
             updateView();
         } else if (msg.Cmd == "offer") {
