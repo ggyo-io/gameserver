@@ -9,36 +9,38 @@ import (
 )
 
 type PlayerI interface {
-	readPump()
-	writePump()
-	foe() *Player
+	Client
 	openConnection()
 	closeConnection()
 	makeMove() (*Message, error)
-	dispatch(message *Message) error
 }
 
 type Player struct {
 	PlayerI
-
-	hub *Hub
-
-	user string
-
-	// Buffered channel of outbound messages.
-	send chan []byte
-
-	// Channel for when a match was found
-	match chan *GameState
-
+	hub       *Hub
+	user      string
+	send      chan []byte     // Buffered channel of outbound messages
+	match     chan *GameState // Channel for when a match was found
 	gameState *GameState
 }
 
-func (c *Player) foe() *Player {
+func (c *Player) Send() chan []byte {
+	return c.send
+}
+
+func (c *Player) User() string {
+	return c.user
+}
+
+func (c *Player) Match() chan *GameState {
+	return c.match
+}
+
+func (c *Player) foe() Client {
 	if c.gameState == nil {
 		return nil
 	}
-	if c.gameState.black == c {
+	if c.gameState.black == c.PlayerI {
 		return c.gameState.white
 	}
 	return c.gameState.black
@@ -93,8 +95,8 @@ func (c *Player) sendToFoe(message *Message) bool {
 	}
 
 	if msgb, err := json.Marshal(message); err == nil {
-		log.Printf("player '%s' sends to '%s' message '%s'\n", c.user, c.foe().user, string(msgb))
-		return SafeSendBytes(c.foe().send, msgb)
+		log.Printf("player '%s' sends to '%s' message '%s'\n", c.user, c.foe().User(), string(msgb))
+		return SafeSendBytes(c.foe().Send(), msgb)
 	}
 
 	return true // json.Marshal error
@@ -181,13 +183,6 @@ func (c *Player) dispatch(message *Message) error {
 func (c *Player) onUnregister() {
 	close(c.send)
 	close(c.match)
-}
-
-func (c *Player) openConnection() {
-	log.Printf("func (c *Player) openConnection()")
-}
-
-func (c *Player) closeConnection() {
 }
 
 func (c *Player) sendMessage(msg Message) {
