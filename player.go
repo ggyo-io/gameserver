@@ -48,7 +48,7 @@ func (c *Player) foe() Client {
 
 func (c *Player) color() string {
 	color := "black"
-	if c.gameState.white == c {
+	if c.gameState.white == c.PlayerI {
 		color = "white"
 	}
 	return color
@@ -56,7 +56,6 @@ func (c *Player) color() string {
 
 // readPump reads moves from this player and dispatches those to the foe
 func (c *Player) readPump() {
-	log.Printf("in readPump")
 	c.openConnection()
 	for {
 		message, err := c.makeMove()
@@ -108,7 +107,7 @@ func (c *Player) dispatch(message *Message) error {
 
 	if message.Cmd == "start" {
 		log.Printf("player '%s' got start command, params '%s' request to register at hub\n", c.user, message.Params)
-		rr := RegisterRequest{player: c, foe: message.Params, color: message.Color}
+		rr := RegisterRequest{player: c.PlayerI, foe: message.Params, color: message.Color}
 		c.hub.register <- rr
 		return nil
 	}
@@ -187,7 +186,6 @@ func (c *Player) onUnregister() {
 }
 
 func (c *Player) sendMessage(msg Message) {
-	log.Printf("in sendMessage")
 	if msgb, err := json.Marshal(&msg); err == nil {
 		log.Printf("sendMessage: %s\n", msgb)
 		c.send <- msgb
