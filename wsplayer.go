@@ -162,6 +162,25 @@ func WSConnect(hub *Hub, user string, conn *websocket.Conn) {
 	go player.writePump()
 	//}
 	go player.readPump()
-	player.sendMessage(Message{Cmd: "login", User: player.user})
+	data := loadLoginData(user)
+	player.sendMessage(Message{Cmd: "login", User: player.user, Params: data})
+}
 
+func loadLoginData(user string) string {
+	var games []Game
+	db.Where("white = ? OR black = ?", user, user).Order("created_at DESC").Limit(100).Find(&games)
+	ld := LoginData{make([]HistoryGame, len(games))}
+	for i, game := range games {
+		name := game.White + " vs. " + game.Black + " on " + game.CreatedAt.String()
+		url := "?game=" + game.ID
+		hg := HistoryGame{Name: name, URL: url}
+		ld.History[i] = hg
+	}
+
+	msgb, err := json.Marshal(ld)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	return string(msgb)
 }

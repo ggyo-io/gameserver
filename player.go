@@ -119,56 +119,9 @@ func (c *Player) dispatch(message *Message) error {
 
 	switch message.Cmd {
 	case "move":
-		chessGame := c.gameState.chess
-		game := c.gameState.game
-
-		// Pre move state assertions
-		if game.Active == false {
-			log.Fatalf("player '%s' is moving on game.Active = false game\n", c.user)
-		}
-		if chessGame.Outcome() != chess.NoOutcome {
-			log.Fatalf("player '%s' is moving on a game with an outcome '%s' method '%s'\n", c.user, chessGame.Outcome(), chessGame.Method())
-		}
-
-		// Apply the move, check if the move is legal
-		if err := chessGame.MoveStr(message.Params); err != nil {
-			log.Fatal(err)
-		}
-
-		// Check is game is over, GG
-		log.Printf("player '%s' after Move command outcome '%s' method '%s'\n", c.user, chessGame.Outcome(), chessGame.Method())
-		if chessGame.Outcome() != chess.NoOutcome {
-			game.Active = false
-		}
-
-		// Record the move in DB
-		game.State = chessGame.String()
-		db.Save(game)
-		if c.sendToFoe(message) {
-			return errors.New("c.sendToFoe error")
-		}
+		return c.move(message)
 	case "outcome":
-		chessGame := c.gameState.chess
-		switch message.Params {
-		case "draw":
-			chessGame.Draw(chess.DrawOffer)
-		case "resign":
-			if c.color() == "black" {
-				chessGame.Resign(chess.Black)
-			} else {
-				chessGame.Resign(chess.White)
-			}
-		default:
-			log.Printf("Unknown outcome command params %s\n", message)
-		} // switch outcome command params
-
-		game := c.gameState.game
-		game.State = chessGame.String()
-		game.Active = false
-		db.Save(game)
-		if c.sendToFoe(message) {
-			return errors.New("c.sendToFoe error")
-		}
+		return c.outcome(message)
 	case "offer":
 		if c.sendToFoe(message) {
 			return errors.New("c.sendToFoe error")
@@ -192,4 +145,61 @@ func (c *Player) sendMessage(msg Message) {
 	} else {
 		log.Printf("ERROR marshalling message: %s\n", err)
 	}
+}
+
+func (c *Player) move(message *Message) error {
+	chessGame := c.gameState.chess
+	game := c.gameState.game
+
+	// Pre move state assertions
+	if game.Active == false {
+		log.Fatalf("player '%s' is moving on game.Active = false game\n", c.user)
+	}
+	if chessGame.Outcome() != chess.NoOutcome {
+		log.Fatalf("player '%s' is moving on a game with an outcome '%s' method '%s'\n", c.user, chessGame.Outcome(), chessGame.Method())
+	}
+
+	// Apply the move, check if the move is legal
+	if err := chessGame.MoveStr(message.Params); err != nil {
+		log.Fatal(err)
+	}
+
+	// Check is game is over, GG
+	log.Printf("player '%s' after Move command outcome '%s' method '%s'\n", c.user, chessGame.Outcome(), chessGame.Method())
+	if chessGame.Outcome() != chess.NoOutcome {
+		game.Active = false
+	}
+
+	// Record the move in DB
+	game.State = chessGame.String()
+	db.Save(game)
+	if c.sendToFoe(message) {
+		return errors.New("c.sendToFoe error")
+	}
+	return nil
+}
+
+func (c *Player) outcome(message *Message) error {
+	chessGame := c.gameState.chess
+	switch message.Params {
+	case "draw":
+		chessGame.Draw(chess.DrawOffer)
+	case "resign":
+		if c.color() == "black" {
+			chessGame.Resign(chess.Black)
+		} else {
+			chessGame.Resign(chess.White)
+		}
+	default:
+		log.Printf("Unknown outcome command params %s\n", message)
+	} // switch outcome command params
+
+	game := c.gameState.game
+	game.State = chessGame.String()
+	game.Active = false
+	db.Save(game)
+	if c.sendToFoe(message) {
+		return errors.New("c.sendToFoe error")
+	}
+	return nil
 }

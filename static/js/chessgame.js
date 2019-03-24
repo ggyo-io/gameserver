@@ -215,64 +215,21 @@ if (window["WebSocket"]) {
         console.log(evt.data);
         var msg = JSON.parse(evt.data);
         if (msg.Cmd == "start") {
-            foeEl.html(msg.User);
-            gameIDEl.html(msg.Params);
-            colorEl.html('You are ' + msg.Color)
-            board = makeBoard('start', msg.Color);
-            game  = new Chess();
-            game_started = true;
-            updateStatus();
+            start(msg);
         } else if (msg.Cmd == "resume") {
-            colorEl.html('You are ' + msg.Color);
-            game  = new Chess();
-            console.log("on resume game load_pgn: " + game.load_pgn(msg.Params, {sloppy: true}));
-            var fen = game.fen();
-            console.log("fen is: " + fen);
-            board = makeBoard(fen, msg.Color);
-            updateStatus();
+            resume(msg);
         } else if (msg.Cmd == "move") {
-            var from_sq = msg.Params[0] + msg.Params[1];
-            var to_sq   = msg.Params[2] + msg.Params[3];
-            var promotePiece = "q";
-            if (msg.Params.length > 4) {
-                if (msg.Params[4] == "=")
-                    promotePiece = msg.Params[5];
-                else
-                    promotePiece = msg.Params[4];
-            }
-            var mr = game.move({
-               from: from_sq,
-               to: to_sq,
-               promotion: promotePiece
-            });
-            console.log("computa mr begin from: " + from_sq + " to: " + to_sq + " promo: " + promotePiece);
-            console.log(mr);
-            console.log("computa mr end");
-            console.log("game fen: " + game.fen())
-            updateStatus();
-            board.position(game.fen());
+            move(msg);
         } else if (msg.Cmd == "outcome") {
-            statusEl.html("Your opponent have accepted: '" + msg.Params + "', click the Start button for a new game");
-            console.log("opponent outcome '" + msg.Params + "'");
-            game_started = false;
-            updateView();
+            outcome(msg);
         } else if (msg.Cmd == "offer") {
-            offerParams = msg.Params;
-            offerEl.html(offerParams);
-            modalEl.style.display = "block"; // make visible
+            offer(msg); // make visible
         } else if (msg.Cmd == "disconnect") {
-            statusEl.html("Your opponent have disconnected.");
+            disconnect();
         } else if (msg.Cmd == "must_login") {
-            statusEl.html("<b>Please login first!</b>");
+            must_login();
         } else if (msg.Cmd == "login") {
-            if (msg.User == "") {
-                $('#userHeader').css('display', 'none');
-                $('#loginHeader').css('display', 'inline');
-            } else {
-                $('#loginHeader').css('display', 'none');
-                $('#username').html(msg.User);
-                $('#userHeader').css('display', 'inline');
-            }
+            login(msg);
         } else {
             console.log("Unknown command: '" + msg.Cmd + "'");
         }
@@ -280,3 +237,98 @@ if (window["WebSocket"]) {
 } else {
     statusEl.html("<b>Your browser does not support WebSockets.</b>");
 }
+function login(msg) {
+    if (msg.User == "") {
+        showMustLogin();
+    } else {
+        showLoggedIn(msg);
+        loadData(msg);
+    }
+}
+
+function loadData(msg) {
+    if (!msg.Params) return;
+    var data = JSON.parse(msg.Params);
+    var hist = data.history;
+    if (!hist) return;
+    for (var i = 0; i < hist.length; i++) {
+        var hi = hist[i];
+        $('#history').append("<li><a href='"+hi.url+"'>"+hi.name+"</a></li>");
+    }
+}
+
+function showLoggedIn(msg) {
+    $('#loginHeader').css('display', 'none');
+    $('#username').html(msg.User);
+    $('#userHeader').css('display', 'inline');
+}
+
+function showMustLogin() {
+    $('#userHeader').css('display', 'none');
+    $('#loginHeader').css('display', 'inline');
+}
+
+function must_login() {
+    statusEl.html("<b>Please login first!</b>");
+}
+
+function disconnect() {
+    statusEl.html("Your opponent have disconnected.");
+}
+
+function offer(msg) {
+    offerParams = msg.Params;
+    offerEl.html(offerParams);
+    modalEl.style.display = "block";
+}
+
+function outcome(msg) {
+    statusEl.html("Your opponent have accepted: '" + msg.Params + "', click the Start button for a new game");
+    console.log("opponent outcome '" + msg.Params + "'");
+    game_started = false;
+    updateView();
+}
+
+function move(msg) {
+    var from_sq = msg.Params[0] + msg.Params[1];
+    var to_sq = msg.Params[2] + msg.Params[3];
+    var promotePiece = "q";
+    if (msg.Params.length > 4) {
+        if (msg.Params[4] == "=")
+            promotePiece = msg.Params[5];
+        else
+            promotePiece = msg.Params[4];
+    }
+    var mr = game.move({
+        from: from_sq,
+        to: to_sq,
+        promotion: promotePiece
+    });
+    console.log("computa mr begin from: " + from_sq + " to: " + to_sq + " promo: " + promotePiece);
+    console.log(mr);
+    console.log("computa mr end");
+    console.log("game fen: " + game.fen());
+    updateStatus();
+    board.position(game.fen());
+}
+
+function resume(msg) {
+    colorEl.html('You are ' + msg.Color);
+    game = new Chess();
+    console.log("on resume game load_pgn: " + game.load_pgn(msg.Params, { sloppy: true }));
+    var fen = game.fen();
+    console.log("fen is: " + fen);
+    board = makeBoard(fen, msg.Color);
+    updateStatus();
+}
+
+function start(msg) {
+    foeEl.html(msg.User);
+    gameIDEl.html(msg.Params);
+    colorEl.html('You are ' + msg.Color);
+    board = makeBoard('start', msg.Color);
+    game = new Chess();
+    game_started = true;
+    updateStatus();
+}
+
