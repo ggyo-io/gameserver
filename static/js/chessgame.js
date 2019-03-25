@@ -212,8 +212,13 @@ if (window["WebSocket"]) {
         statusEl.html("<b>Connection closed.</b>");
     };
     conn.onmessage = function (evt) {
-        console.log(evt.data);
         var msg = JSON.parse(evt.data);
+        if (msg.Cmd == "login") {
+            console.log({Cmd: "login", User: msg.User});
+            login(msg);            
+            return;
+        }
+        console.log(msg);
         if (msg.Cmd == "start") {
             start(msg);
         } else if (msg.Cmd == "resume") {
@@ -228,8 +233,6 @@ if (window["WebSocket"]) {
             disconnect();
         } else if (msg.Cmd == "must_login") {
             must_login();
-        } else if (msg.Cmd == "login") {
-            login(msg);
         } else {
             console.log("Unknown command: '" + msg.Cmd + "'");
         }

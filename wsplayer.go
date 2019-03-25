@@ -168,7 +168,7 @@ func WSConnect(hub *Hub, user string, conn *websocket.Conn) {
 
 func loadLoginData(user string) string {
 	var games []Game
-	db.Where("white = ? OR black = ?", user, user).Order("created_at DESC").Limit(100).Find(&games)
+	db.Where("white = ? OR black = ?", user, user).Order("created_at DESC").Limit(20).Find(&games)
 	ld := LoginData{make([]HistoryGame, len(games))}
 	for i, game := range games {
 		name := game.White + " vs. " + game.Black + " on " + game.CreatedAt.String()
