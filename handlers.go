@@ -12,6 +12,25 @@ var (
 	store = sessions.NewCookieStore(key)
 )
 
+func Index(w http.ResponseWriter, r *http.Request) {
+	data := IndexData{
+		UserName: "Anonnymous",
+		IsAnnon:  true,
+		ShowGame: true,
+		PGN:      "123",
+	}
+	user := getUserName(r)
+	if user != "" {
+		data.UserName = user
+		data.IsAnnon = false
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+
+	templates["index"].Execute(w, data)
+}
+
 func Login(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("email")
 	pass := r.FormValue("password")

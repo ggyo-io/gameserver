@@ -1,4 +1,4 @@
-<DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <title>Chess</title>
@@ -54,11 +54,16 @@
     <h3 class="nogame">History</h3>
     <ul class="nogame" id="history"/>
   </div>
+
+{{if .ShowGame}}
+<script>  
+var PGN = {{.PGN}}
+</script>
+{{end}}
   <script src="/static/js/json3.min.js"></script>
   <script src="/static/js/jquery-1.10.1.min.js"></script>
   <script src="/static/js/chessboard-0.3.0.min.js"></script>
   <script src="/static/js/chess.min.js"></script>
   <script src="/static/js/chessgame.js"></script>
-
 </body>
 </html>
