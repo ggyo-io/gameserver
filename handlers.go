@@ -14,21 +14,36 @@ var (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	data := IndexData{
-		UserName: "Anonnymous",
-		IsAnnon:  true,
-		ShowGame: true,
-		PGN:      "123",
+		// UserName: "Anonnymous",
+		// IsAnnon:  true,
+		PGN: "",
 	}
-	user := getUserName(r)
-	if user != "" {
-		data.UserName = user
-		data.IsAnnon = false
+	gameID := r.URL.Query().Get("game")
+	if game := findGame(gameID); game != nil {
+		data.PGN = game.State
 	}
+
+	// user := getUserName(r)
+	// if user != "" {
+	// 	data.UserName = user
+	// 	data.IsAnnon = false
+	// }
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 
 	templates["index"].Execute(w, data)
+}
+
+func findGame(id string) *Game {
+	if id == "" {
+		return nil
+	}
+	var game Game
+	if db.Where("id = ?", id).First(&game).RecordNotFound() {
+		return nil
+	}
+	return &game
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
