@@ -335,11 +335,15 @@ function start(msg) {
     updateStatus();
 }
 
-if (PGN) {
+function showFinishedGame(pgn) {
     game = new Chess();
-    console.log("load history game load_pgn: " + game.load_pgn(PGN, { sloppy: true }));    
+    console.log("load history game load_pgn: " + game.load_pgn(pgn, { sloppy: true }));
     var fen = game.fen();
     console.log("fen is: " + fen);
     board = makeBoard(fen, "white");
     updateStatus();
+}
+
+if (PGN) {
+    showFinishedGame(PGN);
 }
