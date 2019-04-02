@@ -1,0 +1,11 @@
+.git
+
+gameserver
+debug
+gs.db
+.vscode/
+.idea/
+networks/
+lc0
+stockfish
+leelaz_opencl_tuning

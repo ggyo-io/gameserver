@@ -4,15 +4,15 @@ dbpass=-p$(DB_PASS)
 endif
 
 .PHONY: all clean run deps db
-all: gameserver
+all: build
 
-gameserver:
+build:
 	go build .
 
 clean:
 	rm -f gameserver
 
-run: gameserver
+run: build
 	./gameserver
 
 deps:
@@ -21,3 +21,6 @@ deps:
 db:
 	mysqladmin -u root $(dbpass) -f drop test
 	mysqladmin -u root $(dbpass) -f create test
+
+container:
+	docker build .
