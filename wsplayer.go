@@ -113,6 +113,10 @@ func (c *WSPlayer) writePump() {
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
+			if gameState == nil {
+				c.sendMessage(Message{Cmd: "nomatch"})
+				continue
+			}
 
 			c.gameState = gameState
 			msg := Message{Cmd: "start", Color: c.color(), User: c.foe().User(), Params: c.gameState.game.ID}

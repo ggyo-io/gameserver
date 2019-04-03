@@ -55,11 +55,10 @@
     <ul class="nogame" id="history"/>
   </div>
 
-{{if ne .PGN ""}}
 <script>  
-var PGN = {{.PGN}}
+var PGN = {{if ne .PGN ""}}"{{.PGN}}"{{else}}null{{end}};
 </script>
-{{end}}
+
   <script src="/static/js/json3.min.js"></script>
   <script src="/static/js/jquery-1.10.1.min.js"></script>
   <script src="/static/js/chessboard-0.3.0.min.js"></script>

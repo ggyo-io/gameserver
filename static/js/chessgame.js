@@ -233,6 +233,8 @@ if (window["WebSocket"]) {
             disconnect();
         } else if (msg.Cmd == "must_login") {
             must_login();
+        } else if (msg.Cmd == "nomatch") {
+            nomatch();
         } else {
             console.log("Unknown command: '" + msg.Cmd + "'");
         }
@@ -342,6 +344,10 @@ function showFinishedGame(pgn) {
     console.log("fen is: " + fen);
     board = makeBoard(fen, "white");
     updateStatus();
+}
+
+function nomatch() {
+    statusEl.html("No match found")
 }
 
 if (PGN) {

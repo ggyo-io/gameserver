@@ -1,3 +1,8 @@
+IMAGE=gs
+TAG = $(shell git describe --abbrev=0)
+BuildDate = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+Commit = $(shell git rev-parse --short HEAD)
+
 dbpass=
 ifdef DB_PASS
 dbpass=-p$(DB_PASS)
@@ -23,4 +28,6 @@ db:
 	mysqladmin -u root $(dbpass) -f create test
 
 container:
-	docker build .
+	docker build -t $(IMAGE):$(TAG) .
+	docker tag $(IMAGE):$(TAG) $(IMAGE):latest
+	docker tag $(IMAGE):latest gcr.io/deductive-reach-207607/gs

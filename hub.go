@@ -51,9 +51,13 @@ func newHub(rs ...UciLauncher) *Hub {
 	}
 
 	for _, r := range rs {
-		log.Printf("Starting %s\n", r.name())
-		h.robots[r.name()] = r
-		r.launch()
+		if exePresent(r) {
+			log.Printf("Starting %s\n", r.name())
+			h.robots[r.name()] = r
+			r.launch()
+		} else {
+			log.Printf("%s exe not found.\n", r.name())
+		}
 	}
 
 	go h.run()
@@ -80,6 +84,10 @@ func (h *Hub) run() {
 }
 
 func (h *Hub) matchUCI(rq RegisterRequest) {
+	if _, ok := h.robots[rq.foe]; !ok {
+		rq.player.Match() <- nil
+		return
+	}
 	uciPlayer := NewUCIPlayer(h, rq.foe)
 	go uciPlayer.writePump()
 	go uciPlayer.readPump()

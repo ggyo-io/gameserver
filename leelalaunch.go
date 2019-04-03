@@ -1,18 +1,18 @@
 package main
 
-
 type LeelaLauncher struct {
-    mrChannel chan MoveRequest
+	mrChannel chan MoveRequest
 }
 
 func (l *LeelaLauncher) name() string {
-    return "lc0"
+	return "lc0"
 }
 
 func (l *LeelaLauncher) launch() {
-   leelaStart(l)
+	leelaStart(l)
 }
 
-func (l* LeelaLauncher) moveRequest() chan MoveRequest {
-    return l.mrChannel
+func (l *LeelaLauncher) moveRequest() chan MoveRequest {
+	return l.mrChannel
 }
+
