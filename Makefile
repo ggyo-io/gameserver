@@ -1,4 +1,5 @@
 IMAGE=gs
+GKE_IMAGE=gcr.io/deductive-reach-207607/gs
 TAG = $(shell git describe --abbrev=0)
 BuildDate = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 Commit = $(shell git rev-parse --short HEAD)
@@ -30,4 +31,14 @@ db:
 container:
 	docker build -t $(IMAGE):$(TAG) .
 	docker tag $(IMAGE):$(TAG) $(IMAGE):latest
-	docker tag $(IMAGE):latest gcr.io/deductive-reach-207607/gs
+	docker tag $(IMAGE):latest $(GKE_IMAGE)
+
+
+push: container
+	docker push $(GKE_IMAGE)
+
+gke:
+	
+
+local:
+
