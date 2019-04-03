@@ -142,6 +142,13 @@ $('#startBtn').on('click', function() {
     }
 });
 
+$('#undoBtn').on('click', function() {
+    if (game == null) { return; }
+    if (conn) {
+        conn.send(JSON.stringify({Cmd: "undo"}));
+    }
+});
+
 $('#resignBtn').on('click', function() {
     if (game == null) { return; }
     if (conn) {
