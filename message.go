@@ -2,15 +2,9 @@ package main
 
 type Message struct {
 	Cmd    string
-	User   string
-	Params string
-	Color  string
+	User   string `json:",omitempty"`
+	Params string `json:",omitempty"`
+	Color  string `json:",omitempty"`
+	moves  string `json:"-"`
 }
 
-type LoginData struct {
-	History []HistoryGame `json:"history"`
-}
-type HistoryGame struct {
-	URL  string `json:"url"`
-	Name string `json:"name"`
-}

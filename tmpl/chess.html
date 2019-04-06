@@ -8,17 +8,21 @@
 <body>
   <div class="box">
     <h2>
+      <span id="home"><a href="/">Home</a></span>
       <span>&nbsp;</span>
-      <form  id="loginHeader" action="/login" method="POST">
+      {{if .IsAnnon}}
+      <form id="loginHeader" action="/login" method="POST">
         <input type="email" id="email" name="email" placeholder="email"/>
         <input type="password" id="password" name="password" placeholder="password"/>
         <input type="submit" id="loginBtn" value="Log In" />
       </form>
-      <span  id="userHeader">Hello, <i id="username">Vasia</i>     
+      {{else}}
+      <span  id="userHeader">Hello, <i id="username">{{.UserName}}</i>     
         <form id="logout" action="/logout" method="GET">
           <input type="submit" id="logoutBtn" value="Sign Out" />
         </form>
       </span>
+      {{end}}
     </h2>
     <p>    
       <div id="board" style="float: left; margin-left: 5px; width: 400px"></div>
@@ -52,8 +56,13 @@
         </div>
       </div>
     </p>
+    {{if not .IsAnnon}}
     <h3 class="nogame">History</h3>
-    <ul class="nogame" id="history"/>
+    <ul class="nogame" id="history">
+    {{range .History}}<li><a href="{{.URL}}">{{.Name}}</a></li>{{end}}  
+    </ul>
+    {{end}}
+    
   </div>
 
 <script>  

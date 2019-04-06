@@ -16,4 +16,10 @@ type IndexData struct {
 	IsAnnon  bool
 	ShowGame bool
 	PGN      string
+	History  []HistoryGame
+}
+
+type HistoryGame struct {
+	URL  string
+	Name string
 }

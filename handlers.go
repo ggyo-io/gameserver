@@ -1,6 +1,8 @@
 package main
 
 import (
+	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -14,25 +16,41 @@ var (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	data := IndexData{
-		// UserName: "Anonnymous",
-		// IsAnnon:  true,
-		PGN: "",
+		UserName: "",
+		IsAnnon:  true,
+		PGN:      "",
 	}
 	gameID := r.URL.Query().Get("game")
 	if game := findGame(gameID); game != nil {
 		data.PGN = game.State
 	}
-
-	// user := getUserName(r)
-	// if user != "" {
-	// 	data.UserName = user
-	// 	data.IsAnnon = false
-	// }
-
+	user := getUserName(r)
+	if user != "" {
+		data.UserName = user
+		data.IsAnnon = false
+		loadLoginData(user, &data)
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
+	// templates["index"].Execute(w, data)
+	// Parse every time for now, gives refresh w/o restart
+	template := template.Must(template.ParseFiles("tmpl/chess.html"))
+	err := template.Execute(w, data)
+	if err != nil {
+		log.Printf("Error parsing the template: %s\n", err)
+	}
+}
 
-	templates["index"].Execute(w, data)
+func loadLoginData(user string, data *IndexData) {
+	var games []Game
+	db.Where("white = ? OR black = ?", user, user).Order("created_at DESC").Limit(20).Find(&games)
+	data.History = make([]HistoryGame, len(games))
+	for i, game := range games {
+		name := game.White + " vs. " + game.Black + " on " + game.CreatedAt.String()
+		url := "?game=" + game.ID
+		hg := HistoryGame{Name: name, URL: url}
+		data.History[i] = hg
+	}
 }
 
 func findGame(id string) *Game {

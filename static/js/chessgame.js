@@ -220,11 +220,6 @@ if (window["WebSocket"]) {
     };
     conn.onmessage = function (evt) {
         var msg = JSON.parse(evt.data);
-        if (msg.Cmd == "login") {
-            console.log({Cmd: "login", User: msg.User});
-            login(msg);            
-            return;
-        }
         console.log(msg);
         if (msg.Cmd == "start") {
             start(msg);
@@ -248,36 +243,6 @@ if (window["WebSocket"]) {
     };
 } else {
     statusEl.html("<b>Your browser does not support WebSockets.</b>");
-}
-function login(msg) {
-    if (msg.User == "") {
-        showMustLogin();
-    } else {
-        showLoggedIn(msg);
-        loadData(msg);
-    }
-}
-
-function loadData(msg) {
-    if (!msg.Params) return;
-    var data = JSON.parse(msg.Params);
-    var hist = data.history;
-    if (!hist) return;
-    for (var i = 0; i < hist.length; i++) {
-        var hi = hist[i];
-        $('#history').append("<li><a href='"+hi.url+"'>"+hi.name+"</a></li>");
-    }
-}
-
-function showLoggedIn(msg) {
-    $('#loginHeader').css('display', 'none');
-    $('#username').html(msg.User);
-    $('#userHeader').css('display', 'inline');
-}
-
-function showMustLogin() {
-    $('#userHeader').css('display', 'none');
-    $('#loginHeader').css('display', 'inline');
 }
 
 function must_login() {

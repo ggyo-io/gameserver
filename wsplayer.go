@@ -9,7 +9,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -42,6 +41,94 @@ type WSPlayer struct {
 	conn *websocket.Conn
 }
 
+// readPump reads moves from this player and dispatches those to the foe
+func (c *WSPlayer) readPump() {
+	c.openConnection()
+	for {
+		message, err := c.makeMove()
+		if err != nil {
+			log.Printf("wsplayer '%s' readPump breaks the loop, makeMove error: '%v'\n", c.user, err)
+			break
+		}
+		if c.user == "" {
+			c.send <- &Message{Cmd: "must_login"}
+		} else {
+			c.dispatch(message)
+		}
+	}
+	c.closeConnection()
+	c.unregister()
+}
+
+// writePump pumps messages to the websocket connection.
+//
+// A goroutine running writePump is started for each connection. The
+// application ensures that there is at most one writer to a connection by
+// executing all writes from this goroutine.
+func (c *WSPlayer) writePump() {
+	ticker := time.NewTicker(pingPeriod)
+	defer func() {
+		ticker.Stop()
+		c.conn.Close()
+		log.Printf("wsplayer '%s' returns from writePump()\n", c.user)
+	}()
+	for {
+		select {
+		case message, ok := <-c.send:
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if !ok {
+				// Somebody closed the channel.
+				log.Printf("wsplayer '%s' send channel closed\n", c.user)
+				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				return
+			}
+
+			w, err := c.conn.NextWriter(websocket.TextMessage)
+			if err != nil {
+				return
+			}
+
+			if msgb, err := json.Marshal(message); err == nil {
+				log.Printf("wsplayer '%s' pumping up the WS, message: %s\n", c.user, string(msgb))
+				w.Write(msgb)
+			}
+
+			if err := w.Close(); err != nil {
+				log.Printf("w.Close() error '%s'\n", c.user)
+				return
+			}
+		case <-ticker.C:
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				return
+			}
+		case match, ok := <-c.match:
+			if !ok {
+				// The hub closed the channel.
+				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				return
+			}
+			if match == nil {
+				c.send <- &Message{Cmd: "nomatch"}
+				continue
+			}
+			c.onMatch(match)
+			c.send <- &Message{Cmd: "start", Color: c.color, User: c.foe, Params: c.gameID}
+		}
+	}
+}
+
+/* recieve messages from web socket and forward moves to the foe side */
+func (c *WSPlayer) dispatch(message *Message) {
+	if message.Cmd == "start" {
+		log.Printf("wsplayer '%s' got start command, params '%s' request to register at hub\n", c.user, message.Params)
+		rr := RegisterRequest{player: c, foe: message.Params, color: message.Color}
+		c.hub.register <- rr
+	} else {
+		c.sendBoard(message)
+	}
+}
+
 func (c *WSPlayer) openConnection() {
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -70,75 +157,9 @@ func (c *WSPlayer) makeMove() (*Message, error) {
 	return &message, nil
 }
 
-// writePump pumps messages from the hub to the websocket connection.
-//
-// A goroutine running writePump is started for each connection. The
-// application ensures that there is at most one writer to a connection by
-// executing all writes from this goroutine.
-func (c *WSPlayer) writePump() {
-	ticker := time.NewTicker(pingPeriod)
-	defer func() {
-		ticker.Stop()
-		c.conn.Close()
-		log.Printf("wsplayer '%s' returns from writePump()\n", c.user)
-	}()
-	for {
-		select {
-		case message, ok := <-c.send:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if !ok {
-				// The hub closed the channel.
-				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
-				return
-			}
-
-			w, err := c.conn.NextWriter(websocket.TextMessage)
-			if err != nil {
-				return
-			}
-			log.Printf("pumping up the WS, message: %s\n", string(message))
-			w.Write(message)
-
-			if err := w.Close(); err != nil {
-				return
-			}
-		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-				return
-			}
-		case gameState, ok := <-c.match:
-			if !ok {
-				// The hub closed the channel.
-				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
-				return
-			}
-			if gameState == nil {
-				c.sendMessage(Message{Cmd: "nomatch"})
-				continue
-			}
-
-			c.gameState = gameState
-			msg := Message{Cmd: "start", Color: c.color(), User: c.foe().User(), Params: c.gameState.game.ID}
-			c.sendMessage(msg)
-		}
-	}
-}
-
-func (c *WSPlayer) sendState() {
-	position := c.gameState.chess.String()
-	// need to remove trailing * cuz it look like diz: \n1.e2e4 d7d5 2.b1c3 c7c6  *
-	position = strings.TrimSuffix(position, " *")
-	position = strings.TrimSpace(position)
-	msg := Message{Cmd: "resume", Color: c.color(), Params: position}
-	c.sendMessage(msg)
-}
-
 func NewWSPlayer(hub *Hub, user string, conn *websocket.Conn) *WSPlayer {
-	player := &Player{hub: hub, user: user, send: make(chan []byte, 256), match: make(chan *GameState)}
+	player := &Player{hub: hub, user: user, send: make(chan *Message, 256), match: make(chan *Match)}
 	client := &WSPlayer{Player: player, conn: conn}
-	client.PlayerI = client
-
 	return client
 }
 
@@ -166,25 +187,4 @@ func WSConnect(hub *Hub, user string, conn *websocket.Conn) {
 	go player.writePump()
 	//}
 	go player.readPump()
-	data := loadLoginData(user)
-	player.sendMessage(Message{Cmd: "login", User: player.user, Params: data})
-}
-
-func loadLoginData(user string) string {
-	var games []Game
-	db.Where("white = ? OR black = ?", user, user).Order("created_at DESC").Limit(20).Find(&games)
-	ld := LoginData{make([]HistoryGame, len(games))}
-	for i, game := range games {
-		name := game.White + " vs. " + game.Black + " on " + game.CreatedAt.String()
-		url := "?game=" + game.ID
-		hg := HistoryGame{Name: name, URL: url}
-		ld.History[i] = hg
-	}
-
-	msgb, err := json.Marshal(ld)
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-	return string(msgb)
 }

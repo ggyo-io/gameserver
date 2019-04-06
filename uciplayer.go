@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"log"
 )
@@ -10,6 +9,23 @@ type UCIPlayer struct {
 	*Player
 
 	bestMove chan string
+}
+
+// readPump reads moves from this player and dispatches those to the foe
+func (c *UCIPlayer) readPump() {
+	for {
+		message, err := c.makeMove()
+		if err != nil {
+			log.Printf("uciplayer '%s' readPump breaks the loop, makeMove error: '%v'\n", c.user, err)
+			break
+		}
+		c.dispatch(message)
+	}
+	c.unregister()
+}
+
+func (c *UCIPlayer) dispatch(message *Message) {
+	c.sendBoard(message)
 }
 
 func (c *UCIPlayer) makeMove() (*Message, error) {
@@ -26,63 +42,42 @@ func (c *UCIPlayer) makeMove() (*Message, error) {
 }
 
 func (c *UCIPlayer) writePump() {
+	defer close(c.bestMove)
 	for {
 		select {
-		case mb, ok := <-c.send:
-			log.Printf("uciplayer '%s' got message from send channel: '%s'\n", c.user, string(mb))
+		case message, ok := <-c.send:
+			log.Printf("uciPlayer '%s' got message from send channel: '%s'\n", c.user, message)
 			if !ok {
-				log.Fatal("read send channel error")
+				log.Print("read send channel error")
 				return
 			}
-			var message Message
-			if err := json.Unmarshal(mb, &message); err != nil {
-				log.Printf("uciplayer '%s' ERROR: Unsupported message format '%s'\n", c.user, string(mb))
-				return
-			}
-
 			switch message.Cmd {
 			case "move":
-				moves := ""
-				chess := c.gameState.chess
-				for _, move := range chess.Moves() {
-					moves += " " + move.String()
-				}
+				moves := message.moves
 				log.Printf("uciplayer '%s' moves '%s'\n", c.user, moves)
 				mr := MoveRequest{moves: moves, bestMove: c.bestMove}
 				c.hub.robots[c.user].moveRequest() <- mr
 
 			case "outcome":
 				log.Printf("uciplayer '%s' outcome '%s', return from writePump(), signal readPump to exit\n", c.user, message.Params)
-				close(c.bestMove)
 				return
 
 			case "disconnect":
 				log.Printf("uciplayer '%s' got 'disconnect' (%s), return from writePump(), signal readPump to exit\n", c.user, message.Params)
-				close(c.bestMove)
 				return
 
 			case "offer":
 				log.Printf("uciplayer '%s' ignore offer '%s'\n", c.user, message.Params)
 
 			default:
-				log.Printf("uciplayer '%s' got Unknown command '%s'\n", c.user, string(mb))
+				log.Printf("uciplayer '%s' got Unknown command '%s'\n", c.user, message.Cmd)
 			}
 		}
 	}
 }
 
-func (c *UCIPlayer) openConnection() {
-	log.Printf("func (c *UCIPlayer) openConnection()")
-}
-
-func (c *UCIPlayer) closeConnection() {
-	log.Printf("func (c *UCIPlayer) openConnection()")
-}
-
 func NewUCIPlayer(hub *Hub, user string) *UCIPlayer {
-	player := &Player{hub: hub, user: user, send: make(chan []byte, 256), match: make(chan *GameState)}
+	player := &Player{hub: hub, user: user, send: make(chan *Message, 256), match: make(chan *Match)}
 	client := &UCIPlayer{Player: player, bestMove: make(chan string)}
-	client.PlayerI = client
-
 	return client
 }

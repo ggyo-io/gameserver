@@ -1,30 +1,28 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
 	"log"
-
-	"github.com/notnil/chess"
 )
 
-type PlayerI interface {
-	Client
-	openConnection()
-	closeConnection()
-	makeMove() (*Message, error)
-}
-
 type Player struct {
-	PlayerI
-	hub       *Hub
-	user      string
-	send      chan []byte     // Buffered channel of outbound messages
-	match     chan *GameState // Channel for when a match was found
-	gameState *GameState
+	hub    *Hub
+	user   string
+	color  string
+	foe    string
+	gameID string
+	send   chan *Message // Buffered channel of outbound messages
+	match  chan *Match   // Channel for when a match was found
+	board  chan *Message
 }
 
-func (c *Player) Send() chan []byte {
+type Match struct {
+	ch     chan *Message
+	color  string
+	foe    string
+	gameID string
+}
+
+func (c *Player) Send() chan *Message {
 	return c.send
 }
 
@@ -32,53 +30,12 @@ func (c *Player) User() string {
 	return c.user
 }
 
-func (c *Player) Match() chan *GameState {
+func (c *Player) Match() chan *Match {
 	return c.match
 }
 
-func (c *Player) foe() Client {
-	if c.gameState == nil {
-		return nil
-	}
-	if c.gameState.black == c.PlayerI {
-		return c.gameState.white
-	}
-	return c.gameState.black
-}
-
-func (c *Player) color() string {
-	color := "black"
-	if c.gameState.white == c.PlayerI {
-		color = "white"
-	}
-	return color
-}
-
-// readPump reads moves from this player and dispatches those to the foe
-func (c *Player) readPump() {
-	c.openConnection()
-	for {
-		message, err := c.makeMove()
-		if err != nil {
-			log.Printf("player '%s' readPump breaks the loop, makeMove error: '%v'\n", c.user, err)
-			break
-		}
-		if c.user == "" {
-			c.sendMessage(Message{Cmd: "must_login"})
-		} else {
-			err = c.dispatch(message)
-		}
-		if err != nil {
-			log.Printf("player '%s' readPump breaks the loop, dispatch error: '%v'\n", c.user, err)
-			break
-		}
-	}
-	c.closeConnection()
-	c.hub.unregister <- c
-}
-
 /* see https://go101.org/article/channel-closing.html */
-func SafeSendBytes(ch chan []byte, value []byte) (closed bool) {
+func SafeSendBytes(ch chan *Message, value *Message) (closed bool) {
 	defer func() {
 		if recover() != nil {
 			closed = true
@@ -89,117 +46,23 @@ func SafeSendBytes(ch chan []byte, value []byte) (closed bool) {
 	return false // <=> closed = false; return
 }
 
-func (c *Player) sendToFoe(message *Message) bool {
-	if foe := c.foe(); foe == nil {
-		return true
-	}
-
-	if msgb, err := json.Marshal(message); err == nil {
-		log.Printf("player '%s' sends to '%s' message '%s'\n", c.user, c.foe().User(), string(msgb))
-		return SafeSendBytes(c.foe().Send(), msgb)
-	}
-
-	return true // json.Marshal error
+func (c *Player) onMatch(match *Match) {
+	c.board = match.ch
+	c.color = match.color
+	c.foe = match.foe
+	c.gameID = match.gameID
 }
 
-/* recieve messages from player (web socket or uci) and forward moves to the foe side */
-func (c *Player) dispatch(message *Message) error {
-
-	if message.Cmd == "start" {
-		log.Printf("player '%s' got start command, params '%s' request to register at hub\n", c.user, message.Params)
-		rr := RegisterRequest{player: c.PlayerI, foe: message.Params, color: message.Color}
-		c.hub.register <- rr
-		return nil
+func (c *Player) sendBoard(msg *Message) {
+	if c.board == nil {
+		log.Printf("player '%s' ignore '%s' command, board == nil\n", c.user, msg.Cmd)
+		return
 	}
-
-	if c.gameState == nil {
-		log.Printf("player '%s' ignore '%s' command, gameState == nil\n", c.user, message.Cmd)
-		return nil
-	}
-
-	switch message.Cmd {
-	case "move":
-		return c.move(message)
-	case "outcome":
-		return c.outcome(message)
-	case "offer":
-		if c.sendToFoe(message) {
-			return errors.New("c.sendToFoe error")
-		}
-	default:
-		log.Printf("Unknown command %s\n", message)
-	} // switch message command
-
-	return nil
+	c.board <- msg
 }
 
-func (c *Player) onUnregister() {
-	close(c.send)
-	close(c.match)
-}
-
-func (c *Player) sendMessage(msg Message) {
-	if msgb, err := json.Marshal(&msg); err == nil {
-		log.Printf("sendMessage: %s\n", msgb)
-		c.send <- msgb
-	} else {
-		log.Printf("ERROR marshalling message: %s\n", err)
+func (c *Player) unregister() {
+	if c.board != nil {
+		close(c.board)
 	}
-}
-
-func (c *Player) move(message *Message) error {
-	chessGame := c.gameState.chess
-	game := c.gameState.game
-
-	// Pre move state assertions
-	if game.Active == false {
-		log.Fatalf("player '%s' is moving on game.Active = false game\n", c.user)
-	}
-	if chessGame.Outcome() != chess.NoOutcome {
-		log.Fatalf("player '%s' is moving on a game with an outcome '%s' method '%s'\n", c.user, chessGame.Outcome(), chessGame.Method())
-	}
-
-	// Apply the move, check if the move is legal
-	if err := chessGame.MoveStr(message.Params); err != nil {
-		log.Fatal(err)
-	}
-
-	// Check is game is over, GG
-	log.Printf("player '%s' after Move command outcome '%s' method '%s'\n", c.user, chessGame.Outcome(), chessGame.Method())
-	if chessGame.Outcome() != chess.NoOutcome {
-		game.Active = false
-	}
-
-	// Record the move in DB
-	game.State = chessGame.String()
-	db.Save(game)
-	if c.sendToFoe(message) {
-		return errors.New("c.sendToFoe error")
-	}
-	return nil
-}
-
-func (c *Player) outcome(message *Message) error {
-	chessGame := c.gameState.chess
-	switch message.Params {
-	case "draw":
-		chessGame.Draw(chess.DrawOffer)
-	case "resign":
-		if c.color() == "black" {
-			chessGame.Resign(chess.Black)
-		} else {
-			chessGame.Resign(chess.White)
-		}
-	default:
-		log.Printf("Unknown outcome command params %s\n", message)
-	} // switch outcome command params
-
-	game := c.gameState.game
-	game.State = chessGame.String()
-	game.Active = false
-	db.Save(game)
-	if c.sendToFoe(message) {
-		return errors.New("c.sendToFoe error")
-	}
-	return nil
 }
