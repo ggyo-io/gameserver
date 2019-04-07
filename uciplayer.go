@@ -46,7 +46,7 @@ func (c *UCIPlayer) writePump() {
 	for {
 		select {
 		case message, ok := <-c.send:
-			log.Printf("uciPlayer '%s' got message from send channel: '%s'\n", c.user, message)
+			log.Printf("uciPlayer '%s' got message from send channel: '%#v'\n", c.user, message)
 			if !ok {
 				log.Print("read send channel error")
 				return
@@ -68,6 +68,9 @@ func (c *UCIPlayer) writePump() {
 
 			case "offer":
 				log.Printf("uciplayer '%s' ignore offer '%s'\n", c.user, message.Params)
+
+			case "undo":
+				c.sendBoard(&Message{Cmd: "accept_undo"})
 
 			default:
 				log.Printf("uciplayer '%s' got Unknown command '%s'\n", c.user, message.Cmd)

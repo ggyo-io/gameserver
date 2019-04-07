@@ -237,12 +237,24 @@ if (window["WebSocket"]) {
             must_login();
         } else if (msg.Cmd == "nomatch") {
             nomatch();
+        } else if (msg.Cmd == "accept_undo") {
+            accept_undo(msg);
         } else {
             console.log("Unknown command: '" + msg.Cmd + "'");
         }
     };
 } else {
     statusEl.html("<b>Your browser does not support WebSockets.</b>");
+}
+
+function accept_undo(msg) {
+    game.undo();
+    if (msg.Params == "2") {
+        game.undo();
+    }
+    updateStatus();
+    board.position(game.fen())
+    statusEl.html("Undo accepted, " + statusEl.html())
 }
 
 function must_login() {
