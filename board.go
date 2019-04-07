@@ -94,19 +94,20 @@ func (b *Board) accept_undo(bp *BoardPlayer, message *Message) error {
 		return nil
 	}
 	undoMoves := 2
-	newslice := append(slice[:ln-3], slice[ln-1:]...)
+	newslice := append(slice[:ln-4], slice[ln-1:]...)
 	if strings.Contains(slice[ln-2], ".") && b.black == bp ||
 		!strings.Contains(slice[ln-2], ".") && b.white == bp {
 		newslice = append(slice[:ln-2], slice[ln-1:]...)
 		undoMoves = 1
 	}
 	newpgn := strings.Join(newslice, " ")
+	log.Printf("board newpgn %s\n", newpgn)
 	reader := strings.NewReader(newpgn)
 	fpgn, err := chess.PGN(reader)
 	if err != nil {
 		log.Printf("board accept_undo failed to parse pgn %s", newpgn)
 	}
-	b.chess = chess.NewGame(fpgn)
+	b.chess = chess.NewGame(fpgn, chess.UseNotation(chess.LongAlgebraicNotation{}))
 
 	// Record the move in DB
 	b.game.State = b.chess.String()
@@ -121,6 +122,7 @@ func (c *Board) move(bp *BoardPlayer, message *Message) error {
 	chessGame := c.chess
 	game := c.game
 
+	log.Printf("pgn %s", chessGame)
 	// Pre move state assertions
 	if game.Active == false {
 		return errors.New(fmt.Sprintf("board '%s' is moving on game.Active = false game\n", bp.User()))

@@ -18,7 +18,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
+	//	"time"
 )
 
 var networksDir = "networks"
@@ -122,22 +122,24 @@ func leelaStart(l UciLauncher) {
 			log.Printf("Can not find last local lc0 weights network\n")
 		}
 
-		for {
-			new_net, net_sha := updateNetwork()
-			log.Printf("updateNetwork: new %v sha '%v'\n", new_net, net_sha)
-			if (new_net || p == nil) && net_sha != "" {
-				if p != nil {
-					mr := MoveRequest{moves: "", bestMove: nil}
-					l.moveRequest() <- mr
-					p.Input.Close()
-				}
-				p = &UciEngine{}
-				launchLc0(p, l, net_sha)
+		/*
+			for {
+				new_net, net_sha := updateNetwork()
+				log.Printf("updateNetwork: new %v sha '%v'\n", new_net, net_sha)
+				if (new_net || p == nil) && net_sha != "" {
+					if p != nil {
+						mr := MoveRequest{moves: "", bestMove: nil}
+						l.moveRequest() <- mr
+						p.Input.Close()
+					}
+					p = &UciEngine{}
+					launchLc0(p, l, net_sha)
 
-				//defer *p.Input.Close()
+					//defer *p.Input.Close()
+				}
+				time.Sleep(12000 * time.Second)
 			}
-			time.Sleep(12000 * time.Second)
-		}
+		*/
 	}()
 }
 
