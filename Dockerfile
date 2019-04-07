@@ -35,9 +35,11 @@ RUN make build ARCH=x86-64
 WORKDIR ../..
 
 # Gameserver
+WORKDIR ./gameserver
 COPY *.go ./
-RUN go get -d ./...
-RUN go build -o gameserver
+COPY Makefile ./
+RUN make deps
+RUN make
 
 # final stage - small image
 FROM alpine
