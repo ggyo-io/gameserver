@@ -58,6 +58,10 @@ func (c *WSPlayer) readPump() {
 	}
 	c.closeConnection()
 	c.unregister()
+
+	// Signal the hub to close the match channel
+	rr := RegisterRequest{player: c, request: "disconnected"}
+	c.hub.register <- rr
 }
 
 // writePump pumps messages to the websocket connection.
@@ -122,7 +126,7 @@ func (c *WSPlayer) writePump() {
 func (c *WSPlayer) dispatch(message *Message) {
 	if message.Cmd == "start" {
 		log.Printf("wsplayer '%s' got start command, params '%s' request to register at hub\n", c.user, message.Params)
-		rr := RegisterRequest{player: c, foe: message.Params, color: message.Color}
+		rr := RegisterRequest{player: c, foe: message.Params, color: message.Color, request: "match"}
 		c.hub.register <- rr
 	} else {
 		c.sendBoard(message)
@@ -187,4 +191,9 @@ func WSConnect(hub *Hub, user string, conn *websocket.Conn) {
 	go player.writePump()
 	//}
 	go player.readPump()
+
+	// Register with the hub
+	rr := RegisterRequest{player: player, request: "connected"}
+	hub.register <- rr
+
 }

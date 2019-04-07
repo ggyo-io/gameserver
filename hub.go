@@ -17,9 +17,10 @@ type Client interface {
 }
 
 type RegisterRequest struct {
-	player Client
-	foe    string
-	color  string
+	player  Client
+	foe     string
+	color   string
+	request string
 }
 
 // Hub maintains the set of active clients and broadcasts messages to the
@@ -28,7 +29,7 @@ type Hub struct {
 	clients  map[Client]RegisterRequest // open register requests
 	register chan RegisterRequest       // Register requests from the clients.
 	robots   map[string]UciLauncher
-	//users  map[string]*WSPlayer
+	users    map[string]*Board
 }
 
 func newHub(rs ...UciLauncher) *Hub {
@@ -36,7 +37,7 @@ func newHub(rs ...UciLauncher) *Hub {
 		register: make(chan RegisterRequest),
 		clients:  make(map[Client]RegisterRequest),
 		robots:   make(map[string]UciLauncher),
-		//users:      make(map[string]*WSPlayer),
+		users:    make(map[string]*Board),
 	}
 
 	for _, r := range rs {
@@ -57,10 +58,18 @@ func (h *Hub) run() {
 	for {
 		select {
 		case rq := <-h.register:
-			if rq.foe == "human" {
-				h.matchWs(rq)
-			} else {
-				h.matchUCI(rq)
+			switch rq.request {
+			case "connected":
+				// todo: Check if games is in progress and connect to it
+
+			case "disconnected":
+				close(rq.player.Match())
+			case "match":
+				if rq.foe == "human" {
+					h.matchWs(rq)
+				} else {
+					h.matchUCI(rq)
+				}
 			}
 		}
 	}
@@ -95,6 +104,7 @@ func (h *Hub) matchUCI(rq RegisterRequest) {
 		uciPlayer.onMatch(&Match{ch: board.black.ch, color: "black", foe: rq.player.User(), gameID: game.ID})
 		rq.player.Match() <- &Match{ch: board.white.ch, color: "white", foe: uciPlayer.User(), gameID: game.ID}
 	}
+
 	go uciPlayer.writePump()
 	go uciPlayer.readPump()
 	go board.run()

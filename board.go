@@ -176,8 +176,6 @@ func (c *Board) outcome(bp *BoardPlayer, message *Message) error {
 func (c *Board) onClose(bp *BoardPlayer) error {
 	log.Printf("board onClose %s", bp)
 	bp.ch = nil
-	close(bp.Send())
-
 	if c.game.Active {
 		return c.sendToFoe(bp, &Message{Cmd: "disconnect"})
 	}
