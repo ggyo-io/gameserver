@@ -16,10 +16,12 @@ type Player struct {
 }
 
 type Match struct {
-	ch     chan *Message
-	color  string
-	foe    string
-	gameID string
+	ch       chan *Message
+	color    string
+	foe      string
+	gameID   string
+	resume   bool
+	position string
 }
 
 func (c *Player) Send() chan *Message {

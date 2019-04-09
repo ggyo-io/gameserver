@@ -233,6 +233,8 @@ if (window["WebSocket"]) {
             offer(msg); // make visible
         } else if (msg.Cmd == "disconnect") {
             disconnect();
+        } else if (msg.Cmd == "reconnected") {
+            reconnected();
         } else if (msg.Cmd == "must_login") {
             must_login();
         } else if (msg.Cmd == "nomatch") {
@@ -262,8 +264,13 @@ function must_login() {
 }
 
 function disconnect() {
-    statusEl.html("Your opponent have disconnected.");
+    statusEl.html("Your opponent have <b>disconnected</b>.");
 }
+
+function reconnected() {
+    statusEl.html("Your opponent have <b>reconnected</b>.");
+}
+
 
 function offer(msg) {
     offerParams = msg.Params;
@@ -303,7 +310,10 @@ function move(msg) {
 
 function resume(msg) {
     colorEl.html('You are ' + msg.Color);
+    foeEl.html(msg.User);
+    gameIDEl.html(msg.GameID);
     game = new Chess();
+    game_started = true
     console.log("on resume game load_pgn: " + game.load_pgn(msg.Params, { sloppy: true }));
     var fen = game.fen();
     console.log("fen is: " + fen);
@@ -313,7 +323,7 @@ function resume(msg) {
 
 function start(msg) {
     foeEl.html(msg.User);
-    gameIDEl.html(msg.Params);
+    gameIDEl.html(msg.GameID);
     colorEl.html('You are ' + msg.Color);
     board = makeBoard('start', msg.Color);
     game = new Chess();

@@ -21,16 +21,39 @@ func NewBoardPlayer(client Client) *BoardPlayer {
 }
 
 type Board struct {
-	game  *Game
-	chess *chess.Game
-	white *BoardPlayer
-	black *BoardPlayer
+	game       *Game
+	chess      *chess.Game
+	white      *BoardPlayer
+	black      *BoardPlayer
+	control    chan Client
+	hubChannel chan *RegisterRequest
+}
+
+func NewBoard(hubChannel chan *RegisterRequest, white Client, black Client) *Board {
+	game := Game{Active: true, White: white.User(), Black: black.User()}
+	db.Create(&game)
+	board := Board{
+		game:       &game,
+		chess:      chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})),
+		white:      NewBoardPlayer(white),
+		black:      NewBoardPlayer(black),
+		control:    make(chan Client, 256),
+		hubChannel: hubChannel,
+	}
+	return &board
 }
 
 func (b *Board) run() {
 	for {
 		var err error
 		select {
+		case client := <-b.control:
+			if client == nil {
+				log.Print("board exited!!!")
+				return
+			}
+			match := b.reconnect(client)
+			b.hubChannel <- &RegisterRequest{board: b, request: "reconnected", match: match, player: client}
 		case msg, ok := <-b.white.ch:
 			if !ok {
 				err = b.onClose(b.white)
@@ -47,12 +70,11 @@ func (b *Board) run() {
 		if err != nil {
 			log.Print(err)
 		}
-		// both clients disconnected -> exit
-		if b.white.ch == nil && b.black.ch == nil {
-			return
+		// game over or both clients disconnected -> exit
+		if b.white.ch == nil && b.black.ch == nil || b.game.Active == false {
+			b.hubChannel <- &RegisterRequest{request: "gameover", board: b}
 		}
 	}
-	log.Print("Board exits")
 }
 
 func (b *Board) foe(bp *BoardPlayer) *BoardPlayer {
@@ -94,12 +116,11 @@ func (b *Board) accept_undo(bp *BoardPlayer, message *Message) error {
 		return nil
 	}
 	undoMoves := 2
-	newslice := append(slice[:ln-4], slice[ln-1:]...)
 	if strings.Contains(slice[ln-2], ".") && b.black == bp ||
 		!strings.Contains(slice[ln-2], ".") && b.white == bp {
-		newslice = append(slice[:ln-2], slice[ln-1:]...)
 		undoMoves = 1
 	}
+	newslice := append(slice[:ln-undoMoves-2], slice[ln-1:]...)
 	newpgn := strings.Join(newslice, " ")
 	log.Printf("board newpgn %s\n", newpgn)
 	reader := strings.NewReader(newpgn)
@@ -204,11 +225,25 @@ func (c *Board) sendToFoe(bp *BoardPlayer, message *Message) error {
 	return nil
 }
 
-// func (c *Board) sendState(bp *BoardPlayer) {
-// 	position := c.gameState.chess.String()
-// 	// need to remove trailing * cuz it look like diz: \n1.e2e4 d7d5 2.b1c3 c7c6  *
-// 	position = strings.TrimSuffix(position, " *")
-// 	position = strings.TrimSpace(position)
-// 	msg := Message{Cmd: "resume", Color: c.color(), Params: position}
-// 	c.sendMessage(msg)
-// }
+func (c *Board) reconnect(client Client) *Match {
+	color := "white"
+	foe := c.black.User()
+	var bp *BoardPlayer
+	if client.User() == c.black.User() {
+		color = "black"
+		foe = c.white.User()
+		c.black = NewBoardPlayer(client)
+		bp = c.black
+	} else {
+		c.white = NewBoardPlayer(client)
+		bp = c.white
+	}
+	c.sendToFoe(bp, &Message{Cmd: "reconnected"})
+
+	position := c.chess.String()
+	// need to remove trailing * cuz it look like diz: \n1.e2e4 d7d5 2.b1c3 c7c6  *
+	position = strings.TrimSuffix(position, " *")
+	position = strings.TrimSpace(position)
+	match := &Match{ch: bp.ch, color: color, foe: foe, resume: true, position: position}
+	return match
+}

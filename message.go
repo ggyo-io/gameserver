@@ -5,6 +5,6 @@ type Message struct {
 	User   string `json:",omitempty"`
 	Params string `json:",omitempty"`
 	Color  string `json:",omitempty"`
+	GameID string `json:",omitempty"`
 	moves  string `json:"-"`
 }
-

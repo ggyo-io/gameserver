@@ -6,8 +6,6 @@ package main
 
 import (
 	"log"
-
-	"github.com/notnil/chess"
 )
 
 type Client interface {
@@ -17,27 +15,31 @@ type Client interface {
 }
 
 type RegisterRequest struct {
+	request string
 	player  Client
 	foe     string
 	color   string
-	request string
+	board   *Board
+	match   *Match
 }
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
-	clients  map[Client]RegisterRequest // open register requests
-	register chan RegisterRequest       // Register requests from the clients.
-	robots   map[string]UciLauncher
-	users    map[string]*Board
+	clients      map[Client]*RegisterRequest // open register requests
+	register     chan *RegisterRequest       // Register requests from the clients
+	robots       map[string]UciLauncher
+	disconnected map[string]*Board
+	boards       map[Client]*Board
 }
 
 func newHub(rs ...UciLauncher) *Hub {
 	h := &Hub{
-		register: make(chan RegisterRequest),
-		clients:  make(map[Client]RegisterRequest),
-		robots:   make(map[string]UciLauncher),
-		users:    make(map[string]*Board),
+		clients:      make(map[Client]*RegisterRequest),
+		register:     make(chan *RegisterRequest),
+		boards:       make(map[Client]*Board),
+		robots:       make(map[string]UciLauncher),
+		disconnected: make(map[string]*Board),
 	}
 
 	for _, r := range rs {
@@ -60,22 +62,37 @@ func (h *Hub) run() {
 		case rq := <-h.register:
 			switch rq.request {
 			case "connected":
-				// todo: Check if games is in progress and connect to it
-
+				b := h.disconnected[rq.player.User()]
+				log.Printf("board user %s connected found board %#v", rq.player.User(), b)
+				if b != nil {
+					b.control <- rq.player
+				}
 			case "disconnected":
 				close(rq.player.Match())
+				b := h.boards[rq.player]
+				if b != nil {
+					h.disconnected[rq.player.User()] = b
+				}
+				delete(h.boards, rq.player)
 			case "match":
 				if rq.foe == "human" {
 					h.matchWs(rq)
 				} else {
 					h.matchUCI(rq)
 				}
+			case "gameover":
+				rq.board.control <- nil
+				delete(h.disconnected, rq.board.white.User())
+				delete(h.disconnected, rq.board.black.User())
+			case "reconnected":
+				log.Printf("board reconnected %#v", rq)
+				rq.player.Match() <- rq.match
 			}
 		}
 	}
 }
 
-func (h *Hub) matchUCI(rq RegisterRequest) {
+func (h *Hub) matchUCI(rq *RegisterRequest) {
 	if _, ok := h.robots[rq.foe]; !ok {
 		rq.player.Match() <- nil
 		return
@@ -90,20 +107,17 @@ func (h *Hub) matchUCI(rq RegisterRequest) {
 		whitePlayer = uciPlayer
 		blackPlayer = rq.player
 	}
-
-	game := Game{Active: true, White: whitePlayer.User(), Black: blackPlayer.User()}
-	db.Create(&game)
-	board := Board{game: &game, chess: chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})),
-		white: NewBoardPlayer(whitePlayer), black: NewBoardPlayer(blackPlayer)}
-
+	board := NewBoard(h.register, whitePlayer, blackPlayer)
 	if uciPlayer == whitePlayer {
-		uciPlayer.onMatch(&Match{ch: board.white.ch, color: "white", foe: rq.player.User(), gameID: game.ID})
-		rq.player.Match() <- &Match{ch: board.black.ch, color: "black", foe: uciPlayer.User(), gameID: game.ID}
+		uciPlayer.onMatch(&Match{ch: board.white.ch, color: "white", foe: rq.player.User(), gameID: board.game.ID})
+		rq.player.Match() <- &Match{ch: board.black.ch, color: "black", foe: uciPlayer.User(), gameID: board.game.ID}
 		uciPlayer.Send() <- &Message{Cmd: "move"}
 	} else {
-		uciPlayer.onMatch(&Match{ch: board.black.ch, color: "black", foe: rq.player.User(), gameID: game.ID})
-		rq.player.Match() <- &Match{ch: board.white.ch, color: "white", foe: uciPlayer.User(), gameID: game.ID}
+		uciPlayer.onMatch(&Match{ch: board.black.ch, color: "black", foe: rq.player.User(), gameID: board.game.ID})
+		rq.player.Match() <- &Match{ch: board.white.ch, color: "white", foe: uciPlayer.User(), gameID: board.game.ID}
 	}
+
+	h.boards[rq.player] = board
 
 	go uciPlayer.writePump()
 	go uciPlayer.readPump()
@@ -123,7 +137,7 @@ func matchColor(c1, c2 string) bool {
 	return false
 }
 
-func choosePlayersColors(rq1, rq2 RegisterRequest) (white, black Client) {
+func choosePlayersColors(rq1, rq2 *RegisterRequest) (white, black Client) {
 	if !matchColor(rq1.color, rq2.color) {
 		log.Fatalf("can not match color rq1 '%v' rq2 '%v'\n", rq1, rq2)
 		return nil, nil
@@ -140,21 +154,22 @@ func choosePlayersColors(rq1, rq2 RegisterRequest) (white, black Client) {
 	return rq1.player, rq2.player
 }
 
-func (h *Hub) matchWs(rq RegisterRequest) {
+func (h *Hub) matchWs(rq *RegisterRequest) {
 	// _very_ naive matching
 	if len(h.clients) > 0 {
 		for k := range h.clients {
 			if k != rq.player && matchColor(rq.color, h.clients[k].color) {
 				log.Printf("Found match creating a game")
 				white, black := choosePlayersColors(rq, h.clients[k])
-				game := Game{Active: true, White: white.User(), Black: black.User()}
-				db.Create(&game)
-				board := Board{game: &game, chess: chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})),
-					white: NewBoardPlayer(white), black: NewBoardPlayer(black)}
+				board := NewBoard(h.register, white, black)
 				delete(h.clients, white)
 				delete(h.clients, black)
-				white.Match() <- &Match{ch: board.white.ch, color: "white", foe: black.User(), gameID: game.ID}
-				black.Match() <- &Match{ch: board.black.ch, color: "black", foe: white.User(), gameID: game.ID}
+
+				h.boards[white] = board
+				h.boards[black] = board
+
+				white.Match() <- &Match{ch: board.white.ch, color: "white", foe: black.User(), gameID: board.game.ID}
+				black.Match() <- &Match{ch: board.black.ch, color: "black", foe: white.User(), gameID: board.game.ID}
 				go board.run()
 				return
 			}
