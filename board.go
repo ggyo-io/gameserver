@@ -30,7 +30,7 @@ type Board struct {
 }
 
 func NewBoard(hubChannel chan *RegisterRequest, white Client, black Client) *Board {
-	game := Game{Active: true, White: white.User(), Black: black.User()}
+	game := Game{Active: true, White: white.User(), Black: black.User(), Mode: "Blitz"}
 	db.Create(&game)
 	board := Board{
 		game:       &game,
@@ -162,6 +162,7 @@ func (c *Board) move(bp *BoardPlayer, message *Message) error {
 	log.Printf("board '%s' after Move command outcome '%s' method '%s'\n", bp.User(), chessGame.Outcome(), chessGame.Method())
 	if chessGame.Outcome() != chess.NoOutcome {
 		game.Active = false
+		c.UpdateScores()
 	}
 
 	// Record the move in DB
@@ -172,6 +173,10 @@ func (c *Board) move(bp *BoardPlayer, message *Message) error {
 		message.moves += " " + move.String()
 	}
 	return c.sendToFoe(bp, message)
+}
+
+func (c *Board) UpdateScores() {
+	UpdateScores(c.white.User(), c.black.User(), c.chess.Outcome(), c.game.Mode)
 }
 
 func (c *Board) outcome(bp *BoardPlayer, message *Message) error {
@@ -192,6 +197,7 @@ func (c *Board) outcome(bp *BoardPlayer, message *Message) error {
 	game := c.game
 	game.State = chessGame.String()
 	game.Active = false
+	c.UpdateScores()
 	db.Save(game)
 	return c.sendToFoe(bp, message)
 }

@@ -32,8 +32,8 @@ deps:
 	go get github.com/notnil/chess
 
 db:
-	mysqladmin -u root $(dbpass) -f drop test
-	mysqladmin -u root $(dbpass) -f create test
+	mysqladmin -u root $(dbpass) -f drop chess
+	mysqladmin -u root $(dbpass) -f create chess
 
 container:
 	docker build -t $(IMAGE):$(TAG) .
@@ -45,7 +45,7 @@ push: container
 	docker push $(GKE_IMAGE)
 
 gke:
-	
+
 
 local:
 

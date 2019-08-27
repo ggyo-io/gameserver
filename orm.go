@@ -55,4 +55,5 @@ func InitSchema() {
 	// Migrate the schema
 	db.AutoMigrate(&Game{})
 	db.AutoMigrate(&User{})
+	db.AutoMigrate(&Rating{})
 }

@@ -21,12 +21,20 @@ type Game struct {
 	Active bool
 	White  string
 	Black  string
+	Mode   string
 }
 
 type User struct {
 	Model
 	Name     string `sql:"index"`
 	Password string
+}
+
+type Rating struct {
+	Model
+	UserID	string `sql:"index:idx_uid_mode"`
+	Mode 	string `sql:"index:idx_uid_mode"`
+	Score   int
 }
 
 func (model *Model) BeforeCreate(scope *gorm.Scope) error {
