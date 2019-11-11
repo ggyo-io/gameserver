@@ -6,3 +6,5 @@ networks/
 lc0
 stockfish
 leelaz_opencl_tuning
+*.iml
+.idea/
