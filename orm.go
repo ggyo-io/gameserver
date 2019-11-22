@@ -13,7 +13,7 @@ var (
 	db *gorm.DB
 )
 
-func InitDb() {
+func initDb() {
 	userPass := "root"
 	dbpass := os.Getenv("DB_PASS")
 	if dbpass != "" {
@@ -48,10 +48,10 @@ func InitDb() {
 		}
 	}
 	db.LogMode(true)
-	InitSchema()
+	initSchema()
 }
 
-func InitSchema() {
+func initSchema() {
 	// Migrate the schema
 	db.AutoMigrate(&Game{})
 	db.AutoMigrate(&User{})

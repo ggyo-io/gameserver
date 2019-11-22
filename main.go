@@ -10,14 +10,14 @@ import (
 )
 
 func main() {
-	hub := newHub( &LeelaLauncher{make (chan MoveRequest) }, &StockfishLauncher{make (chan MoveRequest), &UciEngine{}} )
-	router := NewRouter(hub)
+	hub := newHub(&leelaLauncher{make(chan MoveRequest)}, &stockfishLauncher{make(chan MoveRequest), &uciEngine{}})
+	router := newRouter(hub)
 
 	log.Printf("Starting hub\n")
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 
 	log.Printf("Initializing the database\n")
-	InitDb()
+	initDb()
 	defer db.Close()
 
 	port := 8383

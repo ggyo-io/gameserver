@@ -2,9 +2,10 @@ gameserver
 debug
 gs.db
 .vscode/
-networks/
+networks*/
 lc0
 stockfish
 leelaz_opencl_tuning
 *.iml
 .idea/
+__debug_bin

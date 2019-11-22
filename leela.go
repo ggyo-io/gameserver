@@ -24,9 +24,11 @@ import (
 var networksDir = "networks"
 
 var httpClient *http.Client
-var HOSTNAME = "http://testserver.lczero.org"
 
-var curNetId uint = 0
+// HOSTNAME lczeero server URL
+const HOSTNAME = "http://testserver.lczero.org"
+
+var curNetID uint = 0
 
 func getExtraParams() map[string]string {
 	randToken := -17
@@ -55,7 +57,7 @@ func getNetwork(sha string) (string, bool, error) {
 
 	fmt.Printf("Downloading network...\n")
 	// Otherwise, let's download it
-	err := DownloadNetwork(httpClient, HOSTNAME, path, sha)
+	err := downloadNetwork(httpClient, HOSTNAME, path, sha)
 	if err != nil {
 		return "", false, err
 	}
@@ -81,26 +83,26 @@ func readNetworkSha() string {
 }
 
 func updateNetwork() (bool, string) {
-	nextGame, err := NextGame(httpClient, HOSTNAME, getExtraParams())
-	log.Println(nextGame, err)
+	ng, err := nextGame(httpClient, HOSTNAME, getExtraParams())
+	log.Println(ng, err)
 	if err != nil {
-		log.Printf("NextGame error %v\n", err)
+		log.Printf("nextGame error %v\n", err)
 		return false, ""
 	}
 
-	if nextGame.Type == "train" {
-		_, newNet, err := getNetwork(nextGame.Sha)
+	if ng.Type == "train" {
+		_, newNet, err := getNetwork(ng.Sha)
 		if err != nil {
 			log.Printf("getNetwork error %v\n", err)
 			return false, ""
 		}
-		curNetId = nextGame.NetworkId
-		return newNet, nextGame.Sha
+		curNetID = ng.NetworkID
+		return newNet, ng.Sha
 	}
 	return false, ""
 }
 
-func launchLc0(p *UciEngine, l UciLauncher, sha string) {
+func launchLc0(p *uciEngine, l uciLauncher, sha string) {
 	path := filepath.Join(networksDir, sha)
 	weights := fmt.Sprintf("--weights=%s", path)
 	args := make([]string, 1)
@@ -108,15 +110,15 @@ func launchLc0(p *UciEngine, l UciLauncher, sha string) {
 	p.launch(l.name(), args, "50", l.moveRequest())
 }
 
-func leelaStart(l UciLauncher) {
+func leelaStart(l uciLauncher) {
 	httpClient = &http.Client{}
 
 	go func() {
-		var p *UciEngine = nil
+		var p *uciEngine = nil
 
 		sha := readNetworkSha()
 		if sha != "" {
-			p = &UciEngine{}
+			p = &uciEngine{}
 			launchLc0(p, l, sha)
 		} else {
 			log.Printf("Can not find last local lc0 weights network\n")
@@ -143,15 +145,15 @@ func leelaStart(l UciLauncher) {
 	}()
 }
 
-type NextGameResponse struct {
+type nextGameResponse struct {
 	Type         string
-	TrainingId   uint
-	NetworkId    uint
+	TrainingID   uint
+	NetworkID    uint
 	Sha          string
 	CandidateSha string
 	Params       string
 	Flip         bool
-	MatchGameId  uint
+	MatchGameID  uint
 }
 
 func postParams(httpClient *http.Client, uri string, data map[string]string, target interface{}) error {
@@ -178,8 +180,8 @@ func postParams(httpClient *http.Client, uri string, data map[string]string, tar
 	return err
 }
 
-func NextGame(httpClient *http.Client, hostname string, params map[string]string) (NextGameResponse, error) {
-	resp := NextGameResponse{}
+func nextGame(httpClient *http.Client, hostname string, params map[string]string) (nextGameResponse, error) {
+	resp := nextGameResponse{}
 	err := postParams(httpClient, hostname+"/next_game", params, &resp)
 
 	if len(resp.Sha) == 0 {
@@ -189,13 +191,13 @@ func NextGame(httpClient *http.Client, hostname string, params map[string]string
 	return resp, err
 }
 
-func DownloadNetwork(httpClient *http.Client, hostname string, networkPath string, sha string) error {
+func downloadNetwork(httpClient *http.Client, hostname string, networkPath string, sha string) error {
 	uri := hostname + fmt.Sprintf("/get_network?sha=%s", sha)
 	r, err := httpClient.Get(uri)
-	defer r.Body.Close()
 	if err != nil {
 		return err
 	}
+	defer r.Body.Close()
 
 	out, err := os.Create(networkPath)
 	defer out.Close()

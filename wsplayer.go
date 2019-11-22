@@ -33,7 +33,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-// Client is a middleman between the websocket connection and the hub.
+// WSPlayer is a Player middleman between the websocket connection and the hub.
 type WSPlayer struct {
 	*Player
 
@@ -60,7 +60,7 @@ func (c *WSPlayer) readPump() {
 	c.unregister()
 
 	// Signal the hub to close the match channel
-	rr := &RegisterRequest{player: c, request: "disconnected"}
+	rr := &registerRequest{player: c, request: "disconnected"}
 	c.hub.register <- rr
 }
 
@@ -118,9 +118,11 @@ func (c *WSPlayer) writePump() {
 			}
 			c.onMatch(match)
 			if match.resume {
-				c.send <- &Message{Cmd: "resume", Color: c.color, User: c.foe, GameID: c.gameID, Params: match.position}
+				c.send <- &Message{Cmd: "resume", Color: c.color, User: c.foe, GameID: c.gameID, Params: match.position,
+					WhiteClock: match.whiteClock, BlackClock: match.blackClock}
 			} else {
-				c.send <- &Message{Cmd: "start", Color: c.color, User: c.foe, GameID: c.gameID}
+				c.send <- &Message{Cmd: "start", Color: c.color, User: c.foe, GameID: c.gameID,
+					WhiteClock: match.whiteClock, BlackClock: match.blackClock}
 			}
 
 		}
@@ -131,7 +133,7 @@ func (c *WSPlayer) writePump() {
 func (c *WSPlayer) dispatch(message *Message) {
 	if message.Cmd == "start" {
 		log.Printf("wsplayer '%s' got start command, params '%s' request to register at hub\n", c.user, message.Params)
-		rr := &RegisterRequest{player: c, foe: message.Params, color: message.Color, request: "match"}
+		rr := &registerRequest{player: c, foe: message.Params, color: message.Color, request: "match"}
 		c.hub.register <- rr
 	} else {
 		c.sendBoard(message)
@@ -166,7 +168,7 @@ func (c *WSPlayer) makeMove() (*Message, error) {
 	return &message, nil
 }
 
-func NewWSPlayer(hub *Hub, user string, conn *websocket.Conn) *WSPlayer {
+func newWSPlayer(hub *Hub, user string, conn *websocket.Conn) *WSPlayer {
 	player := &Player{hub: hub, user: user, send: make(chan *Message, 256), match: make(chan *Match)}
 	client := &WSPlayer{Player: player, conn: conn}
 	return client
@@ -180,12 +182,12 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := getUserName(r)
-	WSConnect(hub, user, conn)
+	wcconnect(hub, user, conn)
 }
 
-func WSConnect(hub *Hub, user string, conn *websocket.Conn) {
+func wcconnect(hub *Hub, user string, conn *websocket.Conn) {
 	log.Printf("wsconnect %s\n", user)
-	player := NewWSPlayer(hub, user, conn)
+	player := newWSPlayer(hub, user, conn)
 	//if oldPlayer, ok := h.users[user]; ok {
 	//	log.Printf("found existing player for user: %s", user)
 	//	player = oldPlayer
@@ -198,6 +200,6 @@ func WSConnect(hub *Hub, user string, conn *websocket.Conn) {
 	go player.readPump()
 
 	// Register with the hub
-	rr := &RegisterRequest{player: player, request: "connected"}
+	rr := &registerRequest{player: player, request: "connected"}
 	hub.register <- rr
 }

@@ -14,8 +14,8 @@ var (
 	store = sessions.NewCookieStore(key)
 )
 
-func Index(w http.ResponseWriter, r *http.Request) {
-	data := IndexData{
+func index(w http.ResponseWriter, r *http.Request) {
+	data := indexData{
 		UserName: "",
 		IsAnnon:  true,
 		PGN:      "",
@@ -41,14 +41,14 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func loadLoginData(user string, data *IndexData) {
+func loadLoginData(user string, data *indexData) {
 	var games []Game
 	db.Where("white = ? OR black = ?", user, user).Order("created_at DESC").Limit(20).Find(&games)
-	data.History = make([]HistoryGame, len(games))
+	data.History = make([]historyGame, len(games))
 	for i, game := range games {
 		name := game.White + " vs. " + game.Black + " on " + game.CreatedAt.String()
 		url := "?game=" + game.ID
-		hg := HistoryGame{Name: name, URL: url}
+		hg := historyGame{Name: name, URL: url}
 		data.History[i] = hg
 	}
 }
@@ -64,7 +64,7 @@ func findGame(id string) *Game {
 	return &game
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func login(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("email")
 	pass := r.FormValue("password")
 	if name != "" && pass != "" {
@@ -78,7 +78,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 302)
 }
 
-func Logout(w http.ResponseWriter, r *http.Request) {
+func logout(w http.ResponseWriter, r *http.Request) {
 	clearSession(w, r)
 	http.Redirect(w, r, "/", 302)
 }

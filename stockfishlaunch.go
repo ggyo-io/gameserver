@@ -1,18 +1,18 @@
 package main
 
-type StockfishLauncher struct {
-    mrChannel chan MoveRequest
-    p         *UciEngine
+type stockfishLauncher struct {
+	mrChannel chan MoveRequest
+	p         *uciEngine
 }
 
-func (l *StockfishLauncher) name() string {
-    return "stockfish"
+func (l *stockfishLauncher) name() string {
+	return "stockfish"
 }
 
-func (l *StockfishLauncher) launch() {
-   l.p.launch(l.name(), nil, "50", l.moveRequest())
+func (l *stockfishLauncher) launch() {
+	l.p.launch(l.name(), nil, "50", l.moveRequest())
 }
 
-func (l* StockfishLauncher) moveRequest() chan MoveRequest {
-    return l.mrChannel
+func (l *stockfishLauncher) moveRequest() chan MoveRequest {
+	return l.mrChannel
 }

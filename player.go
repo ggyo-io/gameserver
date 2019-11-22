@@ -4,6 +4,7 @@ import (
 	"log"
 )
 
+// Player is a base for UCI and WS players
 type Player struct {
 	hub    *Hub
 	user   string
@@ -15,29 +16,35 @@ type Player struct {
 	board  chan *Message
 }
 
+// Match upon game start or resume
 type Match struct {
-	ch       chan *Message
-	color    string
-	foe      string
-	gameID   string
-	resume   bool
-	position string
+	ch         chan *Message
+	color      string
+	foe        string
+	gameID     string
+	resume     bool
+	position   string
+	whiteClock int64
+	blackClock int64
 }
 
+// Send implements Client's interface
 func (c *Player) Send() chan *Message {
 	return c.send
 }
 
+// User implements Client's interface
 func (c *Player) User() string {
 	return c.user
 }
 
+// Match implements Client's interface
 func (c *Player) Match() chan *Match {
 	return c.match
 }
 
 /* see https://go101.org/article/channel-closing.html */
-func SafeSendBytes(ch chan *Message, value *Message) (closed bool) {
+func safeSendBytes(ch chan *Message, value *Message) (closed bool) {
 	defer func() {
 		if recover() != nil {
 			closed = true

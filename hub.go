@@ -4,13 +4,14 @@ import (
 	"log"
 )
 
+// Client represents a playing user registered to the hub
 type Client interface {
 	User() string
 	Match() chan *Match
 	Send() chan *Message
 }
 
-type RegisterRequest struct {
+type registerRequest struct {
 	request string
 	player  Client
 	foe     string
@@ -22,19 +23,19 @@ type RegisterRequest struct {
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
-	clients      map[Client]*RegisterRequest // open register requests
-	register     chan *RegisterRequest       // Register requests from the clients
-	robots       map[string]UciLauncher
+	clients      map[Client]*registerRequest // open register requests
+	register     chan *registerRequest       // Register requests from the clients
+	robots       map[string]uciLauncher
 	disconnected map[string]*Board
 	boards       map[Client]*Board
 }
 
-func newHub(rs ...UciLauncher) *Hub {
+func newHub(rs ...uciLauncher) *Hub {
 	h := &Hub{
-		clients:      make(map[Client]*RegisterRequest),
-		register:     make(chan *RegisterRequest),
+		clients:      make(map[Client]*registerRequest),
+		register:     make(chan *registerRequest),
 		boards:       make(map[Client]*Board),
-		robots:       make(map[string]UciLauncher),
+		robots:       make(map[string]uciLauncher),
 		disconnected: make(map[string]*Board),
 	}
 
@@ -88,12 +89,12 @@ func (h *Hub) run() {
 	}
 }
 
-func (h *Hub) matchUCI(rq *RegisterRequest) {
+func (h *Hub) matchUCI(rq *registerRequest) {
 	if _, ok := h.robots[rq.foe]; !ok {
 		rq.player.Match() <- nil
 		return
 	}
-	uciPlayer := NewUCIPlayer(h, rq.foe)
+	uciPlayer := newUCIPlayer(h, rq.foe)
 	var whitePlayer, blackPlayer Client
 
 	whitePlayer = rq.player
@@ -103,14 +104,17 @@ func (h *Hub) matchUCI(rq *RegisterRequest) {
 		whitePlayer = uciPlayer
 		blackPlayer = rq.player
 	}
-	board := NewBoard(h.register, whitePlayer, blackPlayer)
+
+	tc := timeControl{time: 15 * 60, increment: 15}
+	board := newBoard(h.register, whitePlayer, blackPlayer, tc)
+	cms := tc.time * 1000
 	if uciPlayer == whitePlayer {
-		uciPlayer.onMatch(&Match{ch: board.white.ch, color: "white", foe: rq.player.User(), gameID: board.game.ID})
-		rq.player.Match() <- &Match{ch: board.black.ch, color: "black", foe: uciPlayer.User(), gameID: board.game.ID}
+		uciPlayer.onMatch(&Match{ch: board.white.ch, color: "white", foe: rq.player.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms})
+		rq.player.Match() <- &Match{ch: board.black.ch, color: "black", foe: uciPlayer.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms}
 		uciPlayer.Send() <- &Message{Cmd: "move"}
 	} else {
-		uciPlayer.onMatch(&Match{ch: board.black.ch, color: "black", foe: rq.player.User(), gameID: board.game.ID})
-		rq.player.Match() <- &Match{ch: board.white.ch, color: "white", foe: uciPlayer.User(), gameID: board.game.ID}
+		uciPlayer.onMatch(&Match{ch: board.black.ch, color: "black", foe: rq.player.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms})
+		rq.player.Match() <- &Match{ch: board.white.ch, color: "white", foe: uciPlayer.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms}
 	}
 
 	h.boards[rq.player] = board
@@ -133,7 +137,7 @@ func matchColor(c1, c2 string) bool {
 	return false
 }
 
-func choosePlayersColors(rq1, rq2 *RegisterRequest) (white, black Client) {
+func choosePlayersColors(rq1, rq2 *registerRequest) (white, black Client) {
 	if !matchColor(rq1.color, rq2.color) {
 		log.Fatalf("can not match color rq1 '%v' rq2 '%v'\n", rq1, rq2)
 		return nil, nil
@@ -150,22 +154,24 @@ func choosePlayersColors(rq1, rq2 *RegisterRequest) (white, black Client) {
 	return rq1.player, rq2.player
 }
 
-func (h *Hub) matchWs(rq *RegisterRequest) {
+func (h *Hub) matchWs(rq *registerRequest) {
 	// _very_ naive matching
 	if len(h.clients) > 0 {
 		for k := range h.clients {
 			if k != rq.player && matchColor(rq.color, h.clients[k].color) {
 				log.Printf("Found match creating a game")
 				white, black := choosePlayersColors(rq, h.clients[k])
-				board := NewBoard(h.register, white, black)
+				tc := timeControl{time: 15 * 60, increment: 15}
+				board := newBoard(h.register, white, black, tc)
+				cms := tc.time * 1000
 				delete(h.clients, white)
 				delete(h.clients, black)
 
 				h.boards[white] = board
 				h.boards[black] = board
 
-				white.Match() <- &Match{ch: board.white.ch, color: "white", foe: black.User(), gameID: board.game.ID}
-				black.Match() <- &Match{ch: board.black.ch, color: "black", foe: white.User(), gameID: board.game.ID}
+				white.Match() <- &Match{ch: board.white.ch, color: "white", foe: black.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms}
+				black.Match() <- &Match{ch: board.black.ch, color: "black", foe: white.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms}
 				go board.run()
 				return
 			}

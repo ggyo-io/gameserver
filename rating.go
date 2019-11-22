@@ -3,7 +3,7 @@ package main
 import "github.com/notnil/chess"
 import elogo "github.com/kortemy/elo-go"
 
-func UpdateScores(whiteID string, blackID string, outcome chess.Outcome, mode string) (elogo.Outcome, elogo.Outcome) {
+func updateScores(whiteID string, blackID string, outcome chess.Outcome, mode string) (elogo.Outcome, elogo.Outcome) {
 	whiteRank := getRank(whiteID, mode)
 	blackRank := getRank(blackID, mode)
 	elo := elogo.NewElo()

@@ -10,33 +10,37 @@ import (
 	"github.com/notnil/chess"
 )
 
-type BoardPlayer struct {
+type boardPlayer struct {
 	Client
 	ch     chan *Message
 	undood bool
 }
 
-func NewBoardPlayer(client Client) *BoardPlayer {
-	return &BoardPlayer{Client: client, ch: make(chan *Message, 256)}
+func newBoardPlayer(client Client) *boardPlayer {
+	return &boardPlayer{Client: client, ch: make(chan *Message, 256)}
 }
 
+// Board represents an activeq chess game, routes moves between players
+// and enforces game rules and time control
 type Board struct {
 	game       *Game
 	chess      *chess.Game
-	white      *BoardPlayer
-	black      *BoardPlayer
+	clock      *chessClock
+	white      *boardPlayer
+	black      *boardPlayer
 	control    chan Client
-	hubChannel chan *RegisterRequest
+	hubChannel chan *registerRequest
 }
 
-func NewBoard(hubChannel chan *RegisterRequest, white Client, black Client) *Board {
-	game := Game{Active: true, White: white.User(), Black: black.User(), Mode: "Blitz"}
+func newBoard(hubChannel chan *registerRequest, white Client, black Client, tc timeControl) *Board {
+	game := Game{Active: true, White: white.User(), Black: black.User(), Mode: tc.String()}
 	db.Create(&game)
 	board := Board{
 		game:       &game,
 		chess:      chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})),
-		white:      NewBoardPlayer(white),
-		black:      NewBoardPlayer(black),
+		clock:      newChessClock(&tc),
+		white:      newBoardPlayer(white),
+		black:      newBoardPlayer(black),
 		control:    make(chan Client, 256),
 		hubChannel: hubChannel,
 	}
@@ -44,16 +48,30 @@ func NewBoard(hubChannel chan *RegisterRequest, white Client, black Client) *Boa
 }
 
 func (b *Board) run() {
+
+	b.clock.firstMoveFlag(b.clock.player)
+	defer func() {
+		b.clock.flag.Stop()
+	}()
+
 	for {
 		var err error
+
 		select {
+		case to := <-b.clock.flag.timer.C:
+			numMoves := len(b.chess.Moves())
+			log.Printf("Flag on move #%v, timeout %v, clock %v", numMoves, to, b.clock)
+			b.hubChannel <- &registerRequest{request: "gameover", board: b}
+			b.onTimeOut(b.clock.flagReason)
+			return
+
 		case client := <-b.control:
 			if client == nil {
 				log.Print("board exited!!!")
 				return
 			}
 			match := b.reconnect(client)
-			b.hubChannel <- &RegisterRequest{board: b, request: "reconnected", match: match, player: client}
+			b.hubChannel <- &registerRequest{board: b, request: "reconnected", match: match, player: client}
 		case msg, ok := <-b.white.ch:
 			if !ok {
 				err = b.onClose(b.white)
@@ -72,19 +90,19 @@ func (b *Board) run() {
 		}
 		// game over or both clients disconnected -> exit
 		if b.white.ch == nil && b.black.ch == nil || b.game.Active == false {
-			b.hubChannel <- &RegisterRequest{request: "gameover", board: b}
+			b.hubChannel <- &registerRequest{request: "gameover", board: b}
 		}
 	}
 }
 
-func (b *Board) foe(bp *BoardPlayer) *BoardPlayer {
+func (b *Board) foe(bp *boardPlayer) *boardPlayer {
 	if bp == b.white {
 		return b.black
 	}
 	return b.white
 }
 
-func (b *Board) onMessage(bp *BoardPlayer, msg *Message) error {
+func (b *Board) onMessage(bp *boardPlayer, msg *Message) error {
 	switch msg.Cmd {
 	case "move":
 		return b.move(bp, msg)
@@ -93,20 +111,20 @@ func (b *Board) onMessage(bp *BoardPlayer, msg *Message) error {
 	case "undo":
 		return b.undo(bp, msg)
 	case "accept_undo":
-		return b.accept_undo(bp, msg)
+		return b.acceptUndo(bp, msg)
 	}
 	return b.sendToFoe(bp, msg)
 }
 
-func (b *Board) undo(bp *BoardPlayer, msg *Message) error {
+func (b *Board) undo(bp *boardPlayer, msg *Message) error {
 	bp.undood = true
 	return b.sendToFoe(bp, msg)
 }
 
-func (b *Board) accept_undo(bp *BoardPlayer, message *Message) error {
+func (b *Board) acceptUndo(bp *boardPlayer, message *Message) error {
 	foe := b.foe(bp)
 	if !foe.undood {
-		return errors.New(fmt.Sprintf("board %s accept_undo without %s undood", bp.User(), foe.User()))
+		return fmt.Errorf("board %s acceptUndo without %s undood", bp.User(), foe.User())
 	}
 	pgn := b.chess.String()
 	slice := strings.Split(pgn, " ")
@@ -139,84 +157,102 @@ func (b *Board) accept_undo(bp *BoardPlayer, message *Message) error {
 	return nil
 }
 
-func (c *Board) move(bp *BoardPlayer, message *Message) error {
-	chessGame := c.chess
-	game := c.game
+func (b *Board) move(bp *boardPlayer, message *Message) error {
+	chessGame := b.chess
+	game := b.game
 
 	log.Printf("pgn %s", chessGame)
+
 	// Pre move state assertions
 	if game.Active == false {
-		return errors.New(fmt.Sprintf("board '%s' is moving on game.Active = false game\n", bp.User()))
+		return fmt.Errorf("board '%s' is moving on game.Active = false game", bp.User())
 	}
 	if chessGame.Outcome() != chess.NoOutcome {
-		return errors.New(fmt.Sprintf("board '%s' is moving on a game with an outcome '%s' method '%s'\n", bp.User(), chessGame.Outcome(), chessGame.Method()))
+		return fmt.Errorf("board '%s' is moving on a game with an outcome '%s' method '%s'", bp.User(), chessGame.Outcome(), chessGame.Method())
 	}
 
 	// Apply the move, check if the move is legal
 	if err := chessGame.MoveStr(message.Params); err != nil {
-		return errors.New(fmt.Sprintf("Illegal move %s by %s, error: %s", message.Params, bp.User(), err))
+		return fmt.Errorf("Illegal move %s by %s, error: %s", message.Params, bp.User(), err)
 	}
 	bp.undood = false
+
+	// update the time control
+	numMoves := len(b.chess.Moves())
+	b.clock.onMove(numMoves)
+	message.WhiteClock = b.clock.timeLeft[whiteColor].Milliseconds()
+	message.BlackClock = b.clock.timeLeft[blackColor].Milliseconds()
 
 	// Check is game is over, GG
 	log.Printf("board '%s' after Move command outcome '%s' method '%s'\n", bp.User(), chessGame.Outcome(), chessGame.Method())
 	if chessGame.Outcome() != chess.NoOutcome {
 		game.Active = false
-		c.UpdateScores()
+		b.updateScores()
 	}
 
 	// Record the move in DB
 	game.State = chessGame.String()
 	db.Save(game)
-	message.moves = ""
+	message.Moves = ""
 	for _, move := range chessGame.Moves() {
-		message.moves += " " + move.String()
+		message.Moves += " " + move.String()
 	}
-	return c.sendToFoe(bp, message)
+	return b.sendToFoe(bp, message)
 }
 
-func (c *Board) UpdateScores() {
-	UpdateScores(c.white.User(), c.black.User(), c.chess.Outcome(), c.game.Mode)
+func (b *Board) updateScores() {
+	updateScores(b.white.User(), b.black.User(), b.chess.Outcome(), b.game.Mode)
 }
 
-func (c *Board) outcome(bp *BoardPlayer, message *Message) error {
-	chessGame := c.chess
+func (b *Board) outcome(bp *boardPlayer, message *Message) error {
+	chessGame := b.chess
 	switch message.Params {
 	case "draw":
 		chessGame.Draw(chess.DrawOffer)
 	case "resign":
-		if bp == c.black {
+		if bp == b.black {
 			chessGame.Resign(chess.Black)
 		} else {
 			chessGame.Resign(chess.White)
 		}
 	default:
-		log.Printf("Unknown outcome command params %s\n", message)
+		log.Printf("Unknown outcome command params %v\n", message)
 	} // switch outcome command params
 
-	game := c.game
+	game := b.game
 	game.State = chessGame.String()
 	game.Active = false
-	c.UpdateScores()
+	b.updateScores()
 	db.Save(game)
-	return c.sendToFoe(bp, message)
+	return b.sendToFoe(bp, message)
 }
 
-func (c *Board) onClose(bp *BoardPlayer) error {
-	log.Printf("board onClose %s", bp)
+func (b *Board) onTimeOut(p string) error {
+	if b.game.Active {
+		m := &Message{Cmd: "outcome", Params: p}
+		b.sendToFoe(b.white, m)
+		b.sendToFoe(b.black, m)
+	}
+	b.white.ch = nil
+	b.black.ch = nil
+	return nil
+}
+
+func (b *Board) onClose(bp *boardPlayer) error {
+	log.Printf("board onClose %s", bp.User())
 	bp.ch = nil
-	if c.game.Active {
-		return c.sendToFoe(bp, &Message{Cmd: "disconnect"})
+	if b.game.Active {
+		return b.sendToFoe(bp, &Message{Cmd: "disconnect"})
 	}
 
 	// game over, let the board exit
-	foe := c.foe(bp)
+	foe := b.foe(bp)
 	foe.ch = nil
 	return nil
 }
 
-func (c *Board) sendToFoe(bp *BoardPlayer, message *Message) error {
-	foe := c.foe(bp)
+func (b *Board) sendToFoe(bp *boardPlayer, message *Message) error {
+	foe := b.foe(bp)
 	if foe == nil {
 		return errors.New("c.sendToFoe error foe is nil")
 	}
@@ -225,28 +261,28 @@ func (c *Board) sendToFoe(bp *BoardPlayer, message *Message) error {
 		return errors.New("c.sendToFoe foe is not connected channel is nil")
 	}
 
-	if SafeSendBytes(foe.Send(), message) {
+	if safeSendBytes(foe.Send(), message) {
 		return errors.New("c.sendToFoe error send channel is closed")
 	}
 	return nil
 }
 
-func (c *Board) reconnect(client Client) *Match {
+func (b *Board) reconnect(client Client) *Match {
 	color := "white"
-	foe := c.black.User()
-	var bp *BoardPlayer
-	if client.User() == c.black.User() {
+	foe := b.black.User()
+	var bp *boardPlayer
+	if client.User() == b.black.User() {
 		color = "black"
-		foe = c.white.User()
-		c.black = NewBoardPlayer(client)
-		bp = c.black
+		foe = b.white.User()
+		b.black = newBoardPlayer(client)
+		bp = b.black
 	} else {
-		c.white = NewBoardPlayer(client)
-		bp = c.white
+		b.white = newBoardPlayer(client)
+		bp = b.white
 	}
-	c.sendToFoe(bp, &Message{Cmd: "reconnected"})
+	b.sendToFoe(bp, &Message{Cmd: "reconnected"})
 
-	position := c.chess.String()
+	position := b.chess.String()
 	// need to remove trailing * cuz it look like diz: \n1.e2e4 d7d5 2.b1c3 c7c6  *
 	position = strings.TrimSuffix(position, " *")
 	position = strings.TrimSpace(position)

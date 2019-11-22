@@ -11,15 +11,15 @@ func init() {
 	templates["index"] = template.Must(template.ParseFiles("tmpl/chess.html"))
 }
 
-type IndexData struct {
+type indexData struct {
 	UserName string
 	IsAnnon  bool
 	ShowGame bool
 	PGN      string
-	History  []HistoryGame
+	History  []historyGame
 }
 
-type HistoryGame struct {
+type historyGame struct {
 	URL  string
 	Name string
 }

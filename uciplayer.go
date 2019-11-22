@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// UCIPlayer is a player representing a UCI engine
 type UCIPlayer struct {
 	*Player
 
@@ -53,7 +54,7 @@ func (c *UCIPlayer) writePump() {
 			}
 			switch message.Cmd {
 			case "move":
-				moves := message.moves
+				moves := message.Moves
 				log.Printf("uciplayer '%s' moves '%s'\n", c.user, moves)
 				mr := MoveRequest{moves: moves, bestMove: c.bestMove}
 				c.hub.robots[c.user].moveRequest() <- mr
@@ -79,7 +80,7 @@ func (c *UCIPlayer) writePump() {
 	}
 }
 
-func NewUCIPlayer(hub *Hub, user string) *UCIPlayer {
+func newUCIPlayer(hub *Hub, user string) *UCIPlayer {
 	player := &Player{hub: hub, user: user, send: make(chan *Message, 256), match: make(chan *Match)}
 	client := &UCIPlayer{Player: player, bestMove: make(chan string)}
 	return client
