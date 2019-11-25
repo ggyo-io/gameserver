@@ -41,7 +41,8 @@ type Rating struct {
 	Score  int
 }
 
-func (model *Model) beforeCreate(scope *gorm.Scope) error {
+// BeforeCreate is a hook function called by gorm
+func (model *Model) BeforeCreate(scope *gorm.Scope) error {
 	id := uuid.NewV4()
 	return scope.SetColumn("ID", str(id))
 }
