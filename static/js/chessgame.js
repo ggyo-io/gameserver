@@ -89,7 +89,7 @@ var onDrop = function (source, target) {
 var onSnapEnd = function () {
     board.position(game.fen());
     if (game.game_over() === false) {
-        var toStart, startTimer, stopTimer;
+        var toStart;
 
         if (game.turn() === 'w') {
             toStart = "white";
