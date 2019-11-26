@@ -34,7 +34,11 @@ type Board struct {
 
 func newBoard(hubChannel chan *registerRequest, white Client, black Client, tc timeControl) *Board {
 	game := Game{Active: true, White: white.User(), Black: black.User(), Mode: tc.String()}
-	db.Create(&game)
+
+	if err := db.Create(&game).Error; err != nil {
+		panic(err)
+	}
+
 	board := Board{
 		game:       &game,
 		chess:      chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})),
@@ -150,7 +154,9 @@ func (b *Board) acceptUndo(bp *boardPlayer, message *Message) error {
 
 	// Record the move in DB
 	b.game.State = b.chess.String()
-	db.Save(b.game)
+	if err := db.Save(b.game).Error; err != nil {
+		panic(err)
+	}
 	message.Params = strconv.Itoa(undoMoves)
 	b.white.Send() <- message
 	b.black.Send() <- message
@@ -192,7 +198,9 @@ func (b *Board) move(bp *boardPlayer, message *Message) error {
 
 	// Record the move in DB
 	game.State = chessGame.String()
-	db.Save(game)
+	if err := db.Save(game).Error; err != nil {
+		panic(err)
+	}
 	message.Moves = ""
 	for _, move := range chessGame.Moves() {
 		message.Moves += " " + move.String()
@@ -223,7 +231,9 @@ func (b *Board) outcome(bp *boardPlayer, message *Message) error {
 	game.State = chessGame.String()
 	game.Active = false
 	b.updateScores()
-	db.Save(game)
+	if err := db.Save(game).Error; err != nil {
+		panic(err)
+	}
 	return b.sendToFoe(bp, message)
 }
 

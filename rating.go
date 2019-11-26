@@ -22,7 +22,10 @@ func updateScores(whiteID string, blackID string, outcome chess.Outcome, mode st
 }
 
 func saveScore(playerID string, mode string, outcome elogo.Outcome) {
-	db.Save(&Rating{UserID: playerID, Mode: mode, Score: outcome.Rating})
+	if err := db.Save(&Rating{UserID: playerID,
+		Mode: mode, Score: outcome.Rating}).Error; err != nil {
+		panic(err)
+	}
 }
 
 func getRank(playerID string, mode string) int {

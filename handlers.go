@@ -71,7 +71,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 		var user User
 		if db.Where("name = ?", name).First(&user).RecordNotFound() {
 			user = User{Name: name, Password: pass}
-			db.Create(&user)
+			if err := db.Create(&user).Error; err != nil {
+				panic(err)
+			}
 		}
 		setSession(name, w, r)
 	}
