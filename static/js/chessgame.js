@@ -2,7 +2,7 @@ var runningTimer = null;
 var nextDistance = null;
 
 function printClock(color, distance, msg) {
-    const divId = color + "Clock";
+    divId = color + "Clock";
     /*
         var days = Math.floor(distance / (1000 * 60 * 60 * 24));
         var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -10,8 +10,8 @@ function printClock(color, distance, msg) {
     if (distance === 0) {
         document.getElementById(divId).innerHTML = msg;
     } else {
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        seconds = Math.floor((distance % (1000 * 60)) / 1000);
         document.getElementById(divId).innerHTML = msg + ": " +
             /* days + "d " + hours + "h "
                        + */
@@ -20,18 +20,18 @@ function printClock(color, distance, msg) {
 }
 
 function startCountdown(color, distance, msg) {
-    const countDownDate = new Date().getTime() + distance;
+    countDownDate = new Date().getTime() + distance;
 
-    const msgPrefix = msg;
+    msgPrefix = msg;
 
     // Update the count down every 10 times a second
-    const timer = setInterval(function () {
+    timer = setInterval(function () {
 
         // Get today's date and time
-        const now = new Date().getTime();
+        now = new Date().getTime();
 
         // Find the distance between now and the count down date
-        const distance = countDownDate - now;
+        distance = countDownDate - now;
 
         printClock(color, distance, msgPrefix);
 
@@ -75,11 +75,11 @@ var onDrop = function (source, target) {
     if ('promotion' in move) {
         target += move.promotion;
     }
-    last_move = source + target
+    last_move = source + target;
     console.log("my mr begin from: " + source + " to: " + target + " lastmove: " + last_move);
     console.log(move);
     console.log("my mr end");
-    console.log("game fen: " + game.fen())
+    console.log("game fen: " + game.fen());
 
     updateStatus();
 };
@@ -117,11 +117,11 @@ var updateView = function () {
         $('.nogame').css('display', 'none');
         $('.game').css('display', 'inline');
     } else {
-        clearInterval(runningTimer)
+        clearInterval(runningTimer);
         $('.nogame').css('display', 'inline');
         $('.game').css('display', 'none');
     }
-}
+};
 
 var updateStatus = function () {
     var status = '';
@@ -169,7 +169,7 @@ var makeBoard = function (position, color) {
         onSnapEnd: onSnapEnd
     };
     return ChessBoard('board', cfg);
-}
+};
 
 var
     game = null,
@@ -198,15 +198,15 @@ $('#startBtn').on('click', function () {
     }
 
     if (board) {
-        board.start;
+        board.start();
     }
 
     if (conn) {
         statusEl.html("Waiting for a match...");
         var el1 = document.getElementById("foeSelection");
-        var foeParam = el1.options[el1.selectedIndex].value
+        var foeParam = el1.options[el1.selectedIndex].value;
         var el2 = document.getElementById("colorSelection");
-        var colorParam = el2.options[el2.selectedIndex].value
+        var colorParam = el2.options[el2.selectedIndex].value;
         console.log("start with foe : " + foeParam + " color " + colorParam);
         conn.send(JSON.stringify({
             Cmd: "start",
@@ -242,7 +242,7 @@ $('#resignBtn').on('click', function () {
         }));
         game = null;
         game_started = false;
-        clearInterval(runningTimer)
+        clearInterval(runningTimer);
         updateView();
     } else {
         statusEl.html("No connection to server");
@@ -314,7 +314,7 @@ $('#offerNo').on('click', function () {
     modalEl.style.display = "none"; // make invisible
 });
 
-if (window["WebSocket"]) {
+if (window.WebSocket) {
     updateView();
     conn = new WebSocket("ws://" + document.location.host + "/ws");
     conn.onclose = function (evt) {
@@ -355,8 +355,8 @@ function accept_undo(msg) {
         game.undo();
     }
     updateStatus();
-    board.position(game.fen())
-    statusEl.html("Undo accepted, " + statusEl.html())
+    board.position(game.fen());
+    statusEl.html("Undo accepted, " + statusEl.html());
 }
 
 function must_login() {
@@ -381,9 +381,9 @@ function offer(msg) {
 function outcome(msg) {
     statusEl.html("The outcome is: '" + msg.Params + "', click the Start button for a new game");
     console.log("opponent outcome '" + msg.Params + "'");
-    game = null
+    game = null;
     game_started = false;
-    clearInterval(runningTimer)
+    clearInterval(runningTimer);
     updateView();
 }
 
@@ -410,11 +410,11 @@ function move(msg) {
 
             toStart = "white";
             startDistance = msg.WhiteClock;
-            nextDistance = msg.BlackClock
+            nextDistance = msg.BlackClock;
 
         } else {
 
-            toStart = "black"
+            toStart = "black";
             startDistance = msg.BlackClock;
             nextDistance = msg.WhiteClock;
 
@@ -442,9 +442,9 @@ function start(msg) {
     gameIDEl.html(msg.GameID);
     colorEl.html('You are ' + msg.Color);
     game = new Chess();
-    game_started = true
-    printClock("whitefm", 30 * 1000, "white first move")
-    printClock("blackfm", 30 * 1000, "black first move")
+    game_started = true;
+    printClock("whitefm", 30 * 1000, "white first move");
+    printClock("blackfm", 30 * 1000, "black first move");
     printClock("white", msg.WhiteClock, "white");
     printClock("black", msg.BlackClock, "black");
     var fen = 'start';
@@ -479,7 +479,7 @@ function showFinishedGame(pgn) {
 }
 
 function nomatch() {
-    statusEl.html("No match found")
+    statusEl.html("No match found");
 }
 
 if (PGN) {
