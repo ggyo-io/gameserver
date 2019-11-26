@@ -19,11 +19,13 @@ type Model struct {
 // Game represents an active or past chess game
 type Game struct {
 	Model
-	State  string `sql:"size:4096"`
-	Active bool
-	White  string
-	Black  string
-	Mode   string
+	State      string `sql:"size:4096"`
+	Active     bool
+	White      string
+	Black      string
+	Mode       string
+	WhiteClock int64
+	BlackClock int64
 }
 
 // User represents authenticated web ui users

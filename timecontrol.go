@@ -42,6 +42,15 @@ func playerColor(p int) string {
 	return color
 }
 
+func (c *chessClock) getClock(p int) int64 {
+	r := c.timeLeft[c.player]
+	if p == c.player {
+		now := time.Now()
+		r -= now.Sub(c.lastMoveStart)
+	}
+	return r.Milliseconds()
+
+}
 func (c *chessClock) onMove(numMoves int) {
 	now := time.Now()
 	log.Printf("chessClock start onMove move %v clock %v now %v\n", numMoves, c, now)

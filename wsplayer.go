@@ -117,14 +117,9 @@ func (c *WSPlayer) writePump() {
 				continue
 			}
 			c.onMatch(match)
-			if match.resume {
-				c.send <- &Message{Cmd: "resume", Color: c.color, User: c.foe, GameID: c.gameID, Params: match.position,
-					WhiteClock: match.whiteClock, BlackClock: match.blackClock}
-			} else {
-				c.send <- &Message{Cmd: "start", Color: c.color, User: c.foe, GameID: c.gameID,
-					WhiteClock: match.whiteClock, BlackClock: match.blackClock}
-			}
 
+			c.send <- &Message{Cmd: "start", Color: c.color, User: c.foe, GameID: c.gameID, Params: match.position,
+				WhiteClock: match.whiteClock, BlackClock: match.blackClock}
 		}
 	}
 }

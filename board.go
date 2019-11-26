@@ -153,10 +153,8 @@ func (b *Board) acceptUndo(bp *boardPlayer, message *Message) error {
 	b.chess = chess.NewGame(fpgn, chess.UseNotation(chess.LongAlgebraicNotation{}))
 
 	// Record the move in DB
-	b.game.State = b.chess.String()
-	if err := db.Save(b.game).Error; err != nil {
-		panic(err)
-	}
+	b.recordGame()
+
 	message.Params = strconv.Itoa(undoMoves)
 	b.white.Send() <- message
 	b.black.Send() <- message
@@ -197,10 +195,8 @@ func (b *Board) move(bp *boardPlayer, message *Message) error {
 	}
 
 	// Record the move in DB
-	game.State = chessGame.String()
-	if err := db.Save(game).Error; err != nil {
-		panic(err)
-	}
+	b.recordGame()
+
 	message.Moves = ""
 	for _, move := range chessGame.Moves() {
 		message.Moves += " " + move.String()
@@ -224,16 +220,14 @@ func (b *Board) outcome(bp *boardPlayer, message *Message) error {
 			chessGame.Resign(chess.White)
 		}
 	default:
+		chessGame.Method()
 		log.Printf("Unknown outcome command params %v\n", message)
 	} // switch outcome command params
 
-	game := b.game
-	game.State = chessGame.String()
-	game.Active = false
+	b.game.Active = false
 	b.updateScores()
-	if err := db.Save(game).Error; err != nil {
-		panic(err)
-	}
+	b.recordGame()
+
 	return b.sendToFoe(bp, message)
 }
 
@@ -259,6 +253,17 @@ func (b *Board) onClose(bp *boardPlayer) error {
 	foe := b.foe(bp)
 	foe.ch = nil
 	return nil
+}
+
+// Record the game in DB
+func (b *Board) recordGame() {
+	game := b.game
+	game.State = b.chess.String()
+	game.WhiteClock = b.clock.timeLeft[whiteColor].Milliseconds()
+	game.BlackClock = b.clock.timeLeft[blackColor].Milliseconds()
+	if err := db.Save(game).Error; err != nil {
+		panic(err)
+	}
 }
 
 func (b *Board) sendToFoe(bp *boardPlayer, message *Message) error {
@@ -296,6 +301,6 @@ func (b *Board) reconnect(client Client) *Match {
 	// need to remove trailing * cuz it look like diz: \n1.e2e4 d7d5 2.b1c3 c7c6  *
 	position = strings.TrimSuffix(position, " *")
 	position = strings.TrimSpace(position)
-	match := &Match{ch: bp.ch, color: color, foe: foe, resume: true, position: position}
+	match := &Match{ch: bp.ch, color: color, foe: foe, position: position, whiteClock: b.clock.getClock(whiteColor), blackClock: b.clock.getClock(blackColor)}
 	return match
 }

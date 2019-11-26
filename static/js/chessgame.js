@@ -12,8 +12,10 @@ function printClock(color, distance, msg) {
     } else {
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        document.getElementById(divId).innerHTML = msg + ": " + /* days + "d " + hours + "h "
-            + */ minutes + "m " + seconds + "s ";
+        document.getElementById(divId).innerHTML = msg + ": " +
+            /* days + "d " + hours + "h "
+                       + */
+            minutes + "m " + seconds + "s ";
     }
 }
 
@@ -46,7 +48,9 @@ function startCountdown(color, distance, msg) {
 // only pick up pieces for the side to move
 var onDragStart = function (source, piece, position, orientation) {
     console.log("onDragStart game " + game + " browsing " + browsing);
-    if (game == null || !game_started) { return false; }
+    if (game == null || !game_started) {
+        return false;
+    }
 
     if (browsing == true ||
         game.game_over() === true ||
@@ -101,7 +105,10 @@ var onSnapEnd = function () {
 
     }
     if (conn) {
-        conn.send(JSON.stringify({ Cmd: 'move', Params: last_move }));
+        conn.send(JSON.stringify({
+            Cmd: 'move',
+            Params: last_move
+        }));
     }
 };
 
@@ -196,28 +203,43 @@ $('#startBtn').on('click', function () {
 
     if (conn) {
         statusEl.html("Waiting for a match...");
-        var el1 = document.getElementById("foeSelection"); var foeParam = el1.options[el1.selectedIndex].value
-        var el2 = document.getElementById("colorSelection"); var colorParam = el2.options[el2.selectedIndex].value
+        var el1 = document.getElementById("foeSelection");
+        var foeParam = el1.options[el1.selectedIndex].value
+        var el2 = document.getElementById("colorSelection");
+        var colorParam = el2.options[el2.selectedIndex].value
         console.log("start with foe : " + foeParam + " color " + colorParam);
-        conn.send(JSON.stringify({ Cmd: "start", Params: foeParam, Color: colorParam }));
+        conn.send(JSON.stringify({
+            Cmd: "start",
+            Params: foeParam,
+            Color: colorParam
+        }));
     } else {
         statusEl.html("No connection to server");
     }
 });
 
 $('#undoBtn').on('click', function () {
-    if (game == null) { return; }
+    if (game == null) {
+        return;
+    }
     if (conn) {
-        conn.send(JSON.stringify({ Cmd: "undo" }));
+        conn.send(JSON.stringify({
+            Cmd: "undo"
+        }));
     }
 });
 
 $('#resignBtn').on('click', function () {
-    if (game == null) { return; }
+    if (game == null) {
+        return;
+    }
     if (conn) {
         statusEl.html("You have resigned, click the Start button for a new game");
         console.log("Resigned");
-        conn.send(JSON.stringify({ Cmd: "outcome", Params: "resign" }));
+        conn.send(JSON.stringify({
+            Cmd: "outcome",
+            Params: "resign"
+        }));
         game = null;
         game_started = false;
         clearInterval(runningTimer)
@@ -228,20 +250,29 @@ $('#resignBtn').on('click', function () {
 });
 
 $('#drawBtn').on('click', function () {
-    if (game == null) { return; }
+    if (game == null) {
+        return;
+    }
     statusEl.html("You have offered a draw, waiting for response");
     console.log("Draw offer");
-    conn.send(JSON.stringify({ Cmd: "offer", Params: "draw" }));
+    conn.send(JSON.stringify({
+        Cmd: "offer",
+        Params: "draw"
+    }));
 });
 
 $('#leftBtn').on('click', function () {
-    if (game == null) { return; }
+    if (game == null) {
+        return;
+    }
 
     if (browsing === false) {
         browsing = true;
         statusEl.html("Browsing");
         browsingGame = new Chess();
-        game.history().forEach(function (item, index) { browsingGame.move(item); });
+        game.history().forEach(function (item, index) {
+            browsingGame.move(item);
+        });
     }
 
     browsingGame.undo();
@@ -252,8 +283,12 @@ $('#leftBtn').on('click', function () {
 });
 
 $('#rightBtn').on('click', function () {
-    if (game == null) { return; }
-    if (browsing === false) { return; }
+    if (game == null) {
+        return;
+    }
+    if (browsing === false) {
+        return;
+    }
     browsingGame.move(game.history()[browsingGame.history().length]);
     board.position(browsingGame.fen());
     fenEl.html(browsingGame.fen());
@@ -267,7 +302,10 @@ $('#rightBtn').on('click', function () {
 
 $('#offerYes').on('click', function () {
     console.log("Offer accepted: " + offerParams);
-    conn.send(JSON.stringify({ Cmd: "outcome", Params: offerParams }));
+    conn.send(JSON.stringify({
+        Cmd: "outcome",
+        Params: offerParams
+    }));
     statusEl.html("You have accepted '" + offerParams + "', click the Start button for a new game");
     modalEl.style.display = "none"; // make invisible
 });
@@ -287,8 +325,6 @@ if (window["WebSocket"]) {
         console.log(msg);
         if (msg.Cmd == "start") {
             start(msg);
-        } else if (msg.Cmd == "resume") {
-            resume(msg);
         } else if (msg.Cmd == "move") {
             move(msg);
         } else if (msg.Cmd == "outcome") {
@@ -401,36 +437,41 @@ function move(msg) {
     board.position(game.fen());
 }
 
-function resume(msg) {
-    colorEl.html('You are ' + msg.Color);
-    foeEl.html(msg.User);
-    gameIDEl.html(msg.GameID);
-    game = new Chess();
-    game_started = true
-    console.log("on resume game load_pgn: " + game.load_pgn(msg.Params, { sloppy: true }));
-    var fen = game.fen();
-    console.log("fen is: " + fen);
-    board = makeBoard(fen, msg.Color);
-    updateStatus();
-}
-
 function start(msg) {
     foeEl.html(msg.User);
     gameIDEl.html(msg.GameID);
     colorEl.html('You are ' + msg.Color);
-    board = makeBoard('start', msg.Color);
     game = new Chess();
-    runningTimer = startCountdown("whitefm", 30 * 1000, "white first move");
+    game_started = true
+    printClock("whitefm", 30 * 1000, "white first move")
     printClock("blackfm", 30 * 1000, "black first move")
     printClock("white", msg.WhiteClock, "white");
     printClock("black", msg.BlackClock, "black");
-    game_started = true;
+    var fen = 'start';
+    if (msg.Params !== undefined) {
+        console.log("on resume game load_pgn: " + game.load_pgn(msg.Params, {
+            sloppy: true
+        }));
+        fen = game.fen();
+        console.log("fen is: " + fen);
+        if (game.turn() === 'w') {
+            runningTimer = startCountdown("white", msg.WhiteClock, "white");
+        } else {
+            runningTimer = startCountdown("black", msg.BlackClock, "black");
+        }
+    } else {
+        runningTimer = startCountdown("whitefm", 30 * 1000, "white first move");
+    }
+    board = makeBoard(fen, msg.Color);
+
     updateStatus();
 }
 
 function showFinishedGame(pgn) {
     game = new Chess();
-    console.log("load history game load_pgn: " + game.load_pgn(pgn, { sloppy: true }));
+    console.log("load history game load_pgn: " + game.load_pgn(pgn, {
+        sloppy: true
+    }));
     var fen = game.fen();
     console.log("fen is: " + fen);
     board = makeBoard(fen, "white");

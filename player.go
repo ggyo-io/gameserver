@@ -22,7 +22,6 @@ type Match struct {
 	color      string
 	foe        string
 	gameID     string
-	resume     bool
 	position   string
 	whiteClock int64
 	blackClock int64
