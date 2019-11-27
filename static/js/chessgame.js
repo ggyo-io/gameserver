@@ -185,7 +185,7 @@ var
     colorEl = $('#color'),
     offerEl = $('#offer'),
     weEl = $('#whiteElo'),
-    beEl = $('#blackElo')
+    beEl = $('#blackElo'),
     game_started = false;
 
 var offerParams = null;
