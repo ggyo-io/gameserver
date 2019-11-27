@@ -1,84 +1,22 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>Chess</title>
-  <link rel="stylesheet" href="/static/css/chessboard-0.3.0.min.css" />
-  <link rel="stylesheet" href="/static/css/chessgame.css" />
-</head>
-<body>
-  <div class="box">
-    <h2>
-      <span id="home"><a href="/">Home</a></span>
-      <span>&nbsp;</span>
-      {{if .IsAnnon}}
-      <form id="loginHeader" action="/login" method="POST">
-        <input type="email" id="email" name="email" placeholder="email"/>
-        <input type="password" id="password" name="password" placeholder="password"/>
-        <input type="submit" id="loginBtn" value="Log In" />
-      </form>
-      {{else}}
-      <span  id="userHeader">Hello, <i id="username">{{.UserName}}</i>     
-        <form id="logout" action="/logout" method="GET">
-          <input type="submit" id="logoutBtn" value="Sign Out" />
-        </form>
-      </span>
-      {{end}}
-    </h2>
-    <p>
-      <div id="whitefmClock"></div>    
-      <div id="whiteClock"></div>
-      <div id="blackfmClock"></div>
-      <div id="blackClock"></div>
-      <div id="whiteElo"></div>
-      <div id="blackElo"></div>
-      <div id="board" style="float: left; margin-left: 5px; width: 400px"></div>
-      <input class="nogame" type="button" id="startBtn" value="Start" />
-      <select class="nogame" id="foeSelection">
-        <option value="stockfish" selected>stockfish</option>
-        <option value="lc0">lc0</option>
-        <option value="human">human</option>
-      </select>
-      <select class="nogame" id="colorSelection">
-        <option value="any" selected>any</option>
-        <option value="white">white</option>
-        <option value="black">black</option>
-      </select>
-      <input class="game" type="button" id="undoBtn" value="Undo" />
-      <input class="game" type="button" id="resignBtn" value="Resign" />
-      <input class="game" type="button" id="drawBtn" value="Draw" />
-      <input type="button" id="leftBtn" value="←" />
-      <input type="button" id="rightBtn" value="→" />
-      <p><span>Status: </span>                <span id="status"></span></p>
-      <p><span class="game">Game ID: </span>  <span class="game" id="gameid"></span></p>
-      <p><span class="game">FEN: </span>      <span class="game" id="fen"></span></p>
-      <p><span class="game">PGN: </span>      <span class="game" id="pgn"></span></p>
-      <p><span class="game">Opponent: </span> <span class="game" id="foe"></span></p>
-      <p><span class="game">Color: </span>    <span class="game" id="color"></span></p>
-      <div id="modalDiv" class="modal">
-        <div class="modal-content">
-          <p>Opponent offer: <span id="offer"></span></p>
-          <span id="offerYes" class="close-yes">✓</span>
-          <span id="offerNo"  class="close-no">×</span>
-        </div>
-      </div>
-    </p>
-    {{if not .IsAnnon}}
-    <h3 class="nogame">History</h3>
-    <ul class="nogame" id="history">
-    {{range .History}}<li><a href="{{.URL}}">{{.Name}}</a></li>{{end}}  
-    </ul>
-    {{end}}
+    <head>
+        <meta charset="utf-8"/>
+        <title>Chess</title>
+
+        <link rel="stylesheet" href="/static/css/chessboard-0.3.0.css">
+        <link rel="stylesheet" href="/static/css/chessgame.css">
+
+        <script src="/static/js/chessboard-0.3.0.js"></script>
+        <script src="/static/js/chess.min.js"></script>
+        <script src="/static/js/jquery-1.10.1.min.js"></script>
+    </head>
+    <body>
     
-  </div>
-
-<script>  
-var PGN = {{if ne .PGN ""}}"{{.PGN}}"{{else}}null{{end}};
-</script>
-
-  <script src="/static/js/json3.min.js"></script>
-  <script src="/static/js/jquery-1.10.1.min.js"></script>
-  <script src="/static/js/chessboard-0.3.0.min.js"></script>
-  <script src="/static/js/chess.min.js"></script>
-  <script src="/static/js/chessgame.js"></script>
-</body>
+        <div id="chessgame"></div>
+        <script src="/static/js/chessgame.js"></script>
+    </body>
 </html>
+
+
+
