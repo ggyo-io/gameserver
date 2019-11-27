@@ -184,6 +184,8 @@ var
     pgnEl = $('#pgn'),
     colorEl = $('#color'),
     offerEl = $('#offer'),
+    weEl = $('#whiteElo'),
+    beEl = $('#blackElo')
     game_started = false;
 
 var offerParams = null;
@@ -441,6 +443,8 @@ function start(msg) {
     foeEl.html(msg.User);
     gameIDEl.html(msg.GameID);
     colorEl.html('You are ' + msg.Color);
+    weEl.html('White ELO: ' + msg.WhiteElo);
+    beEl.html('Black ELO: ' + msg.BlackElo);
     game = new Chess();
     game_started = true;
     printClock("whitefm", 30 * 1000, "white first move");

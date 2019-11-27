@@ -301,6 +301,6 @@ func (b *Board) reconnect(client Client) *Match {
 	// need to remove trailing * cuz it look like diz: \n1.e2e4 d7d5 2.b1c3 c7c6  *
 	position = strings.TrimSuffix(position, " *")
 	position = strings.TrimSpace(position)
-	match := &Match{ch: bp.ch, color: color, foe: foe, position: position, whiteClock: b.clock.getClock(whiteColor), blackClock: b.clock.getClock(blackColor)}
+	match := &Match{ch: bp.ch, color: color, foe: foe, position: position, whiteClock: b.clock.getClock(whiteColor), blackClock: b.clock.getClock(blackColor), tc: b.clock.tc}
 	return match
 }

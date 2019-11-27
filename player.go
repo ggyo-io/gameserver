@@ -25,6 +25,7 @@ type Match struct {
 	position   string
 	whiteClock int64
 	blackClock int64
+	tc         timeControl
 }
 
 // Send implements Client's interface

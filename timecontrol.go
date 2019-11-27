@@ -28,6 +28,7 @@ type chessClock struct {
 	flagReason    string
 	player        int
 	lastMoveStart time.Time
+	tc            timeControl
 }
 
 func (c *chessClock) String() string {
@@ -86,6 +87,7 @@ func newChessClock(tc *timeControl) *chessClock {
 	cc.timeLeft[blackColor] = cc.timeLeft[whiteColor]
 	cc.increment[whiteColor] = time.Second * time.Duration(tc.increment)
 	cc.increment[blackColor] = time.Second * time.Duration(tc.increment)
+	cc.tc = *tc
 
 	cc.player = whiteColor
 	cc.flag = newReusableTimer()

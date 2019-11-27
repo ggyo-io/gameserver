@@ -109,12 +109,12 @@ func (h *Hub) matchUCI(rq *registerRequest) {
 	board := newBoard(h.register, whitePlayer, blackPlayer, tc)
 	cms := tc.time * 1000
 	if uciPlayer == whitePlayer {
-		uciPlayer.onMatch(&Match{ch: board.white.ch, color: "white", foe: rq.player.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms})
-		rq.player.Match() <- &Match{ch: board.black.ch, color: "black", foe: uciPlayer.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms}
+		uciPlayer.onMatch(&Match{ch: board.white.ch, color: "white", foe: rq.player.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc})
+		rq.player.Match() <- &Match{ch: board.black.ch, color: "black", foe: uciPlayer.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
 		uciPlayer.Send() <- &Message{Cmd: "move"}
 	} else {
-		uciPlayer.onMatch(&Match{ch: board.black.ch, color: "black", foe: rq.player.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms})
-		rq.player.Match() <- &Match{ch: board.white.ch, color: "white", foe: uciPlayer.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms}
+		uciPlayer.onMatch(&Match{ch: board.black.ch, color: "black", foe: rq.player.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc})
+		rq.player.Match() <- &Match{ch: board.white.ch, color: "white", foe: uciPlayer.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
 	}
 
 	h.boards[rq.player] = board
@@ -170,8 +170,8 @@ func (h *Hub) matchWs(rq *registerRequest) {
 				h.boards[white] = board
 				h.boards[black] = board
 
-				white.Match() <- &Match{ch: board.white.ch, color: "white", foe: black.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms}
-				black.Match() <- &Match{ch: board.black.ch, color: "black", foe: white.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms}
+				white.Match() <- &Match{ch: board.white.ch, color: "white", foe: black.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
+				black.Match() <- &Match{ch: board.black.ch, color: "black", foe: white.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
 				go board.run()
 				return
 			}

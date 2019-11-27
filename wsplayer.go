@@ -118,8 +118,14 @@ func (c *WSPlayer) writePump() {
 			}
 			c.onMatch(match)
 
+			whiteElo := getRank(c.User(), match.tc.String())
+			blackElo := getRank(c.foe, match.tc.String())
+			if c.color != "white" {
+				whiteElo, blackElo = blackElo, whiteElo
+			}
+
 			c.send <- &Message{Cmd: "start", Color: c.color, User: c.foe, GameID: c.gameID, Params: match.position,
-				WhiteClock: match.whiteClock, BlackClock: match.blackClock}
+				WhiteClock: match.whiteClock, BlackClock: match.blackClock, WhiteElo: whiteElo, BlackElo: blackElo}
 		}
 	}
 }

@@ -9,5 +9,7 @@ type Message struct {
 	GameID     string `json:",omitempty"`
 	WhiteClock int64  `json:",omitempty"`
 	BlackClock int64  `json:",omitempty"`
+	WhiteElo   int    `json:",omitempty"`
+	BlackElo   int    `json:",omitempty"`
 	Moves      string `json:"-"`
 }
