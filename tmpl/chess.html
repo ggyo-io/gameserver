@@ -11,12 +11,12 @@
         <script src="/static/js/chess.min.js"></script>
         <script src="/static/js/jquery-1.10.1.min.js"></script>
     </head>
-    <body>
-    
+    <body>  
+        <script>  
+            var UserName = "{{.UserName}}";
+            var PGN = "{{.PGN}}";
+        </script>
         <div id="chessgame"></div>
         <script src="/static/js/chessgame.js"></script>
     </body>
 </html>
-
-
-

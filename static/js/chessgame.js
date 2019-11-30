@@ -99,9 +99,42 @@
                 options: ['any', 'white', 'black']
             },
             {
-                name: 'Time Control',
+                name: selectTimeControl,
                 options: ['900+15', '300+5', '60+1']
             },
+        ];
+
+        var login = "login";
+        var logout = "logout";
+        var emailType = 'email';
+        var passwordType = 'password';
+        var submitType = 'submit';
+
+        var loginForms = [{
+                name: login,
+                action: '/login',
+                method: 'POST',
+                inputs: [{
+                        type: emailType
+                    },
+                    {
+                        type: passwordType
+                    },
+                    {
+                        type: submitType,
+                        submit: 'Log In'
+                    }
+                ]
+            },
+            {
+                name: logout,
+                action: '/logout',
+                method: 'GET',
+                inputs: [{
+                    type: submitType,
+                    submit: 'Sign Out'
+                }]
+            }
         ];
 
         //------------------------------------------------------------------------------
@@ -151,10 +184,8 @@
             GAME_ID = "game-" + createId(),
             BOARD_ID = 'board-' + createId(),
             SELECT_GAME_ID = 'select-game-' + createId(),
-            BUTTONS_ID = 'buttons-' + createId();
-
-
-
+            BUTTONS_ID = 'buttons-' + createId(),
+            LOGIN_FORM_ID = 'loginform-' + createId();
 
         //------------------------------------------------------------------------------
         // JS Util Functions
@@ -663,6 +694,16 @@
             return true;
         }
 
+        function itemByName(l, name) {
+            var r = null;
+            l.forEach(function(item, index) {
+                if (item.name == name) {
+                    r = item;
+                }
+            });
+            return r;
+        }
+
         function statusDivs(l) {
 
             var html = '';
@@ -676,14 +717,33 @@
             return html;
         }
 
-        function itemByName(l, name) {
-            var r = null;
-            l.forEach(function(item, index) {
-                if (item.name == name) {
-                    r = item;
+
+
+        function loginFormDiv() {
+            var html = '<div id="' + LOGIN_FORM_ID + '" >';
+
+            var form = itemByName(loginForms, login);
+            var name = 'Anonymous';
+            if (UserName !== '') {
+                form = itemByName(loginForms, logout);
+                name = UserName;
+            }
+            html += 'Hello, <i>' + name + '</i>';
+
+            html += '<form action="' + form.action + '" method="' + form.method + '">';
+
+            form.inputs.forEach(function(item, index) {
+                html += '<input type="' + item.type + '"';
+                if (item.type !== submitType) {
+                    html += ' placeholder="' + item.type + '" name="' + item.type + '"';
+                } else {
+                    html += ' value="' + item.submit + '"';
                 }
+                html += '/>';
             });
-            return r;
+            html += '</form></div>';
+
+            return html;
         }
 
         function selectGameDiv() {
@@ -728,6 +788,7 @@
         function chessGameDiv() {
             var html = '<div id="' + GAME_ID + '" class="' + CSS.chessgame + '">';
             html += boardDiv();
+            html += loginFormDiv();
             html += selectGameDiv();
             html += buttonsDiv();
             html += statusDivs(statusItems);
@@ -784,6 +845,9 @@
             var margin = 5;
             var top = margin;
             var left = $('#' + BOARD_ID).outerWidth(true) + margin;
+            $('#' + LOGIN_FORM_ID).css({ top: top, left: left, position: 'absolute' });
+            //console.log('id: ' + LOGIN_FORM_ID + 'top: ' + top + ' left: ' + left);
+            top += $('#' + LOGIN_FORM_ID).outerHeight(true) + margin;
             $('#' + SELECT_GAME_ID).css({ top: top, left: left, position: 'absolute' });
             //console.log('id: ' + SELECT_GAME_ID + 'top: ' + top + ' left: ' + left);
             top += $('#' + SELECT_GAME_ID).outerHeight(true) + margin;
