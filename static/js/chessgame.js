@@ -6,37 +6,45 @@
         cfg = cfg || {};
 
         //------------------------------------------------------------------------------
+        // Keyboard keys
+        //------------------------------------------------------------------------------ 
+        // https://stackoverflow.com/questions/1402698/binding-arrow-keys-in-js-jquery
+
+        var leftArrow = 37,
+            rightArrow = 39;
+
+        //------------------------------------------------------------------------------
         // Markup model
         //------------------------------------------------------------------------------ 
         var buttons = [{
                 name: 'start',
-                game: 'nogame',
+                class: 'nogame',
                 onclick: startBtn
             },
             {
                 name: 'undo',
-                game: 'game',
+                class: 'game',
                 onclick: undoBtn,
             },
             {
                 name: 'resign',
-                game: 'game',
+                class: 'game',
                 onclick: resignBtn
             },
             {
                 name: 'draw',
-                game: 'game',
+                class: 'game',
                 onclick: drawBtn
             },
             {
                 name: '←',
-                game: 'always',
-                onclick: leftBtn
+                onclick: leftBtn,
+                onkey: leftArrow
             },
             {
                 name: '→',
-                game: 'always',
-                onclick: rightBtn
+                onclick: rightBtn,
+                onkey: rightArrow
             }
         ];
 
@@ -46,8 +54,6 @@
         var opponentName = 'Opponent';
         var whiteEloName = 'White_ELO';
         var blackEloName = 'Black_ELO';
-        var whiteFMname = 'White_first_move_clock';
-        var blackFMname = 'Black_first_move_clock';
         var whiteClockkName = 'White_clock';
         var blackClockkName = 'Black_clock';
         var fenName = 'FEN';
@@ -56,28 +62,28 @@
                 name: statusName
             },
             {
-                name: gameIDName
+                name: gameIDName,
+                class: 'game'
             },
             {
-                name: opponentName
+                name: opponentName,
+                class: 'game'
             },
             {
-                name: whiteEloName
+                name: whiteEloName,
+                class: 'game'
             },
             {
-                name: blackEloName
+                name: blackEloName,
+                class: 'game'
             },
             {
-                name: whiteFMname
+                name: whiteClockkName,
+                class: 'game'
             },
             {
-                name: blackFMname
-            },
-            {
-                name: whiteClockkName
-            },
-            {
-                name: blackClockkName
+                name: blackClockkName,
+                class: 'game'
             },
             {
                 name: fenName
@@ -527,8 +533,6 @@
             $('#' + itemByName(statusItems, whiteEloName).id).html('White ELO: ' + msg.WhiteElo);
             $('#' + itemByName(statusItems, blackEloName).id).html('Black ELO: ' + msg.BlackElo);
 
-            printClock(itemByName(statusItems, whiteFMname).id, 30 * 1000, "white first move");
-            printClock(itemByName(statusItems, blackFMname).id, 30 * 1000, "black first move");
             printClock(itemByName(statusItems, whiteClockkName).id, msg.WhiteClock, "white clock");
             printClock(itemByName(statusItems, blackClockkName).id, msg.BlackClock, "black clock");
 
@@ -635,7 +639,6 @@
                 if (game.history().length < 2) {
                     toStartMessage = 'white first move';
                     startDistance = 30 * 1000;
-                    toStart = itemByName(statusItems, whiteFMname).id;
                 } else {
                     toStartMessage = 'white';
                     if (msg == null) {
@@ -653,7 +656,6 @@
                 if (game.history().length < 2) {
                     toStartMessage = 'black first move';
                     startDistance = 30 * 1000;
-                    toStart = itemByName(statusItems, blackFMname).id;
                 } else {
                     toStartMessage = 'black';
                     if (msg == null) {
@@ -710,7 +712,11 @@
             l.forEach(function(item, index) {
                 item.id = item.name + '-' + createId();
 
-                html += '<div id="' + item.id + '" >' + item.name + '</div>';
+                html += '<div id="' + item.id + '"';
+                if (item.class !== undefined) {
+                    html += ' class="' + item.class + '"';
+                }
+                html += ' >' + item.name + '</div>';
             });
 
 
@@ -770,8 +776,8 @@
             buttons.forEach(function(item, index) {
                 item.id = item.name + '-' + createId();
                 html += '<li  class="' + CSS.horizLi + '" ><input id="' + item.id + '" type="button" value="' + item.name + '"';
-                if (item.game !== 'always') {
-                    html += ' class="' + item.game + '"';
+                if (item.class !== undefined) {
+                    html += ' class="' + item.class + '"';
                 }
                 html += '/></li>';
             });
@@ -821,6 +827,20 @@
         function initButtonHandlers() {
             buttons.forEach(function(item, index) {
                 $('#' + item.id).on('click', item.onclick);
+                if (item.onkey !== undefined) {
+                    var k = item.onkey;
+                    $(document).keydown(function(e) {
+                        switch (e.which) {
+                            case k:
+                                break;
+
+                            default:
+                                return; // exit this handler for other keys
+                        }
+                        e.preventDefault(); // prevent the default action (scroll / move caret)
+                        item.onclick();
+                    });
+                }
             });
         }
 
@@ -869,8 +889,7 @@
             chessgameEl.html(chessGameDiv());
             initElementRefs();
             initButtonHandlers();
-
-            statusEl.html('Status: Starting');
+            statusEl.html("Choose opponent and click the Start button for a new game");
 
             board = makeBoard(BOARD_ID, 'start', 'white');
             resize();
@@ -881,6 +900,11 @@
             if (initContainerEl() !== true) return;
 
             initDom();
+            updateView();
+
+            if (PGN !== '') {
+                showFinishedGame(PGN);
+            }
         }
 
         // go time
@@ -891,8 +915,6 @@
     }; // end of window['ChessGame']
 
     var chessgame = ChessGame('chessgame', {});
-    //if (PGN) {
-    //    showFinishedGame(PGN);
-    //}
+
 
 })(); // end anonymous wrapper
