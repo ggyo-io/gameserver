@@ -45,19 +45,17 @@
                 name: '→',
                 onclick: rightBtn,
                 onkey: rightArrow
+            },
+            {
+                name: '⇄',
+                onclick: flipBtn
             }
         ];
 
 
         var statusName = 'Status';
         var gameIDName = 'Game_ID';
-        var opponentName = 'Opponent';
-        var whiteEloName = 'White_ELO';
-        var blackEloName = 'Black_ELO';
-        var whiteClockkName = 'White_clock';
-        var blackClockkName = 'Black_clock';
         var fenName = 'FEN';
-        var pgnName = 'PGN';
         var statusItems = [{
                 name: statusName
             },
@@ -66,30 +64,7 @@
                 class: 'game'
             },
             {
-                name: opponentName,
-                class: 'game'
-            },
-            {
-                name: whiteEloName,
-                class: 'game'
-            },
-            {
-                name: blackEloName,
-                class: 'game'
-            },
-            {
-                name: whiteClockkName,
-                class: 'game'
-            },
-            {
-                name: blackClockkName,
-                class: 'game'
-            },
-            {
                 name: fenName
-            },
-            {
-                name: pgnName
             },
         ];
 
@@ -153,6 +128,7 @@
             chessgame: 'chessgame-c70f',
             hotizUl: 'horiz-ul-3d5f',
             horizLi: 'horiz-li-7ba0',
+            scrollable: 'scrollable-136f'
         };
 
         //------------------------------------------------------------------------------
@@ -161,19 +137,19 @@
         var
             game = null,
             board = null,
+            orientation = 'white',
+            myColor = orientation,
             last_move = "",
             browsing = false,
             browsingGame = new Chess(),
             statusEl = null,
             fenEl = null,
-            pgnEl = null,
             offerEl = null,
             game_started = false,
             offerParams = null,
             runningTimer = null,
             nextDistance = null,
             conn = null;
-
 
         // DOM elements
         var chessgameEl;
@@ -185,13 +161,22 @@
         // Stateful
         //------------------------------------------------------------------------------
 
-        // create random IDs for top level elements
+        // Top level elements
         var
             GAME_ID = "game-" + createId(),
             BOARD_ID = 'board-' + createId(),
+            WHITE_PLAYER_ID = 'white-player-' + createId(),
+            WHITE_NAME_ID = 'white-name-' + createId(),
+            WHITE_ELO_ID = 'white-elo-' + createId(),
+            WHITE_CLOCK_ID = 'white-clock-' + createId(),
+            BLACK_PLAYER_ID = 'black-player-' + createId(),
+            BLACK_NAME_ID = 'black-name-' + createId(),
+            BLACK_ELO_ID = 'black-elo-' + createId(),
+            BLACK_CLOCK_ID = 'black-clock-' + createId(),
             SELECT_GAME_ID = 'select-game-' + createId(),
             BUTTONS_ID = 'buttons-' + createId(),
-            LOGIN_FORM_ID = 'loginform-' + createId();
+            LOGIN_FORM_ID = 'loginform-' + createId(),
+            PGN_ID = 'pgn-' + createId();
 
         //------------------------------------------------------------------------------
         // JS Util Functions
@@ -219,8 +204,8 @@
 
             if (browsing == true ||
                 game.game_over() === true ||
-                (game.turn() === 'w' && board.orientation().search(/^b/) !== -1) ||
-                (game.turn() === 'b' && board.orientation().search(/^w/) !== -1) ||
+                (game.turn() === 'w' && myColor === 'black') ||
+                (game.turn() === 'b' && myColor === 'white') ||
                 (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
                 (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
                 return false;
@@ -306,7 +291,7 @@
 
             statusEl.html(status);
             fenEl.html('FEN: <small>' + game.fen() + '</small>');
-            pgnEl.html(game.pgn());
+            $('#' + PGN_ID).html(printPgn(game.pgn()));
             updateView();
         };
 
@@ -330,8 +315,10 @@
                 var foeParam = el1.options[el1.selectedIndex].value;
                 var el2 = document.getElementById(itemByName(selectNewGame, selectColor).id);
                 var colorParam = el2.options[el2.selectedIndex].value;
+                var el3 = document.getElementById(itemByName(selectNewGame, selectTimeControl).id);
+                var tcParam = el3.options[el3.selectedIndex].value;
 
-                console.log("start with foe : " + foeParam + " color " + colorParam);
+                console.log("start with foe: " + foeParam + " color: " + colorParam + " time control: " + tcParam);
                 conn.send(JSON.stringify({
                     Cmd: "start",
                     Params: foeParam,
@@ -402,7 +389,7 @@
             browsingGame.undo();
             board.position(browsingGame.fen());
             fenEl.html('FEN: <small>' + browsingGame.fen() + '</small>');
-            pgnEl.html(browsingGame.pgn());
+            $('#' + PGN_ID).html(printPgn(browsingGame.pgn()));
 
         }
 
@@ -416,12 +403,22 @@
             browsingGame.move(game.history()[browsingGame.history().length]);
             board.position(browsingGame.fen());
             fenEl.html(('FEN: <small>' + browsingGame.fen()) + '</small>');
-            pgnEl.html(browsingGame.pgn());
+            $('#' + PGN_ID).html(printPgn(browsingGame.pgn()));
             if (browsingGame.history().length === game.history().length) {
                 browsing = false;
                 browsingGame = null;
                 updateStatus();
             }
+        }
+
+        function flipBtn() {
+            if (orientation === 'white') {
+                orientation = 'black';
+            } else {
+                orientation = 'white';
+            }
+            board.flip();
+            resize();
         }
 
         //------------------------------------------------------------------------------
@@ -528,13 +525,27 @@
         }
 
         function start(msg) {
-            $('#' + itemByName(statusItems, opponentName).id).html('Opponent: ' + msg.User);
+            myColor = msg.Color;
+            if (myColor != orientation) {
+                var wp = $('#' + WHITE_PLAYER_ID).offset();
+                var bp = $('#' + BLACK_PLAYER_ID).offset();
+                $('#' + WHITE_PLAYER_ID).css({ top: bp.top, left: bp.left, position: 'absolute' });
+                $('#' + BLACK_PLAYER_ID).css({ top: wp.top, left: wp.left, position: 'absolute' });
+            }
+            orientation = myColor;
+            if (orientation === 'white') {
+                $('#' + WHITE_NAME_ID).html(UserName);
+                $('#' + BLACK_NAME_ID).html(msg.User);
+            } else {
+                $('#' + WHITE_NAME_ID).html(msg.User);
+                $('#' + BLACK_NAME_ID).html(UserName);
+            }
             $('#' + itemByName(statusItems, gameIDName).id).html('Game ID: ' + msg.GameID);
-            $('#' + itemByName(statusItems, whiteEloName).id).html('White ELO: ' + msg.WhiteElo);
-            $('#' + itemByName(statusItems, blackEloName).id).html('Black ELO: ' + msg.BlackElo);
+            $('#' + WHITE_ELO_ID).html('ELO: ' + msg.WhiteElo);
+            $('#' + BLACK_ELO_ID).html('ELO: ' + msg.BlackElo);
 
-            printClock(itemByName(statusItems, whiteClockkName).id, msg.WhiteClock, "white clock");
-            printClock(itemByName(statusItems, blackClockkName).id, msg.BlackClock, "black clock");
+            printClock(WHITE_CLOCK_ID, msg.WhiteClock, "white");
+            printClock(BLACK_CLOCK_ID, msg.BlackClock, "black");
 
             game = new Chess();
             game_started = true;
@@ -548,7 +559,7 @@
                 console.log("fen is: " + fen);
             }
 
-            board = makeBoard(BOARD_ID, fen, msg.Color);
+            board = makeBoard(BOARD_ID, fen, orientation);
 
             updateStatus();
             pushGameClock(msg);
@@ -562,7 +573,7 @@
             }));
             var fen = game.fen();
             console.log("fen is: " + fen);
-            board = makeBoard(BOARD_ID, fen, "white");
+            board = makeBoard(BOARD_ID, fen, orientation);
             updateStatus();
         }
 
@@ -635,9 +646,9 @@
             var toStart, toStartMessage, startDistance;
 
             if (game.turn() === 'w') {
-                toStart = itemByName(statusItems, whiteClockkName).id;
+                toStart = WHITE_CLOCK_ID;
                 if (game.history().length < 2) {
-                    toStartMessage = 'white first move';
+                    toStartMessage = 'first move';
                     startDistance = 30 * 1000;
                 } else {
                     toStartMessage = 'white';
@@ -652,9 +663,9 @@
                 }
 
             } else {
-                toStart = itemByName(statusItems, blackClockkName).id;
+                toStart = BLACK_CLOCK_ID;
                 if (game.history().length < 2) {
-                    toStartMessage = 'black first move';
+                    toStartMessage = 'first move';
                     startDistance = 30 * 1000;
                 } else {
                     toStartMessage = 'black';
@@ -676,7 +687,7 @@
         }
 
         //------------------------------------------------------------------------------
-        // Init functions
+        // Markup/Init functions
         //------------------------------------------------------------------------------
 
         function initContainerEl() {
@@ -704,6 +715,38 @@
                 }
             });
             return r;
+        }
+
+        function pgnDiv() {
+            return '<div class="' + CSS.scrollable + '" id="' + PGN_ID + '"></div>';
+        }
+
+        function printPgn(pgn) {
+            var html = '<ol>';
+            var moves = pgn.split(' ');
+
+            var liOpen = false;
+            moves.forEach(function(item, index) {
+                if ((index % 3) === 0) return; // ignore move number
+
+                if (liOpen === false) {
+                    html += '<li>';
+                    liOpen = true;
+                }
+                if (((index + 1) % 3) === 0) {
+                    html += '&nbsp;';
+                }
+                html += moves[index];
+                if (((index + 1) % 3) === 0) {
+                    html += '</li>';
+                    liOpen = false;
+                }
+            });
+            if (liOpen === true) {
+                html += '</li>';
+            }
+            html += '</ol>';
+            return html;
         }
 
         function statusDivs(l) {
@@ -771,6 +814,17 @@
             return html;
         }
 
+        function userDiv(id, clockId, userId, eloId) {
+            var html = '<div id="' + id + '" ><ul class="' + CSS.hotizUl + '" >';
+            html += '<li  class="' + CSS.horizLi + '" id="' + clockId + '">clock</li>';
+            html += '<li  class="' + CSS.horizLi + '" id="' + userId + '">name</li>';
+            html += '<li  class="' + CSS.horizLi + '" id="' + eloId + '">ELO</li>';
+            html += '</ul></div>';
+
+            return html;
+        }
+
+
         function buttonsDiv() {
             var html = '<div id="' + BUTTONS_ID + '" ><ul class="' + CSS.hotizUl + '" >';
             buttons.forEach(function(item, index) {
@@ -779,7 +833,7 @@
                 if (item.class !== undefined) {
                     html += ' class="' + item.class + '"';
                 }
-                html += '/></li>';
+                html += '></li>';
             });
             html += '</ul></div>';
 
@@ -797,6 +851,10 @@
             html += loginFormDiv();
             html += selectGameDiv();
             html += buttonsDiv();
+            html += userDiv(WHITE_PLAYER_ID, WHITE_CLOCK_ID, WHITE_NAME_ID, WHITE_ELO_ID);
+            html += userDiv(BLACK_PLAYER_ID, BLACK_CLOCK_ID, BLACK_NAME_ID, BLACK_ELO_ID);
+
+            html += pgnDiv();
             html += statusDivs(statusItems);
 
             html += '</div>'; // closing div CSS.chessgame
@@ -820,7 +878,6 @@
         function initElementRefs() {
             statusEl = $('#' + itemByName(statusItems, statusName).id);
             fenEl = $('#' + itemByName(statusItems, fenName).id);
-            pgnEl = $('#' + itemByName(statusItems, pgnName).id);
             //offerEl = itemByName('O')
         }
 
@@ -854,17 +911,41 @@
             }
             console.log('resize() window: ' + window.innerWidth + 'X' + window.innerHeight +
                 ' chessgame: ' + w + 'X' + h + ' φ: ' + φ + ' w/h: ' + w / h);
-            $('#' + BOARD_ID).width(h); // chess board listens here ;)
-            if (board !== null) {
-                board.resize();
-            }
 
             // https://stackoverflow.com/questions/12744928/in-jquery-how-can-i-set-top-left-properties-of-an-element-with-position-values
             $('#' + chessgameId).css({ position: 'relative' });
+            $('#' + chessgameId).css({ 'font-size': (h >> 5) });
+            //$('#' + chessgameId + ' *').css({ border: '4px solid red' }); //#404040'});
 
-            var margin = 5;
+            $('#' + chessgameId).width(w);
+            $('#' + chessgameId).height(h);
+
+            var margin = h >> 6; // fixme
+            //$('#' + chessgameId).css("margin", margin);
+            $('#' + BOARD_ID).width(h); // chess board listens here ;)
+
+            if (board !== null) {
+                board.resize();
+                orientation = board.orientation();
+            }
+
             var top = margin;
             var left = $('#' + BOARD_ID).outerWidth(true) + margin;
+            if (orientation === 'white') {
+                $('#' + BLACK_PLAYER_ID).css({ top: top, left: left, position: 'absolute' });
+            } else {
+                $('#' + WHITE_PLAYER_ID).css({ top: top, left: left, position: 'absolute' });
+            }
+            top = h - (h >> 3);
+            if (orientation === 'white') {
+                $('#' + WHITE_PLAYER_ID).css({ top: top, left: left, position: 'absolute' });
+            } else {
+                $('#' + BLACK_PLAYER_ID).css({ top: top, left: left, position: 'absolute' });
+            }
+            $('#' + WHITE_PLAYER_ID + ' *').css("padding", margin);
+            $('#' + BLACK_PLAYER_ID + ' *').css("padding", margin);
+
+            top = margin + h >> 2;
             $('#' + LOGIN_FORM_ID).css({ top: top, left: left, position: 'absolute' });
             //console.log('id: ' + LOGIN_FORM_ID + 'top: ' + top + ' left: ' + left);
             top += $('#' + LOGIN_FORM_ID).outerHeight(true) + margin;
@@ -875,12 +956,20 @@
             //console.log('id: ' + BUTTONS_ID + 'top: ' + top + ' left: ' + left);
             top += $('#' + BUTTONS_ID).outerHeight(true) + margin;
 
+
+            var pgntop = Math.floor(h / φ);
+            var statusItemHeight = Math.floor((pgntop - top - margin) / statusItems.length);
+
             statusItems.forEach(function(item, index) {
-                $('#' + item.id).css({ top: top, left: left, position: 'absolute' });
+                $('#' + item.id).css({ top: top, left: left, position: 'absolute', height: statusItemHeight });
                 //console.log('id: ' + item.id + 'top: ' + top + ' left: ' + left);
-                top += $('#' + item.id).outerHeight(true) + margin;
+                top += statusItemHeight;
             });
 
+
+            $('#' + PGN_ID).css({ top: pgntop, left: left, position: 'absolute' });
+            $('#' + PGN_ID).height(h - pgntop - (h >> 3));
+            $('#' + PGN_ID).width(w - h - 2 * margin);
         }
 
         function initDom() {
