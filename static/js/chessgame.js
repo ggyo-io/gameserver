@@ -37,25 +37,25 @@
                 onclick: drawBtn
             },
             {
-                name: '←',
+                name: '⬅',
                 onclick: leftBtn,
                 onkey: leftArrow
             },
             {
-                name: '→',
+                name: '➡',
                 onclick: rightBtn,
                 onkey: rightArrow
             },
             {
-                name: '⇄',
+                name: '↕',
                 onclick: flipBtn
             }
         ];
 
 
-        var statusName = 'Status';
-        var gameIDName = 'Game_ID';
-        var fenName = 'FEN';
+        var statusName = '📢';
+        var gameIDName = '🆔';
+        var fenName = '🎬';
         var statusItems = [{
                 name: statusName
             },
@@ -289,8 +289,8 @@
                 }
             }
 
-            statusEl.html(status);
-            fenEl.html('FEN: <small>' + game.fen() + '</small>');
+            printStatus(status);
+            fenEl.html('🎬&nbsp;<small>' + game.fen() + '</small>');
             $('#' + PGN_ID).html(printPgn(game.pgn()));
             updateView();
         };
@@ -300,7 +300,7 @@
         //------------------------------------------------------------------------------
         function startBtn() {
             if (game && game.game_over() != true) {
-                statusEl.html("Ignore start, Move! The game is not over yet, resign if you'd like...");
+                printStatus("Ignore start, Move! The game is not over yet, resign if you'd like...");
                 return;
             }
 
@@ -309,7 +309,7 @@
             }
 
             if (conn) {
-                statusEl.html("Waiting for a match...");
+                printStatus("Waiting for a match...");
 
                 var el1 = document.getElementById(itemByName(selectNewGame, selectOpponent).id);
                 var foeParam = el1.options[el1.selectedIndex].value;
@@ -325,7 +325,7 @@
                     Color: colorParam
                 }));
             } else {
-                statusEl.html("No connection to server");
+                printStatus("No connection to server");
             }
         }
 
@@ -345,7 +345,7 @@
                 return;
             }
             if (conn) {
-                statusEl.html("You have resigned, click the Start button for a new game");
+                printStatus("You have resigned, click the Start button for a new game");
                 console.log("Resigned");
                 conn.send(JSON.stringify({
                     Cmd: "outcome",
@@ -356,7 +356,7 @@
                 clearInterval(runningTimer);
                 updateView();
             } else {
-                statusEl.html("No connection to server");
+                printStatus("No connection to server");
             }
         }
 
@@ -364,7 +364,7 @@
             if (game == null) {
                 return;
             }
-            statusEl.html("You have offered a draw, waiting for response");
+            printStatus("You have offered a draw, waiting for response");
             console.log("Draw offer");
             conn.send(JSON.stringify({
                 Cmd: "offer",
@@ -379,7 +379,7 @@
 
             if (browsing === false) {
                 browsing = true;
-                statusEl.html("Browsing");
+                printStatus("Browsing");
                 browsingGame = new Chess();
                 game.history().forEach(function(item, index) {
                     browsingGame.move(item);
@@ -388,7 +388,7 @@
 
             browsingGame.undo();
             board.position(browsingGame.fen());
-            fenEl.html('FEN: <small>' + browsingGame.fen() + '</small>');
+            fenEl.html('🎬&nbsp;<small>' + browsingGame.fen() + '</small>');
             $('#' + PGN_ID).html(printPgn(browsingGame.pgn()));
 
         }
@@ -402,7 +402,7 @@
             }
             browsingGame.move(game.history()[browsingGame.history().length]);
             board.position(browsingGame.fen());
-            fenEl.html(('FEN: <small>' + browsingGame.fen()) + '</small>');
+            fenEl.html(('🎬&nbsp;<small>' + browsingGame.fen()) + '</small>');
             $('#' + PGN_ID).html(printPgn(browsingGame.pgn()));
             if (browsingGame.history().length === game.history().length) {
                 browsing = false;
@@ -429,7 +429,7 @@
             updateView();
             conn = new WebSocket("ws://" + document.location.host + "/ws");
             conn.onclose = function(evt) {
-                statusEl.html("<b>Connection closed.</b>");
+                printStatus("<b>Connection closed.</b>");
             };
             conn.onmessage = function(evt) {
                 var msg = JSON.parse(evt.data);
@@ -457,7 +457,7 @@
                 }
             };
         } else {
-            statusEl.html("<b>Your browser does not support WebSockets.</b>");
+            printStatus("<b>Your browser does not support WebSockets.</b>");
         }
 
         function accept_undo(msg) {
@@ -467,19 +467,19 @@
             }
             updateStatus();
             board.position(game.fen());
-            statusEl.html("Undo accepted, " + statusEl.html());
+            printStatus("Undo accepted, " + statusEl.html());
         }
 
         function must_login() {
-            statusEl.html("<b>Please login first!</b>");
+            printStatus("Please login first!</b>");
         }
 
         function disconnect() {
-            statusEl.html("Your opponent have <b>disconnected</b>.");
+            printStatus("Your opponent have <b>disconnected</b>.");
         }
 
         function reconnected() {
-            statusEl.html("Your opponent have <b>reconnected</b>.");
+            printStatus("Your opponent have <b>reconnected</b>.");
         }
 
 
@@ -490,7 +490,7 @@
         }
 
         function outcome(msg) {
-            statusEl.html("The outcome is: '" + msg.Params + "', click the Start button for a new game");
+            printStatus("The outcome is: '" + msg.Params + "', click the Start button for a new game");
             console.log("opponent outcome '" + msg.Params + "'");
             game = null;
             game_started = false;
@@ -534,18 +534,18 @@
             }
             orientation = myColor;
             if (orientation === 'white') {
-                $('#' + WHITE_NAME_ID).html(UserName);
-                $('#' + BLACK_NAME_ID).html(msg.User);
+                $('#' + WHITE_NAME_ID).html('👓&nbsp;' + UserName);
+                $('#' + BLACK_NAME_ID).html('🕶&nbsp;' + msg.User);
             } else {
-                $('#' + WHITE_NAME_ID).html(msg.User);
-                $('#' + BLACK_NAME_ID).html(UserName);
+                $('#' + WHITE_NAME_ID).html('👓&nbsp;' + msg.User);
+                $('#' + BLACK_NAME_ID).html('🕶&nbsp;' + UserName);
             }
-            $('#' + itemByName(statusItems, gameIDName).id).html('Game ID: ' + msg.GameID);
-            $('#' + WHITE_ELO_ID).html('ELO: ' + msg.WhiteElo);
-            $('#' + BLACK_ELO_ID).html('ELO: ' + msg.BlackElo);
+            $('#' + itemByName(statusItems, gameIDName).id).html('🆔&nbsp;' + msg.GameID);
+            $('#' + WHITE_ELO_ID).html('🏆&nbsp;' + msg.WhiteElo);
+            $('#' + BLACK_ELO_ID).html('🏆&nbsp;' + msg.BlackElo);
 
-            printClock(WHITE_CLOCK_ID, msg.WhiteClock, "white");
-            printClock(BLACK_CLOCK_ID, msg.BlackClock, "black");
+            printClock(WHITE_CLOCK_ID, msg.WhiteClock, "⌛");
+            printClock(BLACK_CLOCK_ID, msg.BlackClock, "⌛");
 
             game = new Chess();
             game_started = true;
@@ -578,7 +578,7 @@
         }
 
         function nomatch() {
-            statusEl.html("No match found");
+            printStatus("No match found");
         }
 
 
@@ -648,10 +648,10 @@
             if (game.turn() === 'w') {
                 toStart = WHITE_CLOCK_ID;
                 if (game.history().length < 2) {
-                    toStartMessage = 'first move';
+                    toStartMessage = 'first move ⌛';
                     startDistance = 30 * 1000;
                 } else {
-                    toStartMessage = 'white';
+                    toStartMessage = '⌛';
                     if (msg == null) {
                         startDistance = nextDistance;
                     } else {
@@ -665,10 +665,10 @@
             } else {
                 toStart = BLACK_CLOCK_ID;
                 if (game.history().length < 2) {
-                    toStartMessage = 'first move';
+                    toStartMessage = 'first move ⌛';
                     startDistance = 30 * 1000;
                 } else {
-                    toStartMessage = 'black';
+                    toStartMessage = '⌛';
                     if (msg == null) {
                         startDistance = nextDistance;
                     } else {
@@ -749,6 +749,10 @@
             return html;
         }
 
+        function printStatus(msg) {
+            statusEl.html('📢&nbsp;' + msg);
+        }
+
         function statusDivs(l) {
 
             var html = '';
@@ -815,10 +819,10 @@
         }
 
         function userDiv(id, clockId, userId, eloId) {
-            var html = '<div id="' + id + '" ><ul class="' + CSS.hotizUl + '" >';
-            html += '<li  class="' + CSS.horizLi + '" id="' + clockId + '">clock</li>';
-            html += '<li  class="' + CSS.horizLi + '" id="' + userId + '">name</li>';
-            html += '<li  class="' + CSS.horizLi + '" id="' + eloId + '">ELO</li>';
+            var html = '<div id="' + id + '" class="game"><ul class="' + CSS.hotizUl + '" >';
+            html += '<li  class="' + CSS.horizLi + '" id="' + clockId + '">⌛</li>';
+            html += '<li  class="' + CSS.horizLi + '" id="' + userId + '">👓</li>';
+            html += '<li  class="' + CSS.horizLi + '" id="' + eloId + '">🏆 </li>';
             html += '</ul></div>';
 
             return html;
@@ -978,7 +982,7 @@
             chessgameEl.html(chessGameDiv());
             initElementRefs();
             initButtonHandlers();
-            statusEl.html("Choose opponent and click the Start button for a new game");
+            printStatus('Choose opponent and click the Start button for a new game');
 
             board = makeBoard(BOARD_ID, 'start', 'white');
             resize();
