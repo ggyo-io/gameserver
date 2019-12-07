@@ -47,7 +47,7 @@
                 onkey: rightArrow
             },
             {
-                name: '↕',
+                name: '⇄',
                 onclick: flipBtn
             }
         ];
@@ -68,9 +68,9 @@
             },
         ];
 
-        var selectOpponent = 'Select opponent';
+        var selectOpponent = 'Select_opponent';
         var selectColor = 'Color';
-        var selectTimeControl = 'Time Control';
+        var selectTimeControl = 'Time_Control';
         var selectNewGame = [{
                 name: selectOpponent,
                 options: ['stockfish', 'lc0', 'human']
@@ -125,10 +125,10 @@
         // use unique class names to prevent clashing with anything else on the page
         // and simplify selectors
         var CSS = {
-            chessgame: 'chessgame-c70f',
             hotizUl: 'horiz-ul-3d5f',
             horizLi: 'horiz-li-7ba0',
-            scrollable: 'scrollable-136f'
+            scrollable: 'scrollable-136f',
+            styledSelect: 'styled-select-41bd'
         };
 
         //------------------------------------------------------------------------------
@@ -149,7 +149,8 @@
             offerParams = null,
             runningTimer = null,
             nextDistance = null,
-            conn = null;
+            conn = null,
+            cssStyle = null;
 
         // DOM elements
         var chessgameEl;
@@ -544,8 +545,8 @@
             $('#' + WHITE_ELO_ID).html('🏆&nbsp;' + msg.WhiteElo);
             $('#' + BLACK_ELO_ID).html('🏆&nbsp;' + msg.BlackElo);
 
-            printClock(WHITE_CLOCK_ID, msg.WhiteClock, "⌛");
-            printClock(BLACK_CLOCK_ID, msg.BlackClock, "⌛");
+            printClock(WHITE_CLOCK_ID, msg.WhiteClock, '');
+            printClock(BLACK_CLOCK_ID, msg.BlackClock, '');
 
             game = new Chess();
             game_started = true;
@@ -600,14 +601,16 @@
                 var days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             */
-            if (distance === 0) {
-                document.getElementById(divId).innerHTML = msg;
-            } else {
+            if (distance >= 0) {
                 var minutes = pad(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)));
                 var seconds = pad(Math.floor((distance % (1000 * 60)) / 1000));
-                var html = msg + ' ' + minutes + ':' + seconds;
+                var html = '⌛' + minutes + ':' + seconds;
 
                 document.getElementById(divId).innerHTML = html;
+
+            }
+            if (msg !== '') {
+                printStatus(msg);
             }
         }
 
@@ -643,15 +646,15 @@
                 return;
             }
 
-            var toStart, toStartMessage, startDistance;
+            var toStart, toStartMessage = '',
+                startDistance;
 
             if (game.turn() === 'w') {
                 toStart = WHITE_CLOCK_ID;
                 if (game.history().length < 2) {
-                    toStartMessage = 'first move ⌛';
+                    toStartMessage = 'White first move';
                     startDistance = 30 * 1000;
                 } else {
-                    toStartMessage = '⌛';
                     if (msg == null) {
                         startDistance = nextDistance;
                     } else {
@@ -665,10 +668,9 @@
             } else {
                 toStart = BLACK_CLOCK_ID;
                 if (game.history().length < 2) {
-                    toStartMessage = 'first move ⌛';
+                    toStartMessage = 'Black first move';
                     startDistance = 30 * 1000;
                 } else {
-                    toStartMessage = '⌛';
                     if (msg == null) {
                         startDistance = nextDistance;
                     } else {
@@ -819,11 +821,11 @@
         }
 
         function userDiv(id, clockId, userId, eloId) {
-            var html = '<div id="' + id + '" class="game"><ul class="' + CSS.hotizUl + '" >';
-            html += '<li  class="' + CSS.horizLi + '" id="' + clockId + '">⌛</li>';
-            html += '<li  class="' + CSS.horizLi + '" id="' + userId + '">👓</li>';
-            html += '<li  class="' + CSS.horizLi + '" id="' + eloId + '">🏆 </li>';
-            html += '</ul></div>';
+            var html = '<div id="' + id + '" class="game">';
+            html += '<div id="' + clockId + '">⌛00:00</div>';
+            html += '<div id="' + userId + '">👓</div>';
+            html += '<div id="' + eloId + '">🏆 </div>';
+            html += '</div>';
 
             return html;
         }
@@ -850,19 +852,14 @@
 
 
         function chessGameDiv() {
-            var html = '<div id="' + GAME_ID + '" class="' + CSS.chessgame + '">';
-            html += boardDiv();
+            var html = boardDiv();
             html += loginFormDiv();
             html += selectGameDiv();
             html += buttonsDiv();
             html += userDiv(WHITE_PLAYER_ID, WHITE_CLOCK_ID, WHITE_NAME_ID, WHITE_ELO_ID);
             html += userDiv(BLACK_PLAYER_ID, BLACK_CLOCK_ID, BLACK_NAME_ID, BLACK_ELO_ID);
-
             html += pgnDiv();
             html += statusDivs(statusItems);
-
-            html += '</div>'; // closing div CSS.chessgame
-
             return html;
         }
 
@@ -905,75 +902,137 @@
             });
         }
 
+        // Addition to jQuery to get the inner text width
+        $.fn.textWidth = function() {
+            var text = $(this).html();
+            $(this).html('<span>' + text + '</span>');
+            var width = $(this).find('span:first').width();
+            $(this).html(text);
+            console.log('textWidth text:' + text);
+            return width;
+        };
+
+        function styleRule(f, h) {
+            if (cssStyle !== null) {
+                document.getElementsByTagName("head")[0].removeChild(cssStyle);
+            }
+            cssStyle = document.createElement('style');
+            cssStyle.type = 'text/css';
+            var rules = document.createTextNode('.' + CSS.styledSelect + ' select {font-size: ' + f + 'px;height: ' + h + 'px;}');
+            cssStyle.appendChild(rules);
+            document.getElementsByTagName("head")[0].appendChild(cssStyle);
+
+            return CSS.styledSelect;
+        }
+
         function resize() {
             var φ = 1.618; // ~ golden ratio
-            var w = window.innerWidth;
+
+            var margin = parseInt($('#' + chessgameId).parent().css('marginLeft'), 10) +
+                parseInt($('#' + chessgameId).parent().css('marginRight'), 10);
+
+            var w = window.innerWidth - margin;
             var h = Math.floor(w / φ);
-            if (window.innerHeight < h) {
-                h = window.innerHeight;
+            var fontSize = Math.floor(w / 64);
+
+            if (window.innerHeight - (2 * margin) < h) {
+                h = window.innerHeight - (2 * margin);
                 w = Math.floor(h * φ);
             }
-            console.log('resize() window: ' + window.innerWidth + 'X' + window.innerHeight +
+            console.log('resize() margin: ' + margin + ' window: ' + window.innerWidth + 'X' + window.innerHeight +
                 ' chessgame: ' + w + 'X' + h + ' φ: ' + φ + ' w/h: ' + w / h);
 
             // https://stackoverflow.com/questions/12744928/in-jquery-how-can-i-set-top-left-properties-of-an-element-with-position-values
             $('#' + chessgameId).css({ position: 'relative' });
-            $('#' + chessgameId).css({ 'font-size': (h >> 5) });
-            //$('#' + chessgameId + ' *').css({ border: '4px solid red' }); //#404040'});
+            $('#' + chessgameId).css({ 'font-size': fontSize });
 
             $('#' + chessgameId).width(w);
             $('#' + chessgameId).height(h);
 
-            var margin = h >> 6; // fixme
-            //$('#' + chessgameId).css("margin", margin);
             $('#' + BOARD_ID).width(h); // chess board listens here ;)
+
+            var boardBorderWidth = 0;
+            var rowHeight = 0;
 
             if (board !== null) {
                 board.resize();
                 orientation = board.orientation();
+                boardBorderWidth = board.borderSize();
+                rowHeight = board.squareSize();
             }
 
-            var top = margin;
+            // start locating elements right of the board
             var left = $('#' + BOARD_ID).outerWidth(true) + margin;
-            if (orientation === 'white') {
-                $('#' + BLACK_PLAYER_ID).css({ top: top, left: left, position: 'absolute' });
-            } else {
-                $('#' + WHITE_PLAYER_ID).css({ top: top, left: left, position: 'absolute' });
-            }
-            top = h - (h >> 3);
-            if (orientation === 'white') {
-                $('#' + WHITE_PLAYER_ID).css({ top: top, left: left, position: 'absolute' });
-            } else {
-                $('#' + BLACK_PLAYER_ID).css({ top: top, left: left, position: 'absolute' });
-            }
-            $('#' + WHITE_PLAYER_ID + ' *').css("padding", margin);
-            $('#' + BLACK_PLAYER_ID + ' *').css("padding", margin);
+            var itemWidth = w - left - margin;
 
-            top = margin + h >> 2;
-            $('#' + LOGIN_FORM_ID).css({ top: top, left: left, position: 'absolute' });
+            $('#' + WHITE_PLAYER_ID).height(rowHeight);
+            $('#' + BLACK_PLAYER_ID).height(rowHeight);
+
+            var whiteTop = 0;
+            var blackTop = 0;
+            if (orientation === 'white') {
+                blackTop = boardBorderWidth;
+                whiteTop = h - (h >> 3);
+            } else {
+                whiteTop = boardBorderWidth;
+                blackTop = h - (h >> 3);
+            }
+
+            var halfRowHeight = (rowHeight >> 1);
+            var halfRowBorder = (rowHeight & 1);
+
+            $('#' + WHITE_CLOCK_ID).css({ top: whiteTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
+            $('#' + BLACK_CLOCK_ID).css({ top: blackTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
+
+            // have to make the user div visible to measure text width
+            var clockDisplay = $('#' + WHITE_PLAYER_ID).css('display');
+            $('#' + WHITE_PLAYER_ID).css('display', 'inline');
+            var clockWidth = $('#' + WHITE_CLOCK_ID).textWidth();
+            $('#' + WHITE_PLAYER_ID).css('display', clockDisplay);
+
+            var userLeft = left + clockWidth + margin;
+            console.log("clock width: " + clockWidth + " left: " + left + " userLeft: " + userLeft);
+            $('#' + WHITE_NAME_ID).css({ top: whiteTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
+            $('#' + BLACK_NAME_ID).css({ top: blackTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
+            $('#' + WHITE_ELO_ID).css({ top: whiteTop + halfRowHeight + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
+            $('#' + BLACK_ELO_ID).css({ top: blackTop + halfRowHeight + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
+            $('#' + WHITE_PLAYER_ID).width(itemWidth);
+            $('#' + BLACK_PLAYER_ID).width(itemWidth);
+
+
+            var top = boardBorderWidth + rowHeight;
+
+            $('#' + LOGIN_FORM_ID).css({ top: top, left: left, position: 'absolute', width: itemWidth, height: rowHeight });
+
+
             //console.log('id: ' + LOGIN_FORM_ID + 'top: ' + top + ' left: ' + left);
-            top += $('#' + LOGIN_FORM_ID).outerHeight(true) + margin;
-            $('#' + SELECT_GAME_ID).css({ top: top, left: left, position: 'absolute' });
+            top += rowHeight;
+            $('#' + SELECT_GAME_ID).css({ top: top, left: left, position: 'absolute', width: itemWidth });
+
+            // for some strange reason, select option font size could be
+            // changed only by external stylesheet
+            var elemHeight = Math.floor(φ * fontSize);
+            $('#' + SELECT_GAME_ID).addClass(styleRule(fontSize, elemHeight));
+
             //console.log('id: ' + SELECT_GAME_ID + 'top: ' + top + ' left: ' + left);
-            top += $('#' + SELECT_GAME_ID).outerHeight(true) + margin;
-            $('#' + BUTTONS_ID).css({ top: top, left: left, position: 'absolute' });
+            top += halfRowHeight + halfRowBorder;
+            $('#' + BUTTONS_ID).css({ top: top, left: left, position: 'absolute', width: itemWidth, height: halfRowHeight });
+            buttons.forEach(function(item, index) {
+                $('#' + item.id).css({ 'font-size': fontSize });
+            });
             //console.log('id: ' + BUTTONS_ID + 'top: ' + top + ' left: ' + left);
-            top += $('#' + BUTTONS_ID).outerHeight(true) + margin;
 
-
+            top += rowHeight;
             var pgntop = Math.floor(h / φ);
             var statusItemHeight = Math.floor((pgntop - top - margin) / statusItems.length);
 
             statusItems.forEach(function(item, index) {
-                $('#' + item.id).css({ top: top, left: left, position: 'absolute', height: statusItemHeight });
+                $('#' + item.id).css({ top: top, left: left, position: 'absolute', height: statusItemHeight, width: itemWidth });
                 //console.log('id: ' + item.id + 'top: ' + top + ' left: ' + left);
                 top += statusItemHeight;
             });
 
-
-            $('#' + PGN_ID).css({ top: pgntop, left: left, position: 'absolute' });
-            $('#' + PGN_ID).height(h - pgntop - (h >> 3));
-            $('#' + PGN_ID).width(w - h - 2 * margin);
+            $('#' + PGN_ID).css({ top: pgntop, left: left, position: 'absolute', height: (h - pgntop - (h >> 3)), width: itemWidth });
         }
 
         function initDom() {

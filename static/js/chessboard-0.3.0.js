@@ -492,13 +492,16 @@ function expandConfig() {
 //------------------------------------------------------------------------------
 // DOM Misc
 //------------------------------------------------------------------------------
+widget.borderSize = function() {
+  return BOARD_BORDER_SIZE;
+};
 
 // calculates square size based on the width of the container
 // got a little CSS black magic here, so let me explain:
 // get the width of the container element (could be anything), reduce by 1 for
 // fudge factor, and then keep reducing until we find an exact mod 8 for
 // our square size
-function calculateSquareSize() {
+widget.squareSize = function() {
   var containerWidth = parseInt(containerEl.css('width'), 10);
 
   // defensive, prevent infinite loop
@@ -1440,7 +1443,7 @@ widget.position = function(position, useAnimation) {
 
 widget.resize = function() {
   // calulate the new square size
-  SQUARE_SIZE = calculateSquareSize();
+  SQUARE_SIZE = widget.squareSize();
 
   // set board width
   boardEl.css('width', (SQUARE_SIZE * 8) + 'px');
