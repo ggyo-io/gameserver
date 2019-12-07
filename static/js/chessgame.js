@@ -604,10 +604,8 @@
             if (distance >= 0) {
                 var minutes = pad(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)));
                 var seconds = pad(Math.floor((distance % (1000 * 60)) / 1000));
-                var html = '⌛' + minutes + ':' + seconds;
-
-                document.getElementById(divId).innerHTML = html;
-
+                var html = '⌛&nbsp;' + minutes + ':' + seconds;
+                $('#' + divId).html(html);
             }
             if (msg !== '') {
                 printStatus(msg);
@@ -822,9 +820,9 @@
 
         function userDiv(id, clockId, userId, eloId) {
             var html = '<div id="' + id + '" class="game">';
-            html += '<div id="' + clockId + '">⌛00:00</div>';
-            html += '<div id="' + userId + '">👓</div>';
-            html += '<div id="' + eloId + '">🏆 </div>';
+            html += '<div id="' + clockId + '">⌛&nbsp;00:00</div>';
+            html += '<div id="' + userId + '">👓&nbsp;</div>';
+            html += '<div id="' + eloId + '">🏆&nbsp;</div>';
             html += '</div>';
 
             return html;
@@ -943,17 +941,11 @@
                 ' chessgame: ' + w + 'X' + h + ' φ: ' + φ + ' w/h: ' + w / h);
 
             // https://stackoverflow.com/questions/12744928/in-jquery-how-can-i-set-top-left-properties-of-an-element-with-position-values
-            $('#' + chessgameId).css({ position: 'relative' });
-            $('#' + chessgameId).css({ 'font-size': fontSize });
-
-            $('#' + chessgameId).width(w);
-            $('#' + chessgameId).height(h);
-
+            $('#' + chessgameId).css({ position: 'relative', 'font-size': fontSize, width: w, height: h });
             $('#' + BOARD_ID).width(h); // chess board listens here ;)
 
             var boardBorderWidth = 0;
             var rowHeight = 0;
-
             if (board !== null) {
                 board.resize();
                 orientation = board.orientation();
@@ -980,7 +972,6 @@
 
             var halfRowHeight = (rowHeight >> 1);
             var halfRowBorder = (rowHeight & 1);
-
             $('#' + WHITE_CLOCK_ID).css({ top: whiteTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
             $('#' + BLACK_CLOCK_ID).css({ top: blackTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
 
