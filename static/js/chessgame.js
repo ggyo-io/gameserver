@@ -128,7 +128,11 @@
             hotizUl: 'horiz-ul-3d5f',
             horizLi: 'horiz-li-7ba0',
             scrollable: 'scrollable-136f',
-            styledSelect: 'styled-select-41bd'
+            styledSelect: 'styled-select-41bd',
+            squareClass: 'square-55d63',
+            blackSquare: 'black-3c85d',
+            highlightWhite: 'highlight-white-7cce',
+            highlightBlack: 'highlight-black-03bf'
         };
 
         //------------------------------------------------------------------------------
@@ -197,16 +201,45 @@
 
         var whiteSquareGrey = '#a9a9a9';
         var blackSquareGrey = '#696969';
+        var squareToHighlight = null;
+
+        function highlightByColor(c) {
+            if (c === 'white') {
+                return CSS.highlightWhite;
+            } else {
+                return CSS.highlightBlack;
+            }
+        }
+
+        function foeColor() {
+            var c = 'white';
+            if (myColor === 'white') {
+                c = 'black';
+            }
+
+            return c;
+        }
+
+        function onMoveEnd() {
+            $('#' + BOARD_ID).find('.square-' + squareToHighlight)
+                .addClass(highlightByColor(foeColor()));
+        }
+
+        function removeHighlights(color) {
+            $('#' + BOARD_ID).find('.' + CSS.squareClass)
+                .removeClass(highlightByColor(color));
+        }
+
 
         function removeGreySquares() {
-            $('#' + BOARD_ID + ' .square-55d63').css('background', '');
+            $('#' + BOARD_ID + ' .' + CSS.squareClass).css('background', '');
         }
 
         function greySquare(square) {
             var $square = $('#' + BOARD_ID + ' .square-' + square);
 
             var background = whiteSquareGrey;
-            if ($square.hasClass('black-3c85d')) {
+            if ($square.hasClass(CSS.blackSquare)) {
                 background = blackSquareGrey;
             }
 
@@ -214,6 +247,8 @@
         }
 
         function onMouseoverSquare(square, piece) {
+            if (game === null) return;
+
             // get list of possible moves for this square
             var moves = game.moves({
                 square: square,
@@ -276,6 +311,11 @@
             console.log("game fen: " + game.fen());
 
             updateStatus();
+
+            // highlight  move
+            removeHighlights(myColor);
+            $('#' + BOARD_ID).find('.square-' + source).addClass(highlightByColor(myColor));
+            $('#' + BOARD_ID).find('.square-' + target).addClass(highlightByColor(myColor));
         };
 
         // update the board position after the piece snap
@@ -565,6 +605,11 @@
             console.log("computa mr end");
             console.log("game fen: " + game.fen());
             updateStatus();
+
+            // highlight foe's move
+            removeHighlights(foeColor());
+            $('#' + BOARD_ID).find('.square-' + mr.from).addClass(highlightByColor(foeColor()));
+            squareToHighlight = mr.to;
             board.position(game.fen());
         }
 
@@ -913,6 +958,7 @@
                 onMouseoutSquare: onMouseoutSquare,
                 onMouseoverSquare: onMouseoverSquare,
                 onDrop: onDrop,
+                onMoveEnd: onMoveEnd,
                 onSnapEnd: onSnapEnd
             };
             return ChessBoard(id, cfg);
