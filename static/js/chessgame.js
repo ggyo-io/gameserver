@@ -140,7 +140,7 @@
         // Module Scope Variables
         //------------------------------------------------------------------------------
         var
-            game = null,
+            game = new Chess(),
             board = null,
             orientation = 'white',
             myColor = orientation,
@@ -402,7 +402,7 @@
         // Button Handlers
         //------------------------------------------------------------------------------
         function startBtn() {
-            if (game && game.game_over() != true) {
+            if (game_started === true) {
                 printStatus("Ignore start, Move! The game is not over yet, resign if you'd like...");
                 return;
             }
@@ -455,7 +455,6 @@
                     Cmd: "outcome",
                     Params: "resign"
                 }));
-                game = null;
                 game_started = false;
                 clearInterval(runningTimer);
                 updateView();
@@ -596,7 +595,6 @@
         function outcome(msg) {
             printStatus("The outcome is: '" + msg.Params + "', click the Start button for a new game");
             console.log("opponent outcome '" + msg.Params + "'");
-            game = null;
             game_started = false;
             clearInterval(runningTimer);
             updateView();
