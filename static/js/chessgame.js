@@ -635,10 +635,8 @@
         function start(msg) {
             myColor = msg.Color;
             if (myColor != orientation) {
-                var wp = $('#' + WHITE_PLAYER_ID).offset();
-                var bp = $('#' + BLACK_PLAYER_ID).offset();
-                $('#' + WHITE_PLAYER_ID).css({ top: bp.top, left: bp.left, position: 'absolute' });
-                $('#' + BLACK_PLAYER_ID).css({ top: wp.top, left: wp.left, position: 'absolute' });
+                board.orientation(myColor);
+                resize();
             }
             orientation = myColor;
             if (orientation === 'white') {
