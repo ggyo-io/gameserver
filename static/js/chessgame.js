@@ -132,7 +132,8 @@
             squareClass: 'square-55d63',
             blackSquare: 'black-3c85d',
             highlightWhite: 'highlight-white-7cce',
-            highlightBlack: 'highlight-black-03bf'
+            highlightBlack: 'highlight-black-03bf',
+            highlightCheck: 'highlight-check-f5f6'
         };
 
         //------------------------------------------------------------------------------
@@ -168,7 +169,6 @@
 
         // Top level elements
         var
-            GAME_ID = "game-" + createId(),
             BOARD_ID = 'board-' + createId(),
             WHITE_PLAYER_ID = 'white-player-' + createId(),
             WHITE_NAME_ID = 'white-name-' + createId(),
@@ -343,6 +343,23 @@
             }
         };
 
+        function removeHighlightCheck() {
+            $('#' + BOARD_ID).find('.' + CSS.squareClass)
+                .removeClass(CSS.highlightCheck);
+        }
+
+        function highlightCheck() {
+            var p = board.position();
+            var piece = game.turn() + 'K';
+
+            for (var c in p) {
+                if (p[c] === piece) {
+                    $('#' + BOARD_ID).find('.square-' + c).addClass(CSS.highlightCheck);
+                    return;
+                }
+            }
+        }
+
         var updateStatus = function() {
             var status = '';
 
@@ -366,10 +383,12 @@
             // game still on
             else {
                 status = moveColor + ' to move';
+                removeHighlightCheck();
 
                 // check?
                 if (game.in_check() === true) {
                     status += ', ' + moveColor + ' is in check';
+                    highlightCheck();
                 }
             }
 
