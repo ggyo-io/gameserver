@@ -4,7 +4,9 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 )
 
@@ -13,6 +15,28 @@ var (
 	key   = []byte("76e98a932d924ef78d0b6e6ba4456dc0")
 	store = sessions.NewCookieStore(key)
 )
+
+func pathHandler(w http.ResponseWriter, r *http.Request) {
+	pathVariables := mux.Vars(r)
+	path, e := pathVariables["path"]
+	if e != true {
+		http.Error(w, "Can not find path mux variable", http.StatusInternalServerError)
+		return
+	}
+
+	// check whether a file exists at the given path
+	path = "static/" + path + ".ico"
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		// if we got an error (that wasn't that the file doesn't exist) stating the
+		// file, return a 500 internal server error and stop
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// otherwise, use http.FileServer to serve the static dir
+	http.FileServer(http.Dir("static")).ServeHTTP(w, r)
+}
 
 func index(w http.ResponseWriter, r *http.Request) {
 	data := indexData{
