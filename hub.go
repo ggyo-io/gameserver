@@ -16,6 +16,7 @@ type registerRequest struct {
 	player  Client
 	foe     string
 	color   string
+	tc      string
 	board   *Board
 	match   *Match
 }
@@ -105,7 +106,7 @@ func (h *Hub) matchUCI(rq *registerRequest) {
 		blackPlayer = rq.player
 	}
 
-	tc := timeControl{time: 15 * 60, increment: 15}
+	tc := newTimeControl(rq.tc)
 	board := newBoard(h.register, whitePlayer, blackPlayer, tc)
 	cms := tc.time * 1000
 	if uciPlayer == whitePlayer {
@@ -161,7 +162,7 @@ func (h *Hub) matchWs(rq *registerRequest) {
 			if k != rq.player && matchColor(rq.color, h.clients[k].color) {
 				log.Printf("Found match creating a game")
 				white, black := choosePlayersColors(rq, h.clients[k])
-				tc := timeControl{time: 15 * 60, increment: 15}
+				tc := newTimeControl(rq.tc)
 				board := newBoard(h.register, white, black, tc)
 				cms := tc.time * 1000
 				delete(h.clients, white)

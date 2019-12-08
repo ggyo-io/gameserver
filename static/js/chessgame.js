@@ -425,7 +425,8 @@
                 conn.send(JSON.stringify({
                     Cmd: "start",
                     Params: foeParam,
-                    Color: colorParam
+                    Color: colorParam,
+                    TimeControl: tcParam
                 }));
             } else {
                 printStatus("No connection to server");

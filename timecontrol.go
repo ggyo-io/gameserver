@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -13,6 +15,16 @@ type timeControl struct {
 
 func (t *timeControl) String() string {
 	return fmt.Sprintf("%d+%d", t.time, t.increment)
+}
+
+func newTimeControl(tc string) timeControl {
+	t := timeControl{}
+	a := strings.Split(tc, "+")
+
+	t.time, _ = strconv.ParseInt(a[0], 10, 64)
+	t.increment, _ = strconv.ParseInt(a[1], 10, 64)
+
+	return t
 }
 
 const (

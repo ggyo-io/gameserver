@@ -134,7 +134,7 @@ func (c *WSPlayer) writePump() {
 func (c *WSPlayer) dispatch(message *Message) {
 	if message.Cmd == "start" {
 		log.Printf("wsplayer '%s' got start command, params '%s' request to register at hub\n", c.user, message.Params)
-		rr := &registerRequest{player: c, foe: message.Params, color: message.Color, request: "match"}
+		rr := &registerRequest{player: c, foe: message.Params, color: message.Color, tc: message.TimeControl, request: "match"}
 		c.hub.register <- rr
 	} else {
 		c.sendBoard(message)
