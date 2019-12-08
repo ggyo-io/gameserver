@@ -1142,9 +1142,11 @@
             chessgameEl.html(chessGameDiv());
             initElementRefs();
             initButtonHandlers();
-            printStatus('Choose opponent and click the Start button for a new game');
+
 
             board = makeBoard(BOARD_ID, 'start', 'white');
+            printStatus('Choose opponent and click the Start button for a new game');
+            fenEl.html('🎬&nbsp;<small>' + board.fen() + '</small>');
             resize();
             window.addEventListener("resize", resize);
         }
