@@ -133,16 +133,20 @@ func (b *Board) acceptUndo(bp *boardPlayer, message *Message) error {
 	pgn := b.chess.String()
 	slice := strings.Split(pgn, " ")
 	ln := len(slice)
-	if ln < 3 {
-		log.Print("board game too short to unde")
+
+	undoMoves := 2
+	garbageLen := 0
+	if slice[ln-1] == "*" { // should always be the last one
+		garbageLen++
+	}
+	if slice[ln-2] == "" { // sometimes (even/odd) comes before '*'
+		garbageLen++
+	}
+	if ln < (undoMoves + garbageLen) {
+		log.Print("board game too short to undo")
 		return nil
 	}
-	undoMoves := 2
-	if strings.Contains(slice[ln-2], ".") && b.black == bp ||
-		!strings.Contains(slice[ln-2], ".") && b.white == bp {
-		undoMoves = 1
-	}
-	newslice := append(slice[:ln-undoMoves-2], slice[ln-1:]...)
+	newslice := append(slice[:ln-undoMoves-garbageLen], slice[ln-1:]...)
 	newpgn := strings.Join(newslice, " ")
 	log.Printf("board newpgn %s\n", newpgn)
 	reader := strings.NewReader(newpgn)
@@ -156,8 +160,8 @@ func (b *Board) acceptUndo(bp *boardPlayer, message *Message) error {
 	b.recordGame()
 
 	message.Params = strconv.Itoa(undoMoves)
-	b.white.Send() <- message
-	b.black.Send() <- message
+	b.sendToFoe(bp, message)
+
 	return nil
 }
 

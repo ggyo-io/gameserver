@@ -135,7 +135,11 @@
             highlightWhite: 'highlight-white-7cce',
             highlightBlack: 'highlight-black-03bf',
             highlightCheck: 'highlight-check-f5f6',
-            highlightPurple: 'highlight-purple-08ac'
+            highlightPurple: 'highlight-purple-08ac',
+            modal: 'modal-4d1f',
+            modalContent: 'modal-content-59a5',
+            closeYes: 'close-yes-71e5',
+            closeNo: 'close-no-e712'
         };
 
         //------------------------------------------------------------------------------
@@ -151,12 +155,12 @@
             browsingGame = new Chess(),
             statusEl = null,
             fenEl = null,
+            modalEl = null,
             offerEl = null,
             game_started = false,
             offerParams = null,
             runningTimer = null,
             nextDistance = null,
-
             cssStyle = null;
 
         // DOM elements
@@ -183,6 +187,10 @@
             SELECT_GAME_ID = 'select-game-' + createId(),
             BUTTONS_ID = 'buttons-' + createId(),
             LOGIN_FORM_ID = 'loginform-' + createId(),
+            MODAL_ID = 'modal-' + createId(),
+            OFFER_ID = 'offer-' + createId(),
+            OFFER_YES_ID = 'offer-yes-' + createId(),
+            OFFER_NO_ID = 'offer-yes-' + createId(),
             PGN_ID = 'pgn-' + createId();
 
         //------------------------------------------------------------------------------
@@ -273,13 +281,21 @@
             removeGreySquares();
         }
 
+        function notMyTurn() {
+            return (game.turn() === 'w' && myColor === 'black') ||
+                (game.turn() === 'b' && myColor === 'white');
+        }
+
+        function notTurnPiece(piece) {
+            return (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+                (game.turn() === 'b' && piece.search(/^w/) !== -1);
+        }
+
         // do not pick up pieces if the game is over
         // only pick up pieces for the side to move
-        function notMyTurOrPiece(piece) {
-            return (game.turn() === 'w' && myColor === 'black') ||
-                (game.turn() === 'b' && myColor === 'white') ||
-                (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-                (game.turn() === 'b' && piece.search(/^w/) !== -1);
+        function notMyTurnOrPiece(piece) {
+            return notMyTurn() ||
+                notTurnPiece(piece);
         }
 
         var onDragStart = function(source, piece, position, orientation) {
@@ -290,7 +306,7 @@
 
             if (browsing == true ||
                 game.game_over() === true ||
-                notMyTurOrPiece(piece)) {
+                notMyTurnOrPiece(piece)) {
                 return false;
             }
         };
@@ -434,6 +450,10 @@
             if (!game_started) {
                 return;
             }
+            if (game.history().length < 2) {
+                printStatus("Too short for undo, " + statusEl.html());
+                return;
+            }
             wsConn.send({
                 Cmd: "undo"
             });
@@ -445,16 +465,12 @@
                 return;
             }
 
-            printStatus("You have resigned, click the Start button for a new game");
             console.log("Resigned");
             wsConn.send({
                 Cmd: "outcome",
                 Params: "resign"
             });
-            game_started = false;
-            clearInterval(runningTimer);
-            updateView();
-
+            outcome('You have resigned');
         }
 
         function drawBtn() {
@@ -518,6 +534,30 @@
             resize();
         }
 
+        function offerYesBtn() {
+            console.log("Offer accepted: " + offerParams);
+
+            if (offerParams === 'draw') {
+                outcome(offerParams + ' is accepted');
+                wsConn.send({
+                    Cmd: "outcome",
+                    Params: offerParams
+                });
+            } else if (offerParams === 'undo') {
+                var msg = {
+                    Cmd: 'accept_undo',
+                    Params: '2'
+                };
+                wsConn.send(msg);
+                accept_undo(msg);
+            }
+            modalEl.hide(); // make invisible
+        }
+
+        function offerNoBtn() {
+            modalEl.hide(); // make invisible
+        }
+
         var clickMoveFrom = null;
         var clickMoveTo = null;
 
@@ -531,13 +571,17 @@
         }
 
         function mouseDownBoard(e) {
+            if (!game_started) return;
+            if (notMyTurn()) return;
+
             var square = getSquareFromEvent(e);
             if (square === null) return;
 
             console.log(' mouseDownBoard: ' + square);
             if (clickMoveFrom === null) {
                 // move source should contain a piece
-                if (e.target.parentElement.hasAttribute('data-square') === false) return;
+                if (e.target.parentElement.hasAttribute('data-square') === false ||
+                    notTurnPiece(e.target.getAttribute('data-piece'))) return;
 
                 clickMoveFrom = square;
                 $('#' + BOARD_ID).find('.square-' + square)
@@ -551,7 +595,7 @@
 
             // parent has data-square - a piece being clicked
             if (e.target.parentElement.hasAttribute('data-square') &&
-                !notMyTurOrPiece(piece)) {
+                !notMyTurnOrPiece(piece)) {
                 $('#' + BOARD_ID).find('.square-' + clickMoveFrom)
                     .removeClass(CSS.highlightPurple);
                 clickMoveFrom = square;
@@ -564,6 +608,8 @@
         }
 
         function mouseUpBoard(e) {
+            if (!game_started) return;
+            if (notMyTurn()) return;
             var square = getSquareFromEvent(e);
             if (square === null) return;
 
@@ -597,9 +643,9 @@
             } else if (msg.Cmd == "move") {
                 move(msg);
             } else if (msg.Cmd == "outcome") {
-                outcome(msg);
+                outcome(msg.Params);
             } else if (msg.Cmd == "offer") {
-                offer(msg); // make visible
+                offer(msg.Params); // make visible
             } else if (msg.Cmd == "disconnect") {
                 disconnect();
             } else if (msg.Cmd == "reconnected") {
@@ -610,6 +656,8 @@
                 nomatch();
             } else if (msg.Cmd == "accept_undo") {
                 accept_undo(msg);
+            } else if (msg.Cmd == "undo") {
+                offer(msg.Cmd);
             } else {
                 console.log("Unknown command: '" + msg.Cmd + "'");
             }
@@ -617,7 +665,7 @@
 
         function accept_undo(msg) {
             game.undo();
-            if (msg.Params == "2") {
+            if (msg.Params === '2') {
                 game.undo();
             }
             updateStatus();
@@ -638,15 +686,15 @@
         }
 
 
-        function offer(msg) {
-            offerParams = msg.Params;
+        function offer(offer) {
+            offerParams = offer;
             offerEl.html(offerParams);
-            modalEl.style.display = "block";
+            modalEl.show();
         }
 
         function outcome(msg) {
-            printStatus("The outcome is: '" + msg.Params + "', click the Start button for a new game");
-            console.log("opponent outcome '" + msg.Params + "'");
+            printStatus("The outcome is: '" + msg + "', click the Start button for a new game");
+            console.log("opponent outcome '" + msg + "'");
             game_started = false;
             clearInterval(runningTimer);
             updateView();
@@ -955,6 +1003,16 @@
             return html;
         }
 
+        function modalDiv() {
+            var html = '<div id="' + MODAL_ID + '" class="' + CSS.modal + '">' +
+                '<div class="' + CSS.modalContent + '">' +
+                '<p>Opponent offer: <span id="' + OFFER_ID + '"></span></p>' +
+                '<span id="' + OFFER_YES_ID + '" class="' + CSS.closeYes + '">✓</span>' +
+                '<span id="' + OFFER_NO_ID + '"  class="' + CSS.closeNo + '">×</span>' +
+                '</div></div>';
+            return html;
+        }
+
         function selectGameDiv() {
             var html = '<div id="' + SELECT_GAME_ID + '" ><ul class="' + CSS.hotizUl + '">';
             selectNewGame.forEach(function(item, index) {
@@ -1014,6 +1072,7 @@
             html += userDiv(BLACK_PLAYER_ID, BLACK_CLOCK_ID, BLACK_NAME_ID, BLACK_ELO_ID);
             html += pgnDiv();
             html += statusDivs(statusItems);
+            html += modalDiv();
             return html;
         }
 
@@ -1036,7 +1095,8 @@
         function initElementRefs() {
             statusEl = $('#' + itemByName(statusItems, statusName).id);
             fenEl = $('#' + itemByName(statusItems, fenName).id);
-            //offerEl = itemByName('O')
+            offerEl = $('#' + OFFER_ID);
+            modalEl = $('#' + MODAL_ID);
         }
 
         function initButtonHandlers() {
@@ -1057,6 +1117,10 @@
                     });
                 }
             });
+
+            // Modal buttons
+            $('#' + OFFER_YES_ID).on('click', offerYesBtn);
+            $('#' + OFFER_NO_ID).on('click', offerNoBtn);
         }
 
         // Addition to jQuery to get the inner text width

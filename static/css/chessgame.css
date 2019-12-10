@@ -29,3 +29,61 @@
 .highlight-purple-08ac {
     box-shadow: inset 0 0 3px 3px purple;
 }
+
+.modal-4d1f {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
+}
+
+.modal-content-59a5 {
+    background-color: #fefefe;
+    text-align: center;
+    margin: 30% auto;
+    padding: 40px;
+    border: 1px solid #888;
+    width: 30%;
+}
+
+.close-yes-71e5 {
+    color: green;
+    float: left;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-no-e712 {
+    color: red;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-yes-71e5:hover,
+.close-yes-71e5:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.close-no-e712:hover,
+.close-no-e712:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
