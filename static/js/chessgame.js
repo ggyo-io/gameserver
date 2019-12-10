@@ -542,26 +542,26 @@
                 clickMoveFrom = square;
                 $('#' + BOARD_ID).find('.square-' + square)
                     .addClass(CSS.highlightPurple);
+                return;
 
-            } else {
-                if (e.target.parentElement.hasAttribute('data-square')) {
-                    var piece = e.target.getAttribute('data-piece');
-                    if (notMyTurOrPiece(piece)) {
-                        return;
-                    }
-                    $('#' + BOARD_ID).find('.square-' + clickMoveFrom)
-                        .removeClass(CSS.highlightPurple);
-                    clickMoveFrom = square;
-                    $('#' + BOARD_ID).find('.square-' + square)
-                        .addClass(CSS.highlightPurple);
-                    return;
-                }
+            }
+
+
+            var piece = e.target.getAttribute('data-piece');
+
+            // parent has data-square - a piece being clicked
+            if (e.target.parentElement.hasAttribute('data-square') &&
+                !notMyTurOrPiece(piece)) {
+                $('#' + BOARD_ID).find('.square-' + clickMoveFrom)
+                    .removeClass(CSS.highlightPurple);
+                clickMoveFrom = square;
+                $('#' + BOARD_ID).find('.square-' + square)
+                    .addClass(CSS.highlightPurple);
+                return;
             }
 
             clickMoveTo = square;
         }
-
-
 
         function mouseUpBoard(e) {
             var square = getSquareFromEvent(e);
