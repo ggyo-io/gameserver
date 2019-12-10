@@ -48,7 +48,8 @@
             },
             {
                 name: '⇄',
-                onclick: flipBtn
+                onclick: flipBtn,
+                class: 'game'
             }
         ];
 
@@ -133,7 +134,8 @@
             blackSquare: 'black-3c85d',
             highlightWhite: 'highlight-white-7cce',
             highlightBlack: 'highlight-black-03bf',
-            highlightCheck: 'highlight-check-f5f6'
+            highlightCheck: 'highlight-check-f5f6',
+            highlightPurple: 'highlight-purple-08ac'
         };
 
         //------------------------------------------------------------------------------
@@ -154,7 +156,7 @@
             offerParams = null,
             runningTimer = null,
             nextDistance = null,
-            conn = null,
+
             cssStyle = null;
 
         // DOM elements
@@ -247,7 +249,7 @@
         }
 
         function onMouseoverSquare(square, piece) {
-            if (game === null) return;
+            if (!game_started) return;
 
             // get list of possible moves for this square
             var moves = game.moves({
@@ -273,18 +275,22 @@
 
         // do not pick up pieces if the game is over
         // only pick up pieces for the side to move
+        function notMyTurOrPiece(piece) {
+            return (game.turn() === 'w' && myColor === 'black') ||
+                (game.turn() === 'b' && myColor === 'white') ||
+                (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+                (game.turn() === 'b' && piece.search(/^w/) !== -1);
+        }
+
         var onDragStart = function(source, piece, position, orientation) {
             console.log("onDragStart game " + game + " browsing " + browsing);
-            if (game == null || !game_started) {
+            if (!game_started) {
                 return false;
             }
 
             if (browsing == true ||
                 game.game_over() === true ||
-                (game.turn() === 'w' && myColor === 'black') ||
-                (game.turn() === 'b' && myColor === 'white') ||
-                (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-                (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+                notMyTurOrPiece(piece)) {
                 return false;
             }
         };
@@ -324,12 +330,10 @@
             board.position(game.fen());
             pushGameClock(null);
 
-            if (conn) {
-                conn.send(JSON.stringify({
-                    Cmd: 'move',
-                    Params: last_move
-                }));
-            }
+            wsConn.send({
+                Cmd: 'move',
+                Params: last_move
+            });
         };
 
         var updateView = function() {
@@ -402,65 +406,55 @@
         // Button Handlers
         //------------------------------------------------------------------------------
         function startBtn() {
-            if (game_started === true) {
+            if (game_started) {
                 printStatus("Ignore start, Move! The game is not over yet, resign if you'd like...");
                 return;
             }
 
-            if (board) {
-                board.start();
-            }
+            board.start();
+            printStatus("Waiting for a match...");
 
-            if (conn) {
-                printStatus("Waiting for a match...");
+            var el1 = document.getElementById(itemByName(selectNewGame, selectOpponent).id);
+            var foeParam = el1.options[el1.selectedIndex].value;
+            var el2 = document.getElementById(itemByName(selectNewGame, selectColor).id);
+            var colorParam = el2.options[el2.selectedIndex].value;
+            var el3 = document.getElementById(itemByName(selectNewGame, selectTimeControl).id);
+            var tcParam = el3.options[el3.selectedIndex].value;
 
-                var el1 = document.getElementById(itemByName(selectNewGame, selectOpponent).id);
-                var foeParam = el1.options[el1.selectedIndex].value;
-                var el2 = document.getElementById(itemByName(selectNewGame, selectColor).id);
-                var colorParam = el2.options[el2.selectedIndex].value;
-                var el3 = document.getElementById(itemByName(selectNewGame, selectTimeControl).id);
-                var tcParam = el3.options[el3.selectedIndex].value;
-
-                console.log("start with foe: " + foeParam + " color: " + colorParam + " time control: " + tcParam);
-                conn.send(JSON.stringify({
-                    Cmd: "start",
-                    Params: foeParam,
-                    Color: colorParam,
-                    TimeControl: tcParam
-                }));
-            } else {
-                printStatus("No connection to server");
-            }
+            console.log("start with foe: " + foeParam + " color: " + colorParam + " time control: " + tcParam);
+            wsConn.send({
+                Cmd: "start",
+                Params: foeParam,
+                Color: colorParam,
+                TimeControl: tcParam
+            });
         }
 
         function undoBtn() {
-            if (game == null) {
+            if (!game_started) {
                 return;
             }
-            if (conn) {
-                conn.send(JSON.stringify({
-                    Cmd: "undo"
-                }));
-            }
+            wsConn.send({
+                Cmd: "undo"
+            });
         }
 
+
         function resignBtn() {
-            if (game == null) {
+            if (game_started === false) {
                 return;
             }
-            if (conn) {
-                printStatus("You have resigned, click the Start button for a new game");
-                console.log("Resigned");
-                conn.send(JSON.stringify({
-                    Cmd: "outcome",
-                    Params: "resign"
-                }));
-                game_started = false;
-                clearInterval(runningTimer);
-                updateView();
-            } else {
-                printStatus("No connection to server");
-            }
+
+            printStatus("You have resigned, click the Start button for a new game");
+            console.log("Resigned");
+            wsConn.send({
+                Cmd: "outcome",
+                Params: "resign"
+            });
+            game_started = false;
+            clearInterval(runningTimer);
+            updateView();
+
         }
 
         function drawBtn() {
@@ -469,10 +463,10 @@
             }
             printStatus("You have offered a draw, waiting for response");
             console.log("Draw offer");
-            conn.send(JSON.stringify({
+            wsConn.send({
                 Cmd: "offer",
                 Params: "draw"
-            }));
+            });
         }
 
         function leftBtn() {
@@ -524,44 +518,102 @@
             resize();
         }
 
-        //------------------------------------------------------------------------------
-        // Websocket handler
-        //------------------------------------------------------------------------------
+        var clickMoveFrom = null;
+        var clickMoveTo = null;
 
-        if (window.WebSocket) {
-            updateView();
-            conn = new WebSocket("ws://" + document.location.host + "/ws");
-            conn.onclose = function(evt) {
-                printStatus("<b>Connection closed.</b>");
-            };
-            conn.onmessage = function(evt) {
-                var msg = JSON.parse(evt.data);
-                console.log(msg);
-                if (msg.Cmd == "start") {
-                    start(msg);
-                } else if (msg.Cmd == "move") {
-                    move(msg);
-                } else if (msg.Cmd == "outcome") {
-                    outcome(msg);
-                } else if (msg.Cmd == "offer") {
-                    offer(msg); // make visible
-                } else if (msg.Cmd == "disconnect") {
-                    disconnect();
-                } else if (msg.Cmd == "reconnected") {
-                    reconnected();
-                } else if (msg.Cmd == "must_login") {
-                    must_login();
-                } else if (msg.Cmd == "nomatch") {
-                    nomatch();
-                } else if (msg.Cmd == "accept_undo") {
-                    accept_undo(msg);
-                } else {
-                    console.log("Unknown command: '" + msg.Cmd + "'");
-                }
-            };
-        } else {
-            printStatus("<b>Your browser does not support WebSockets.</b>");
+        function getSquareFromEvent(e) {
+            if (e.target.hasAttribute('data-square')) {
+                return e.target.getAttribute('data-square');
+            } else if (e.target.parentElement.hasAttribute('data-square')) {
+                return e.target.parentElement.getAttribute('data-square');
+            }
+            return null;
         }
+
+        function mouseDownBoard(e) {
+            var square = getSquareFromEvent(e);
+            if (square === null) return;
+
+            console.log(' mouseDownBoard: ' + square);
+            if (clickMoveFrom === null) {
+                // move source should contain a piece
+                if (e.target.parentElement.hasAttribute('data-square') === false) return;
+
+                clickMoveFrom = square;
+                $('#' + BOARD_ID).find('.square-' + square)
+                    .addClass(CSS.highlightPurple);
+
+            } else {
+                if (e.target.parentElement.hasAttribute('data-square')) {
+                    var piece = e.target.getAttribute('data-piece');
+                    if (notMyTurOrPiece(piece)) {
+                        return;
+                    }
+                    $('#' + BOARD_ID).find('.square-' + clickMoveFrom)
+                        .removeClass(CSS.highlightPurple);
+                    clickMoveFrom = square;
+                    $('#' + BOARD_ID).find('.square-' + square)
+                        .addClass(CSS.highlightPurple);
+                    return;
+                }
+            }
+
+            clickMoveTo = square;
+        }
+
+
+
+        function mouseUpBoard(e) {
+            var square = getSquareFromEvent(e);
+            if (square === null) return;
+
+            console.log(' mouseUpBoard: ' + square);
+
+            if (clickMoveTo !== null) {
+                if (clickMoveTo === square) {
+                    console.log(' click: drop from: ' + clickMoveFrom + ' to: ' + square);
+                    if (onDrop(clickMoveFrom, square) !== 'snapback') {
+                        onSnapEnd();
+                        $('#' + BOARD_ID).find('.square-' + clickMoveFrom)
+                            .removeClass(CSS.highlightPurple);
+                        clickMoveFrom = null;
+                        clickMoveTo = null;
+                    }
+                } else { clickMoveTo = null; }
+            }
+            if (clickMoveFrom !== null && clickMoveFrom !== square) {
+                $('#' + BOARD_ID).find('.square-' + clickMoveFrom)
+                    .removeClass(CSS.highlightPurple);
+                clickMoveFrom = null;
+            }
+
+        }
+
+        var onWebSocketMessage = function(evt) {
+            var msg = JSON.parse(evt.data);
+            console.log('onWebSocketMessage: evt.data: ' + evt.data + ' msg: ' + msg);
+            if (msg.Cmd == "start") {
+                start(msg);
+            } else if (msg.Cmd == "move") {
+                move(msg);
+            } else if (msg.Cmd == "outcome") {
+                outcome(msg);
+            } else if (msg.Cmd == "offer") {
+                offer(msg); // make visible
+            } else if (msg.Cmd == "disconnect") {
+                disconnect();
+            } else if (msg.Cmd == "reconnected") {
+                reconnected();
+            } else if (msg.Cmd == "must_login") {
+                must_login();
+            } else if (msg.Cmd == "nomatch") {
+                nomatch();
+            } else if (msg.Cmd == "accept_undo") {
+                accept_undo(msg);
+            } else {
+                console.log("Unknown command: '" + msg.Cmd + "'");
+            }
+        };
 
         function accept_undo(msg) {
             game.undo();
@@ -1142,10 +1194,22 @@
 
 
             board = makeBoard(BOARD_ID, 'start', 'white');
+            $('#' + BOARD_ID).mousedown(mouseDownBoard);
+            $('#' + BOARD_ID).mouseup(mouseUpBoard);
+
+
             printStatus('Choose opponent and click the Start button for a new game');
             fenEl.html('🎬&nbsp;<small>' + board.fen() + '</small>');
             resize();
             window.addEventListener("resize", resize);
+        }
+
+        function connectToServer() {
+            if (window.WebSocket) {
+                wsConn.connect(onWebSocketMessage);
+            } else {
+                printStatus("<b>Your browser does not support WebSockets.</b>");
+            }
         }
 
         function init() {
@@ -1153,6 +1217,7 @@
 
             initDom();
             updateView();
+            connectToServer();
 
             if (PGN !== '') {
                 showFinishedGame(PGN);
