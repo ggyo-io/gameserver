@@ -160,11 +160,12 @@
             game_started = false,
             offerParams = null,
             runningTimer = null,
-            nextDistance = null,
-            cssStyle = null;
+            nextDistance = null;
 
         // DOM elements
         var chessgameEl;
+
+        var toolbar = ToolBar();
 
         // constructor return object
         var widget = {};
@@ -193,17 +194,7 @@
             OFFER_NO_ID = 'offer-yes-' + createId(),
             PGN_ID = 'pgn-' + createId();
 
-        //------------------------------------------------------------------------------
-        // JS Util Functions
-        //------------------------------------------------------------------------------
 
-        // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-        function createId() {
-            return 'xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx'.replace(/x/g, function(c) {
-                var r = Math.random() * 16 | 0;
-                return r.toString(16);
-            });
-        }
 
         //------------------------------------------------------------------------------
         // Board Handlers
@@ -1073,6 +1064,7 @@
             html += pgnDiv();
             html += statusDivs(statusItems);
             html += modalDiv();
+            html += toolbar.html();
             return html;
         }
 
@@ -1121,30 +1113,24 @@
             // Modal buttons
             $('#' + OFFER_YES_ID).on('click', offerYesBtn);
             $('#' + OFFER_NO_ID).on('click', offerNoBtn);
+            toolbar.events();
         }
 
-        // Addition to jQuery to get the inner text width
-        $.fn.textWidth = function() {
-            var text = $(this).html();
-            $(this).html('<span>' + text + '</span>');
-            var width = $(this).find('span:first').width();
-            $(this).html(text);
-            console.log('textWidth text:' + text);
-            return width;
-        };
+        var cssStyle = null;
 
-        function styleRule(f, h) {
+        var styleRule = function(f, h) {
             if (cssStyle !== null) {
                 document.getElementsByTagName("head")[0].removeChild(cssStyle);
             }
             cssStyle = document.createElement('style');
             cssStyle.type = 'text/css';
-            var rules = document.createTextNode('.' + CSS.styledSelect + ' select {font-size: ' + f + 'px;height: ' + h + 'px;}');
+            //var rules = document.createTextNode('.' + CSS.styledSelect + ' select {font-size: ' + f + 'px;height: ' + h + 'px;}');
+            var rules = document.createTextNode('select {font-size: ' + f + 'px;height: ' + h + 'px;}');
             cssStyle.appendChild(rules);
             document.getElementsByTagName("head")[0].appendChild(cssStyle);
 
             return CSS.styledSelect;
-        }
+        };
 
         function resize() {
             var φ = 1.618; // ~ golden ratio
@@ -1194,7 +1180,10 @@
             }
 
             var halfRowHeight = (rowHeight >> 1);
+            var quarterRowHeight = (rowHeight >> 2);
             var halfRowBorder = (rowHeight & 1);
+            toolbar.resize(0, left, itemWidth, quarterRowHeight);
+
             $('#' + WHITE_CLOCK_ID).css({ top: whiteTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
             $('#' + BLACK_CLOCK_ID).css({ top: blackTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
 
@@ -1226,7 +1215,10 @@
             // for some strange reason, select option font size could be
             // changed only by external stylesheet
             var elemHeight = Math.floor(φ * fontSize);
-            $('#' + SELECT_GAME_ID).addClass(styleRule(fontSize, elemHeight));
+            //if (cssStyle != null) deleteCssRule(cssStyle);
+            //cssStyle = createCssRule('.' + CSS.styledSelect + ' select {font-size: ' + fontSize + 'px;height: ' + elemHeight + 'px;}');
+            styleRule(fontSize, elemHeight);
+
 
             //console.log('id: ' + SELECT_GAME_ID + 'top: ' + top + ' left: ' + left);
             top += halfRowHeight + halfRowBorder;
