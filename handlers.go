@@ -5,15 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
-)
-
-var (
-	// key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
-	key   = []byte("76e98a932d924ef78d0b6e6ba4456dc0")
-	store = sessions.NewCookieStore(key)
 )
 
 func pathHandler(w http.ResponseWriter, r *http.Request) {
@@ -88,19 +82,44 @@ func findGame(id string) *Game {
 	return &game
 }
 
-func login(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("email")
+func register(w http.ResponseWriter, r *http.Request) {
+	name := r.FormValue("username")
 	pass := r.FormValue("password")
-	if name != "" && pass != "" {
-		var user User
-		if db.Where("name = ?", name).First(&user).RecordNotFound() {
-			user = User{Name: name, Password: pass}
-			if err := db.Create(&user).Error; err != nil {
-				panic(err)
-			}
-		}
-		setSession(name, w, r)
+	email := r.FormValue("email")
+	if name == "" || pass == "" || email == "" || !strings.Contains(email, "@") || !strings.Contains(email, "."){
+		http.Redirect(w, r, "/register?err=invalid_input", 302)
+		return
 	}
+
+	if existingUser := findUserByName(name); existingUser != nil {
+		http.Redirect(w, r, "/signup?err=user_taken", 302)
+		return
+	}
+
+	user := &User{Name:name, Password:shastr(pass), Email:email}
+	if err := db.Create(user).Error; err != nil {
+		log.Print("Error creating a user", err)
+		http.Redirect(w, r, "/signup?err=create_failed", 302)
+	}
+	// Success!
+	setSession(name, w, r)
+	http.Redirect(w, r, "/", 302)
+
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
+	name := r.FormValue("username")
+	pass := r.FormValue("password")
+	if name == "" || pass == "" {
+		http.Redirect(w, r, "/signin?err=invalid_input", 302)
+		return
+	}
+	if findUserByNameAndPass(name, pass) == nil {
+		http.Redirect(w, r, "/signin?err=no_such_user", 302)
+		return
+	}
+	// Success!
+	setSession(name, w, r)
 	http.Redirect(w, r, "/", 302)
 }
 
@@ -116,12 +135,10 @@ func getUserName(r *http.Request) (userName string) {
 	userRef, _ := session.Values["user"]
 	switch userRef.(type) {
 	case string:
-		var user User
 		name := userRef.(string)
-		if db.Where("name = ?", name).First(&user).RecordNotFound() {
-			return ""
+		if findUserByName(name) != nil {
+			return name
 		}
-		return name
 	}
 	return ""
 }

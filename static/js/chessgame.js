@@ -974,31 +974,31 @@
             return html;
         }
 
-
-
-        function loginFormDiv() {
+        function userProfileDiv() {
             var html = '<div id="' + LOGIN_FORM_ID + '" >';
 
-            var form = itemByName(loginForms, login);
             var name = 'Anonymous';
-            if (UserName !== '') {
-                form = itemByName(loginForms, logout);
+            if (UserName === '') {
+                html += '<a href="/signin">Sign in</a>'
+            } else {
+                const form = itemByName(loginForms, logout);
                 name = UserName;
+                html += 'Hello, <i>' + name + '</i>';
+
+                html += '<form action="' + form.action + '" method="' + form.method + '">';
+
+                form.inputs.forEach(function (item, index) {
+                    html += '<input type="' + item.type + '"';
+                    if (item.type !== submitType) {
+                        html += ' placeholder="' + item.type + '" name="' + item.type + '"';
+                    } else {
+                        html += ' value="' + item.submit + '"';
+                    }
+                    html += '/>';
+                });
+                html += '</form>';
             }
-            html += 'Hello, <i>' + name + '</i>';
-
-            html += '<form action="' + form.action + '" method="' + form.method + '">';
-
-            form.inputs.forEach(function(item, index) {
-                html += '<input type="' + item.type + '"';
-                if (item.type !== submitType) {
-                    html += ' placeholder="' + item.type + '" name="' + item.type + '"';
-                } else {
-                    html += ' value="' + item.submit + '"';
-                }
-                html += '/>';
-            });
-            html += '</form></div>';
+            html += '</div>';
 
             return html;
         }
@@ -1065,7 +1065,7 @@
 
         function chessGameDiv() {
             var html = boardDiv();
-            html += loginFormDiv();
+            html += userProfileDiv();
             html += selectGameDiv();
             html += buttonsDiv();
             html += userDiv(WHITE_PLAYER_ID, WHITE_CLOCK_ID, WHITE_NAME_ID, WHITE_ELO_ID);
@@ -1249,21 +1249,82 @@
             $('#' + PGN_ID).css({ top: pgntop, left: left, position: 'absolute', height: (h - pgntop - (h >> 3)), width: itemWidth });
         }
 
+        function loginFormDiv() {
+            return '<div class="hzbox">' +
+                '<div id="errMsg"></div>' +
+            '<form id="loginForm" class="hzbox" action="/login" method="POST">' +
+            '<label for="user">Username</label>' +
+            '<input name="username" id="user" autofocus="autofocus" required="required"/>' +
+            '<label for="pwd">Password</label>' +
+            '<input name="password" type="password" id="pwd" required="required"/>' +
+            '<input name="Sign in" type="submit" value="Sign in"/>' +
+            '<div>' +
+            '<a href="/signup">Register</a>&nbsp;&nbsp;' +
+            '<a href="/forgotpwd">Forgot Password</a>' +
+            '</div>' +
+            '</form>' +
+            '</div>';
+        }
+
+        function registerFormDiv() {
+            return '<div class="hzbox">' +
+                '<div id="errMsg"></div>' +
+                '<form id="registerForm" class="hzbox" action="/register" method="POST">' +
+                '<label for="user">Username</label>' +
+                '<input name="username" id="user" autofocus="autofocus" required="required"/>' +
+                '<label for="pwd">Password</label>' +
+                '<input name="password" type="password" id="pwd" required="required" />' +
+                '<label for="email">Email (for password reset)</label>' +
+                '<input name="email" id="email" required="required" type="email"/>' +
+
+
+                '<input name="Register" type="submit" value="Register"/>' +
+                '<div>' +
+                '<a href="/signin">Sign in</a>&nbsp;&nbsp;' +
+                '<a href="/forgotpwd">Forgot Password</a>' +
+                '</div>' +
+                '</form>' +
+                '</div>';
+        }
+
+        function displayErrorMessage() {
+            var urlQuery = window.location.search;
+            var errIdx = urlQuery.indexOf("err=")
+            if (errIdx != -1) {
+                var eqIdx = urlQuery.indexOf('=', errIdx);
+                if (eqIdx != -1) {
+                    var ampIdx = urlQuery.indexOf('&', errIdx);
+                    var errorMessage = ampIdx == -1 ? urlQuery.substring(eqIdx + 1) : urlQuery.substring(eqIdx + 1, ampIdx);
+                    $('#errMsg').html(
+                        errorMessage
+                    ).css('display', 'inline');
+                }
+            }
+        }
+
         function initDom() {
 
             // build game and save it in memory
-            chessgameEl.html(chessGameDiv());
-            initElementRefs();
-            initButtonHandlers();
+            if (window.location.pathname == "/signin") {
+                chessgameEl.html(loginFormDiv());
+            } else if (window.location.pathname == "/signup") {
+                chessgameEl.html(registerFormDiv());
+            } else {
+                chessgameEl.html(chessGameDiv());
+                initElementRefs();
+                initButtonHandlers();
 
 
-            board = makeBoard(BOARD_ID, 'start', 'white');
-            $('#' + BOARD_ID).mousedown(mouseDownBoard);
-            $('#' + BOARD_ID).mouseup(mouseUpBoard);
+                board = makeBoard(BOARD_ID, 'start', 'white');
+                $('#' + BOARD_ID).mousedown(mouseDownBoard);
+                $('#' + BOARD_ID).mouseup(mouseUpBoard);
 
 
-            printStatus('Choose opponent and click the Start button for a new game');
-            fenEl.html('🎬&nbsp;<small>' + board.fen() + '</small>');
+                printStatus('Choose opponent and click the Start button for a new game');
+                fenEl.html('🎬&nbsp;<small>' + board.fen() + '</small>');
+            }
+            displayErrorMessage();
+
             resize();
             window.addEventListener("resize", resize);
         }
