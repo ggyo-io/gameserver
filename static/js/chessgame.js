@@ -1288,17 +1288,12 @@
         }
 
         function displayErrorMessage() {
-            var urlQuery = window.location.search;
-            var errIdx = urlQuery.indexOf("err=")
-            if (errIdx != -1) {
-                var eqIdx = urlQuery.indexOf('=', errIdx);
-                if (eqIdx != -1) {
-                    var ampIdx = urlQuery.indexOf('&', errIdx);
-                    var errorMessage = ampIdx == -1 ? urlQuery.substring(eqIdx + 1) : urlQuery.substring(eqIdx + 1, ampIdx);
-                    $('#errMsg').html(
-                        errorMessage
-                    ).css('display', 'inline');
-                }
+            var url = new URL(window.location.href);
+            var errorMessage = url.searchParams.get("err");
+            if (errorMessage) {
+                $('#errMsg').html(
+                    "Error: " + decodeURI(errorMessage)
+                ).css('display', 'inline');
             }
         }
 
