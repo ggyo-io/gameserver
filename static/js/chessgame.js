@@ -156,9 +156,7 @@
             statusEl = null,
             fenEl = null,
             modalEl = null,
-            offerEl = null,
             game_started = false,
-            offerParams = null,
             runningTimer = null,
             nextDistance = null;
 
@@ -167,6 +165,10 @@
 
         // widgets
         var toolbar = ToolBar();
+        var modal = Modal({
+            'accept_undo': accept_undo,
+            'outcome': outcome
+        });
         var pgn = Pgn();
 
         // constructor return object
@@ -189,14 +191,7 @@
             BLACK_CLOCK_ID = 'black-clock-' + createId(),
             SELECT_GAME_ID = 'select-game-' + createId(),
             BUTTONS_ID = 'buttons-' + createId(),
-            LOGIN_FORM_ID = 'loginform-' + createId(),
-            MODAL_ID = 'modal-' + createId(),
-            OFFER_ID = 'offer-' + createId(),
-            OFFER_YES_ID = 'offer-yes-' + createId(),
-            OFFER_NO_ID = 'offer-yes-' + createId();
-
-
-
+            LOGIN_FORM_ID = 'loginform-' + createId();
 
         //------------------------------------------------------------------------------
         // Board Handlers
@@ -526,29 +521,6 @@
             resize();
         }
 
-        function offerYesBtn() {
-            console.log("Offer accepted: " + offerParams);
-
-            if (offerParams === 'draw') {
-                outcome(offerParams + ' is accepted');
-                wsConn.send({
-                    Cmd: "outcome",
-                    Params: offerParams
-                });
-            } else if (offerParams === 'undo') {
-                var msg = {
-                    Cmd: 'accept_undo',
-                    Params: '2'
-                };
-                wsConn.send(msg);
-                accept_undo(msg);
-            }
-            modalEl.hide(); // make invisible
-        }
-
-        function offerNoBtn() {
-            modalEl.hide(); // make invisible
-        }
 
         var clickMoveFrom = null;
         var clickMoveTo = null;
@@ -637,7 +609,7 @@
             } else if (msg.Cmd == "outcome") {
                 outcome(msg.Params);
             } else if (msg.Cmd == "offer") {
-                offer(msg.Params); // make visible
+                modal.offer(msg.Params); // make visible
             } else if (msg.Cmd == "disconnect") {
                 disconnect();
             } else if (msg.Cmd == "reconnected") {
@@ -649,7 +621,7 @@
             } else if (msg.Cmd == "accept_undo") {
                 accept_undo(msg);
             } else if (msg.Cmd == "undo") {
-                offer(msg.Cmd);
+                modal.offer(msg.Cmd);
             } else {
                 console.log("Unknown command: '" + msg.Cmd + "'");
             }
@@ -675,13 +647,6 @@
 
         function reconnected() {
             printStatus("Your opponent have <b>reconnected</b>.");
-        }
-
-
-        function offer(offer) {
-            offerParams = offer;
-            offerEl.html(offerParams);
-            modalEl.show();
         }
 
         function outcome(msg) {
@@ -963,16 +928,6 @@
             return html;
         }
 
-        function modalDiv() {
-            var html = '<div id="' + MODAL_ID + '" class="' + CSS.modal + '">' +
-                '<div class="' + CSS.modalContent + '">' +
-                '<p>Opponent offer: <span id="' + OFFER_ID + '"></span></p>' +
-                '<span id="' + OFFER_YES_ID + '" class="' + CSS.closeYes + '">✓</span>' +
-                '<span id="' + OFFER_NO_ID + '"  class="' + CSS.closeNo + '">×</span>' +
-                '</div></div>';
-            return html;
-        }
-
         function selectGameDiv() {
             var html = '<div id="' + SELECT_GAME_ID + '" ><ul class="' + CSS.hotizUl + '">';
             selectNewGame.forEach(function(item, index) {
@@ -1025,14 +980,14 @@
 
         function chessGameDiv() {
             var html = boardDiv();
-            html += loginFormDiv();
+            //html += loginFormDiv();
             html += selectGameDiv();
             html += buttonsDiv();
             html += userDiv(WHITE_PLAYER_ID, WHITE_CLOCK_ID, WHITE_NAME_ID, WHITE_ELO_ID);
             html += userDiv(BLACK_PLAYER_ID, BLACK_CLOCK_ID, BLACK_NAME_ID, BLACK_ELO_ID);
             html += pgn.html();
+            html += modal.html();
             html += statusDivs(statusItems);
-            html += modalDiv();
             html += toolbar.html();
             return html;
         }
@@ -1056,8 +1011,6 @@
         function initElementRefs() {
             statusEl = $('#' + itemByName(statusItems, statusName).id);
             fenEl = $('#' + itemByName(statusItems, fenName).id);
-            offerEl = $('#' + OFFER_ID);
-            modalEl = $('#' + MODAL_ID);
         }
 
         function initButtonHandlers() {
@@ -1079,9 +1032,7 @@
                 }
             });
 
-            // Modal buttons
-            $('#' + OFFER_YES_ID).on('click', offerYesBtn);
-            $('#' + OFFER_NO_ID).on('click', offerNoBtn);
+            modal.events();
             toolbar.events();
         }
 
