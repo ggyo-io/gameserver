@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    window.ToolBar = window.ToolBar || function(cfg) {
+    window.ToolBar = function(cfg) {
         var widget = {};
 
         var id = 'toolbar-' + createId(),
@@ -16,8 +16,6 @@
             createCssRule('.' + buttonClass +
                 ':hover {cursor: pointer; background-color: deepskyblue;}')
         ];
-
-        widget.id = function() { return id; };
 
         widget.html = function() {
             var html = '<div id="' + id + '">' +

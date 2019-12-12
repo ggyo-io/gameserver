@@ -165,7 +165,9 @@
         // DOM elements
         var chessgameEl;
 
+        // widgets
         var toolbar = ToolBar();
+        var pgn = Pgn();
 
         // constructor return object
         var widget = {};
@@ -191,8 +193,8 @@
             MODAL_ID = 'modal-' + createId(),
             OFFER_ID = 'offer-' + createId(),
             OFFER_YES_ID = 'offer-yes-' + createId(),
-            OFFER_NO_ID = 'offer-yes-' + createId(),
-            PGN_ID = 'pgn-' + createId();
+            OFFER_NO_ID = 'offer-yes-' + createId();
+
 
 
 
@@ -405,7 +407,7 @@
 
             printStatus(status);
             fenEl.html('🎬&nbsp;<small>' + game.fen() + '</small>');
-            $('#' + PGN_ID).html(printPgn(game.pgn()));
+            pgn.printPgn(game.pgn());
             updateView();
         };
 
@@ -493,8 +495,7 @@
             browsingGame.undo();
             board.position(browsingGame.fen());
             fenEl.html('🎬&nbsp;<small>' + browsingGame.fen() + '</small>');
-            $('#' + PGN_ID).html(printPgn(browsingGame.pgn()));
-
+            pgn.printPgn(browsingGame.pgn());
         }
 
         function rightBtn() {
@@ -507,7 +508,7 @@
             browsingGame.move(game.history()[browsingGame.history().length]);
             board.position(browsingGame.fen());
             fenEl.html(('🎬&nbsp;<small>' + browsingGame.fen()) + '</small>');
-            $('#' + PGN_ID).html(printPgn(browsingGame.pgn()));
+            pgn.printPgn(browsingGame.pgn());
             if (browsingGame.history().length === game.history().length) {
                 browsing = false;
                 browsingGame = null;
@@ -912,38 +913,6 @@
             return r;
         }
 
-        function pgnDiv() {
-            return '<div class="' + CSS.scrollable + '" id="' + PGN_ID + '"></div>';
-        }
-
-        function printPgn(pgn) {
-            var html = '<ol>';
-            var moves = pgn.split(' ');
-
-            var liOpen = false;
-            moves.forEach(function(item, index) {
-                if ((index % 3) === 0) return; // ignore move number
-
-                if (liOpen === false) {
-                    html += '<li>';
-                    liOpen = true;
-                }
-                if (((index + 1) % 3) === 0) {
-                    html += '&nbsp;';
-                }
-                html += moves[index];
-                if (((index + 1) % 3) === 0) {
-                    html += '</li>';
-                    liOpen = false;
-                }
-            });
-            if (liOpen === true) {
-                html += '</li>';
-            }
-            html += '</ol>';
-            return html;
-        }
-
         function printStatus(msg) {
             statusEl.html('📢&nbsp;' + msg);
         }
@@ -1061,7 +1030,7 @@
             html += buttonsDiv();
             html += userDiv(WHITE_PLAYER_ID, WHITE_CLOCK_ID, WHITE_NAME_ID, WHITE_ELO_ID);
             html += userDiv(BLACK_PLAYER_ID, BLACK_CLOCK_ID, BLACK_NAME_ID, BLACK_ELO_ID);
-            html += pgnDiv();
+            html += pgn.html();
             html += statusDivs(statusItems);
             html += modalDiv();
             html += toolbar.html();
@@ -1238,7 +1207,7 @@
                 top += statusItemHeight;
             });
 
-            $('#' + PGN_ID).css({ top: pgntop, left: left, position: 'absolute', height: (h - pgntop - (h >> 3)), width: itemWidth });
+            pgn.resize(pgntop, left, itemWidth, (h - pgntop - (h >> 3)));
         }
 
         function initDom() {
