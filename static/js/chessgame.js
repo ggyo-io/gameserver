@@ -5,53 +5,8 @@
     window.ChessGame = window.ChessGame || function(chessgameId, cfg) {
         cfg = cfg || {};
 
-        //------------------------------------------------------------------------------
-        // Keyboard keys
-        //------------------------------------------------------------------------------ 
-        // https://stackoverflow.com/questions/1402698/binding-arrow-keys-in-js-jquery
 
-        var leftArrow = 37,
-            rightArrow = 39;
 
-        //------------------------------------------------------------------------------
-        // Markup model
-        //------------------------------------------------------------------------------ 
-        var buttons = [{
-                name: 'start',
-                class: 'nogame',
-                onclick: startBtn
-            },
-            {
-                name: 'undo',
-                class: 'game',
-                onclick: undoBtn,
-            },
-            {
-                name: 'resign',
-                class: 'game',
-                onclick: resignBtn
-            },
-            {
-                name: 'draw',
-                class: 'game',
-                onclick: drawBtn
-            },
-            {
-                name: '⬅',
-                onclick: leftBtn,
-                onkey: leftArrow
-            },
-            {
-                name: '➡',
-                onclick: rightBtn,
-                onkey: rightArrow
-            },
-            {
-                name: '⇄',
-                onclick: flipBtn,
-                class: 'game'
-            }
-        ];
 
 
         var statusName = '📢';
@@ -155,7 +110,6 @@
             browsingGame = new Chess(),
             statusEl = null,
             fenEl = null,
-            modalEl = null,
             game_started = false,
             runningTimer = null,
             nextDistance = null;
@@ -165,11 +119,60 @@
 
         // widgets
         var toolbar = ToolBar();
+        var pgn = Pgn();
+        var buttons = Buttons({
+            'game_started': function() { return game_started; },
+            'game': function() { return game; },
+            'board': function() { return board; },
+            'printStatus': printStatus,
+            'outcome': outcome,
+            'browsing': function(val) {
+                if (arguments.length === 0) {
+                    return browsing;
+                } else {
+                    browsing = val;
+                }
+            },
+            'browsingGame': function(val) {
+                if (arguments.length === 0) {
+                    return browsingGame;
+                } else {
+                    browsingGame = val;
+                }
+            },
+            'printPgn': pgn.printPgn,
+            'printFen': function(fen) {
+                fenEl.html('🎬&nbsp;<small>' + fen + '</small>');
+            },
+            'updateStatus': updateStatus,
+            'orientation': function(val) {
+                if (arguments.length === 0) {
+                    return orientation;
+                } else {
+                    orientation = val;
+                }
+            },
+            'onResize': resize,
+
+            'selectNewGame': function() {
+
+                var el1 = document.getElementById(itemByName(selectNewGame, selectOpponent).id);
+                var foeParam = el1.options[el1.selectedIndex].value;
+                var el2 = document.getElementById(itemByName(selectNewGame, selectColor).id);
+                var colorParam = el2.options[el2.selectedIndex].value;
+                var el3 = document.getElementById(itemByName(selectNewGame, selectTimeControl).id);
+                var tcParam = el3.options[el3.selectedIndex].value;
+
+                return [foeParam, colorParam, tcParam];
+            },
+
+        });
+
         var modal = Modal({
             'accept_undo': accept_undo,
             'outcome': outcome
         });
-        var pgn = Pgn();
+
 
         // constructor return object
         var widget = {};
@@ -190,7 +193,6 @@
             BLACK_ELO_ID = 'black-elo-' + createId(),
             BLACK_CLOCK_ID = 'black-clock-' + createId(),
             SELECT_GAME_ID = 'select-game-' + createId(),
-            BUTTONS_ID = 'buttons-' + createId(),
             LOGIN_FORM_ID = 'loginform-' + createId();
 
         //------------------------------------------------------------------------------
@@ -368,7 +370,7 @@
             }
         }
 
-        var updateStatus = function() {
+        function updateStatus() {
             var status = '';
 
             var moveColor = 'White';
@@ -404,123 +406,7 @@
             fenEl.html('🎬&nbsp;<small>' + game.fen() + '</small>');
             pgn.printPgn(game.pgn());
             updateView();
-        };
-
-        //------------------------------------------------------------------------------
-        // Button Handlers
-        //------------------------------------------------------------------------------
-        function startBtn() {
-            if (game_started) {
-                printStatus("Ignore start, Move! The game is not over yet, resign if you'd like...");
-                return;
-            }
-
-            board.start();
-            printStatus("Waiting for a match...");
-
-            var el1 = document.getElementById(itemByName(selectNewGame, selectOpponent).id);
-            var foeParam = el1.options[el1.selectedIndex].value;
-            var el2 = document.getElementById(itemByName(selectNewGame, selectColor).id);
-            var colorParam = el2.options[el2.selectedIndex].value;
-            var el3 = document.getElementById(itemByName(selectNewGame, selectTimeControl).id);
-            var tcParam = el3.options[el3.selectedIndex].value;
-
-            console.log("start with foe: " + foeParam + " color: " + colorParam + " time control: " + tcParam);
-            wsConn.send({
-                Cmd: "start",
-                Params: foeParam,
-                Color: colorParam,
-                TimeControl: tcParam
-            });
         }
-
-        function undoBtn() {
-            if (!game_started) {
-                return;
-            }
-            if (game.history().length < 2) {
-                printStatus("Too short for undo, " + statusEl.html());
-                return;
-            }
-            wsConn.send({
-                Cmd: "undo"
-            });
-        }
-
-
-        function resignBtn() {
-            if (game_started === false) {
-                return;
-            }
-
-            console.log("Resigned");
-            wsConn.send({
-                Cmd: "outcome",
-                Params: "resign"
-            });
-            outcome('You have resigned');
-        }
-
-        function drawBtn() {
-            if (game == null) {
-                return;
-            }
-            printStatus("You have offered a draw, waiting for response");
-            console.log("Draw offer");
-            wsConn.send({
-                Cmd: "offer",
-                Params: "draw"
-            });
-        }
-
-        function leftBtn() {
-            if (game == null) {
-                return;
-            }
-
-            if (browsing === false) {
-                browsing = true;
-                printStatus("Browsing");
-                browsingGame = new Chess();
-                game.history().forEach(function(item, index) {
-                    browsingGame.move(item);
-                });
-            }
-
-            browsingGame.undo();
-            board.position(browsingGame.fen());
-            fenEl.html('🎬&nbsp;<small>' + browsingGame.fen() + '</small>');
-            pgn.printPgn(browsingGame.pgn());
-        }
-
-        function rightBtn() {
-            if (game == null) {
-                return;
-            }
-            if (browsing === false) {
-                return;
-            }
-            browsingGame.move(game.history()[browsingGame.history().length]);
-            board.position(browsingGame.fen());
-            fenEl.html(('🎬&nbsp;<small>' + browsingGame.fen()) + '</small>');
-            pgn.printPgn(browsingGame.pgn());
-            if (browsingGame.history().length === game.history().length) {
-                browsing = false;
-                browsingGame = null;
-                updateStatus();
-            }
-        }
-
-        function flipBtn() {
-            if (orientation === 'white') {
-                orientation = 'black';
-            } else {
-                orientation = 'white';
-            }
-            board.flip();
-            resize();
-        }
-
 
         var clickMoveFrom = null;
         var clickMoveTo = null;
@@ -958,21 +844,6 @@
         }
 
 
-        function buttonsDiv() {
-            var html = '<div id="' + BUTTONS_ID + '" ><ul class="' + CSS.hotizUl + '" >';
-            buttons.forEach(function(item, index) {
-                item.id = item.name + '-' + createId();
-                html += '<li  class="' + CSS.horizLi + '" ><input id="' + item.id + '" type="button" value="' + item.name + '"';
-                if (item.class !== undefined) {
-                    html += ' class="' + item.class + '"';
-                }
-                html += '></li>';
-            });
-            html += '</ul></div>';
-
-            return html;
-        }
-
         function boardDiv() {
             return '<div id="' + BOARD_ID + '" ></div>';
         }
@@ -982,7 +853,7 @@
             var html = boardDiv();
             //html += loginFormDiv();
             html += selectGameDiv();
-            html += buttonsDiv();
+            html += buttons.html();
             html += userDiv(WHITE_PLAYER_ID, WHITE_CLOCK_ID, WHITE_NAME_ID, WHITE_ELO_ID);
             html += userDiv(BLACK_PLAYER_ID, BLACK_CLOCK_ID, BLACK_NAME_ID, BLACK_ELO_ID);
             html += pgn.html();
@@ -1013,25 +884,8 @@
             fenEl = $('#' + itemByName(statusItems, fenName).id);
         }
 
-        function initButtonHandlers() {
-            buttons.forEach(function(item, index) {
-                $('#' + item.id).on('click', item.onclick);
-                if (item.onkey !== undefined) {
-                    var k = item.onkey;
-                    $(document).keydown(function(e) {
-                        switch (e.which) {
-                            case k:
-                                break;
-
-                            default:
-                                return; // exit this handler for other keys
-                        }
-                        e.preventDefault(); // prevent the default action (scroll / move caret)
-                        item.onclick();
-                    });
-                }
-            });
-
+        function initEvents() {
+            buttons.events();
             modal.events();
             toolbar.events();
         }
@@ -1139,14 +993,8 @@
             //cssStyle = createCssRule('.' + CSS.styledSelect + ' select {font-size: ' + fontSize + 'px;height: ' + elemHeight + 'px;}');
             styleRule(fontSize, elemHeight);
 
-
-            //console.log('id: ' + SELECT_GAME_ID + 'top: ' + top + ' left: ' + left);
             top += halfRowHeight + halfRowBorder;
-            $('#' + BUTTONS_ID).css({ top: top, left: left, position: 'absolute', width: itemWidth, height: halfRowHeight });
-            buttons.forEach(function(item, index) {
-                $('#' + item.id).css({ 'font-size': fontSize });
-            });
-            //console.log('id: ' + BUTTONS_ID + 'top: ' + top + ' left: ' + left);
+            buttons.resize(top, left, itemWidth, halfRowHeight, fontSize);
 
             top += rowHeight;
             var pgntop = Math.floor(h / φ);
@@ -1166,7 +1014,7 @@
             // build game and save it in memory
             chessgameEl.html(chessGameDiv());
             initElementRefs();
-            initButtonHandlers();
+            initEvents();
 
 
             board = makeBoard(BOARD_ID, 'start', 'white');
