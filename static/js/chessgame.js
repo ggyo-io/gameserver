@@ -89,9 +89,7 @@
             last_move = "",
             browsing = false,
             browsingGame = new Chess(),
-            game_started = false,
-            runningTimer = null,
-            nextDistance = null;
+            game_started = false;
 
         // DOM elements
         var chessgameEl;
@@ -100,6 +98,7 @@
         var status = Status();
         var toolbar = ToolBar();
         var pgn = Pgn();
+        var players = Players();
         var buttons = Buttons({
             'game_started': function() { return game_started; },
             'game': function() { return game; },
@@ -161,14 +160,7 @@
         // Top level elements
         var
             BOARD_ID = 'board-' + createId(),
-            WHITE_PLAYER_ID = 'white-player-' + createId(),
-            WHITE_NAME_ID = 'white-name-' + createId(),
-            WHITE_ELO_ID = 'white-elo-' + createId(),
-            WHITE_CLOCK_ID = 'white-clock-' + createId(),
-            BLACK_PLAYER_ID = 'black-player-' + createId(),
-            BLACK_NAME_ID = 'black-name-' + createId(),
-            BLACK_ELO_ID = 'black-elo-' + createId(),
-            BLACK_CLOCK_ID = 'black-clock-' + createId(),
+
             SELECT_GAME_ID = 'select-game-' + createId(),
             LOGIN_FORM_ID = 'loginform-' + createId();
 
@@ -324,7 +316,7 @@
                 $('.nogame').css('display', 'none');
                 $('.game').css('display', 'inline');
             } else {
-                clearInterval(runningTimer);
+                players.stopRunningCountdown();
                 $('.nogame').css('display', 'inline');
                 $('.game').css('display', 'none');
             }
@@ -516,7 +508,7 @@
             status.printStatus("The outcome is: '" + msg + "', click the Start button for a new game");
             console.log("opponent outcome '" + msg + "'");
             game_started = false;
-            clearInterval(runningTimer);
+            players.stopRunningCountdown();
             updateView();
         }
 
@@ -558,19 +550,22 @@
                 resize();
             }
             orientation = myColor;
+            var whiteName, blackName;
             if (orientation === 'white') {
-                $('#' + WHITE_NAME_ID).html('👓&nbsp;' + UserName);
-                $('#' + BLACK_NAME_ID).html('🕶&nbsp;' + msg.User);
+                whiteName = UserName;
+                blackName = msg.User;
             } else {
-                $('#' + WHITE_NAME_ID).html('👓&nbsp;' + msg.User);
-                $('#' + BLACK_NAME_ID).html('🕶&nbsp;' + UserName);
+                whiteName = msg.User;
+                blackName = UserName;
             }
             status.printGameId(msg.GameID);
-            $('#' + WHITE_ELO_ID).html('🏆&nbsp;' + msg.WhiteElo);
-            $('#' + BLACK_ELO_ID).html('🏆&nbsp;' + msg.BlackElo);
 
-            printClock(WHITE_CLOCK_ID, msg.WhiteClock, '');
-            printClock(BLACK_CLOCK_ID, msg.BlackClock, '');
+            players.printWhiteName(whiteName);
+            players.printBlackName(blackName);
+            players.printWhiteElo(msg.WhiteElo);
+            players.printBlackElo(msg.BlackElo);
+            players.printWhiteClock(msg.WhiteClock);
+            players.printBlackClock(msg.BlackClock);
 
             game = new Chess();
             game_started = true;
@@ -606,108 +601,51 @@
             status.printStatus("No match found");
         }
 
-
-
-        //------------------------------------------------------------------------------
-        // Countdown functions
-        //------------------------------------------------------------------------------
-        function pad(num) {
-            var n = num.toString();
-            if (n.length === 1) {
-                n = '0' + n;
-            }
-
-            return n;
-        }
-
-        function printClock(divId, distance, msg) {
-            /*
-                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            */
-            if (distance >= 0) {
-                var minutes = pad(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)));
-                var seconds = pad(Math.floor((distance % (1000 * 60)) / 1000));
-                var html = '⌛&nbsp;' + minutes + ':' + seconds;
-                $('#' + divId).html(html);
-            }
-            if (msg !== '') {
-                status.printStatus(msg);
-            }
-        }
-
-        function startCountdown(elementId, distance, msg) {
-            var clock = elementId;
-            var countDownDate = new Date().getTime() + distance;
-
-            var msgPrefix = msg;
-
-            // Update the count down every 10 times a second
-            var timer = setInterval(function() {
-
-                // Get today's date and time
-                var now = new Date().getTime();
-
-                // Find the distance between now and the count down date
-                distance = countDownDate - now;
-
-                printClock(clock, distance, msgPrefix);
-
-                if (distance < 0) {
-                    clearInterval(timer);
-                    printClock(clock, 0, msgPrefix + "EXPIRED");
-                }
-            }, 100);
-
-            return timer;
-        }
-
         function pushGameClock(msg) {
             if (game.game_over() === true) {
-                clearInterval(runningTimer);
+                players.stopRunningCountdown();
                 return;
             }
 
-            var toStart, toStartMessage = '',
+            var startCountdown, toStartMessage = '',
                 startDistance;
 
             if (game.turn() === 'w') {
-                toStart = WHITE_CLOCK_ID;
+                startCountdown = players.startWhiteCountdown;
                 if (game.history().length < 2) {
                     toStartMessage = 'White first move';
                     startDistance = 30 * 1000;
                 } else {
                     if (msg == null) {
-                        startDistance = nextDistance;
+                        startDistance = players.nextDistance();
                     } else {
                         startDistance = msg.WhiteClock;
                     }
                 }
                 if (msg !== null) {
-                    nextDistance = msg.BlackClock;
+                    players.nextDistance(msg.BlackClock);
                 }
 
             } else {
-                toStart = BLACK_CLOCK_ID;
+                startCountdown = players.startBlackCountdown;
                 if (game.history().length < 2) {
                     toStartMessage = 'Black first move';
                     startDistance = 30 * 1000;
                 } else {
                     if (msg == null) {
-                        startDistance = nextDistance;
+                        startDistance = players.nextDistance();
                     } else {
                         startDistance = msg.BlackClock;
                     }
                 }
                 if (msg !== null) {
-                    nextDistance = msg.WhiteClock;
+                    players.nextDistance(msg.WhiteClock);
                 }
 
             }
 
-            clearInterval(runningTimer);
-            console.log('start timer for el ' + toStart + ' msg: ' + toStartMessage + ' distance: ' + startDistance);
-            runningTimer = startCountdown(toStart, startDistance, toStartMessage);
+            startCountdown(startDistance);
+            if (toStartMessage !== '') status.printStatus(toStartMessage);
         }
 
         //------------------------------------------------------------------------------
@@ -777,17 +715,6 @@
             return html;
         }
 
-        function userDiv(id, clockId, userId, eloId) {
-            var html = '<div id="' + id + '" class="game">';
-            html += '<div id="' + clockId + '">⌛&nbsp;00:00</div>';
-            html += '<div id="' + userId + '">👓&nbsp;</div>';
-            html += '<div id="' + eloId + '">🏆&nbsp;</div>';
-            html += '</div>';
-
-            return html;
-        }
-
-
         function boardDiv() {
             return '<div id="' + BOARD_ID + '" ></div>';
         }
@@ -798,8 +725,7 @@
             //html += loginFormDiv();
             html += selectGameDiv();
             html += buttons.html();
-            html += userDiv(WHITE_PLAYER_ID, WHITE_CLOCK_ID, WHITE_NAME_ID, WHITE_ELO_ID);
-            html += userDiv(BLACK_PLAYER_ID, BLACK_CLOCK_ID, BLACK_NAME_ID, BLACK_ELO_ID);
+            html += players.html();
             html += pgn.html();
             html += modal.html();
             html += status.html();
@@ -825,6 +751,7 @@
         function initEvents() {
             window.addEventListener("resize", resize);
 
+            players.events();
             buttons.events();
             modal.events();
             toolbar.events();
@@ -856,7 +783,6 @@
             var w = window.innerWidth - margin;
             var h = Math.floor(w / φ);
 
-
             if (window.innerHeight - (2 * margin) < h) {
                 h = window.innerHeight - (2 * margin);
                 w = Math.floor(h * φ);
@@ -882,45 +808,10 @@
             var left = $('#' + BOARD_ID).outerWidth(true) + margin;
             var itemWidth = w - left - margin;
 
-            $('#' + WHITE_PLAYER_ID).height(rowHeight);
-            $('#' + BLACK_PLAYER_ID).height(rowHeight);
-
-
-            var whiteTop, blackTop;
             var quarterRowHeight = (rowHeight >> 2);
-            var topClock = quarterRowHeight + boardBorderWidth;
-            var bottomClock = h - (h >> 3) - topClock;
-            if (orientation === 'white') {
-                blackTop = topClock;
-                whiteTop = bottomClock;
-            } else {
-                whiteTop = topClock;
-                blackTop = bottomClock;
-            }
-
-            var halfRowHeight = (rowHeight >> 1);
-
-            var halfRowBorder = (rowHeight & 1);
             toolbar.resize(0, left, itemWidth, quarterRowHeight);
 
-            $('#' + WHITE_CLOCK_ID).css({ top: whiteTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
-            $('#' + BLACK_CLOCK_ID).css({ top: blackTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
-
-            // have to make the user div visible to measure text width
-            var clockDisplay = $('#' + WHITE_PLAYER_ID).css('display');
-            $('#' + WHITE_PLAYER_ID).css('display', 'inline');
-            var clockWidth = $('#' + WHITE_CLOCK_ID).textWidth();
-            $('#' + WHITE_PLAYER_ID).css('display', clockDisplay);
-
-            var userLeft = left + clockWidth + margin;
-            console.log("clock width: " + clockWidth + " left: " + left + " userLeft: " + userLeft);
-            $('#' + WHITE_NAME_ID).css({ top: whiteTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
-            $('#' + BLACK_NAME_ID).css({ top: blackTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
-            $('#' + WHITE_ELO_ID).css({ top: whiteTop + halfRowHeight + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
-            $('#' + BLACK_ELO_ID).css({ top: blackTop + halfRowHeight + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
-            $('#' + WHITE_PLAYER_ID).width(itemWidth);
-            $('#' + BLACK_PLAYER_ID).width(itemWidth);
-
+            players.resize(boardBorderWidth, margin, itemWidth, rowHeight, left, h, orientation);
 
             var top = boardBorderWidth + rowHeight;
 
@@ -938,6 +829,8 @@
             //cssStyle = createCssRule('.' + CSS.styledSelect + ' select {font-size: ' + fontSize + 'px;height: ' + elemHeight + 'px;}');
             styleRule(fontSize, elemHeight);
 
+            var halfRowHeight = (rowHeight >> 1);
+            var halfRowBorder = (rowHeight & 1);
             top += halfRowHeight + halfRowBorder;
             buttons.resize(top, left, itemWidth, halfRowHeight, fontSize);
 
@@ -945,7 +838,7 @@
             var pgntop = Math.floor(h / φ);
 
             status.resize(top, left, itemWidth, (pgntop - top - margin));
-            pgn.resize(pgntop, left, itemWidth, (bottomClock - pgntop - margin));
+            pgn.resize(pgntop, left, itemWidth, (players.bottomClock() - pgntop - margin));
         }
 
         function initDom() {
@@ -992,6 +885,5 @@
     }; // end of window['ChessGame']
 
     var chessgame = ChessGame('chessgame', {});
-
 
 })(); // end anonymous wrapper
