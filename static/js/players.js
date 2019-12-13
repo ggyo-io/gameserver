@@ -123,7 +123,7 @@
         };
 
         widget.printBlackClock = function(distance) {
-            printClock(WHITE_CLOCK_ID);
+            printClock(BLACK_CLOCK_ID);
         };
 
         //------------------------------------------------------------------------------

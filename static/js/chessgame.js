@@ -5,56 +5,6 @@
     window.ChessGame = window.ChessGame || function(chessgameId, cfg) {
         cfg = cfg || {};
 
-        var selectOpponent = 'Select_opponent';
-        var selectColor = 'Color';
-        var selectTimeControl = 'Time_Control';
-        var selectNewGame = [{
-                name: selectOpponent,
-                options: ['stockfish', 'lc0', 'human']
-            },
-            {
-                name: selectColor,
-                options: ['any', 'white', 'black']
-            },
-            {
-                name: selectTimeControl,
-                options: ['900+15', '300+5', '60+1']
-            },
-        ];
-
-        var login = "login";
-        var logout = "logout";
-        var emailType = 'email';
-        var passwordType = 'password';
-        var submitType = 'submit';
-
-        var loginForms = [{
-                name: login,
-                action: '/login',
-                method: 'POST',
-                inputs: [{
-                        type: emailType
-                    },
-                    {
-                        type: passwordType
-                    },
-                    {
-                        type: submitType,
-                        submit: 'Log In'
-                    }
-                ]
-            },
-            {
-                name: logout,
-                action: '/logout',
-                method: 'GET',
-                inputs: [{
-                    type: submitType,
-                    submit: 'Sign Out'
-                }]
-            }
-        ];
-
         //------------------------------------------------------------------------------
         // Constants
         //------------------------------------------------------------------------------
@@ -62,20 +12,12 @@
         // use unique class names to prevent clashing with anything else on the page
         // and simplify selectors
         var CSS = {
-            hotizUl: 'horiz-ul-3d5f',
-            horizLi: 'horiz-li-7ba0',
-            scrollable: 'scrollable-136f',
-            styledSelect: 'styled-select-41bd',
             squareClass: 'square-55d63',
             blackSquare: 'black-3c85d',
             highlightWhite: 'highlight-white-7cce',
             highlightBlack: 'highlight-black-03bf',
             highlightCheck: 'highlight-check-f5f6',
-            highlightPurple: 'highlight-purple-08ac',
-            modal: 'modal-4d1f',
-            modalContent: 'modal-content-59a5',
-            closeYes: 'close-yes-71e5',
-            closeNo: 'close-no-e712'
+            highlightPurple: 'highlight-purple-08ac'
         };
 
         //------------------------------------------------------------------------------
@@ -97,6 +39,7 @@
         // widgets
         var status = Status();
         var toolbar = ToolBar();
+        var selectGame = SelectGame();
         var pgn = Pgn();
         var players = Players();
         var buttons = Buttons({
@@ -130,18 +73,7 @@
                 }
             },
             'onResize': resize,
-
-            'selectNewGame': function() {
-
-                var el1 = document.getElementById(itemByName(selectNewGame, selectOpponent).id);
-                var foeParam = el1.options[el1.selectedIndex].value;
-                var el2 = document.getElementById(itemByName(selectNewGame, selectColor).id);
-                var colorParam = el2.options[el2.selectedIndex].value;
-                var el3 = document.getElementById(itemByName(selectNewGame, selectTimeControl).id);
-                var tcParam = el3.options[el3.selectedIndex].value;
-
-                return [foeParam, colorParam, tcParam];
-            },
+            'selectNewGame': selectGame.selected,
 
         });
         var modal = Modal({
@@ -160,8 +92,6 @@
         // Top level elements
         var
             BOARD_ID = 'board-' + createId(),
-
-            SELECT_GAME_ID = 'select-game-' + createId(),
             LOGIN_FORM_ID = 'loginform-' + createId();
 
         //------------------------------------------------------------------------------
@@ -409,10 +339,8 @@
 
             }
 
-
-            var piece = e.target.getAttribute('data-piece');
-
             // parent has data-square - a piece being clicked
+            var piece = e.target.getAttribute('data-piece');
             if (e.target.parentElement.hasAttribute('data-square') &&
                 !notMyTurnOrPiece(piece)) {
                 $('#' + BOARD_ID).find('.square-' + clickMoveFrom)
@@ -696,25 +624,6 @@
             return html;
         }
 
-        function selectGameDiv() {
-            var html = '<div id="' + SELECT_GAME_ID + '" ><ul class="' + CSS.hotizUl + '">';
-            selectNewGame.forEach(function(item, index) {
-                item.id = item.name + '-' + createId();
-                html += '<li class="' + CSS.horizLi + '" ><select id="' + item.id + '" class="nogame">';
-                item.options.forEach(function(item, index) {
-                    html += '<option value="' + item + '"';
-                    if (index === 0) {
-                        html += '  selected';
-                    }
-                    html += '>' + item + '</option>';
-                });
-                html += '</select></li>';
-            });
-            html += '</ul></div>';
-
-            return html;
-        }
-
         function boardDiv() {
             return '<div id="' + BOARD_ID + '" ></div>';
         }
@@ -723,7 +632,7 @@
         function chessGameDiv() {
             var html = boardDiv();
             //html += loginFormDiv();
-            html += selectGameDiv();
+            html += selectGame.html();
             html += buttons.html();
             html += players.html();
             html += pgn.html();
@@ -757,22 +666,6 @@
             toolbar.events();
             status.events();
         }
-
-        var cssStyle = null;
-
-        var styleRule = function(f, h) {
-            if (cssStyle !== null) {
-                document.getElementsByTagName("head")[0].removeChild(cssStyle);
-            }
-            cssStyle = document.createElement('style');
-            cssStyle.type = 'text/css';
-            //var rules = document.createTextNode('.' + CSS.styledSelect + ' select {font-size: ' + f + 'px;height: ' + h + 'px;}');
-            var rules = document.createTextNode('select {font-size: ' + f + 'px;height: ' + h + 'px;}');
-            cssStyle.appendChild(rules);
-            document.getElementsByTagName("head")[0].appendChild(cssStyle);
-
-            return CSS.styledSelect;
-        };
 
         function resize() {
             var φ = 1.618; // ~ golden ratio
@@ -810,24 +703,13 @@
 
             var quarterRowHeight = (rowHeight >> 2);
             toolbar.resize(0, left, itemWidth, quarterRowHeight);
-
             players.resize(boardBorderWidth, margin, itemWidth, rowHeight, left, h, orientation);
 
             var top = boardBorderWidth + rowHeight;
-
             $('#' + LOGIN_FORM_ID).css({ top: top, left: left, position: 'absolute', width: itemWidth, height: rowHeight });
 
-
-            //console.log('id: ' + LOGIN_FORM_ID + 'top: ' + top + ' left: ' + left);
             top += rowHeight;
-            $('#' + SELECT_GAME_ID).css({ top: top, left: left, position: 'absolute', width: itemWidth });
-
-            // for some strange reason, select option font size could be
-            // changed only by external stylesheet
-            var elemHeight = Math.floor(φ * fontSize);
-            //if (cssStyle != null) deleteCssRule(cssStyle);
-            //cssStyle = createCssRule('.' + CSS.styledSelect + ' select {font-size: ' + fontSize + 'px;height: ' + elemHeight + 'px;}');
-            styleRule(fontSize, elemHeight);
+            selectGame.resize(top, left, itemWidth, fontSize);
 
             var halfRowHeight = (rowHeight >> 1);
             var halfRowBorder = (rowHeight & 1);
