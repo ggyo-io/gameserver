@@ -35,5 +35,14 @@
         document.getElementsByTagName("head")[0].removeChild(cssStyle);
     };
 
+    window.itemByName = function(l, name) {
+        var r = null;
+        l.forEach(function(item, index) {
+            if (item.name == name) {
+                r = item;
+            }
+        });
+        return r;
+    };
 
 })(); // end anonymous wrapper

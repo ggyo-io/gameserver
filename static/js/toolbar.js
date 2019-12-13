@@ -47,7 +47,7 @@
         widget.events = function() {
             // jquery ui tooltips
             $(function() {
-                $(document).tooltip();
+                $('#' + id).tooltip();
             });
 
             // Sign out action

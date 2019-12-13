@@ -5,25 +5,6 @@
     window.ChessGame = window.ChessGame || function(chessgameId, cfg) {
         cfg = cfg || {};
 
-
-
-
-
-        var statusName = '📢';
-        var gameIDName = '🆔';
-        var fenName = '🎬';
-        var statusItems = [{
-                name: statusName
-            },
-            {
-                name: gameIDName,
-                class: 'game'
-            },
-            {
-                name: fenName
-            },
-        ];
-
         var selectOpponent = 'Select_opponent';
         var selectColor = 'Color';
         var selectTimeControl = 'Time_Control';
@@ -108,8 +89,6 @@
             last_move = "",
             browsing = false,
             browsingGame = new Chess(),
-            statusEl = null,
-            fenEl = null,
             game_started = false,
             runningTimer = null,
             nextDistance = null;
@@ -118,13 +97,14 @@
         var chessgameEl;
 
         // widgets
+        var status = Status();
         var toolbar = ToolBar();
         var pgn = Pgn();
         var buttons = Buttons({
             'game_started': function() { return game_started; },
             'game': function() { return game; },
             'board': function() { return board; },
-            'printStatus': printStatus,
+            'printStatus': status.printStatus,
             'outcome': outcome,
             'browsing': function(val) {
                 if (arguments.length === 0) {
@@ -141,9 +121,7 @@
                 }
             },
             'printPgn': pgn.printPgn,
-            'printFen': function(fen) {
-                fenEl.html('🎬&nbsp;<small>' + fen + '</small>');
-            },
+            'printFen': status.printFen,
             'updateStatus': updateStatus,
             'orientation': function(val) {
                 if (arguments.length === 0) {
@@ -167,7 +145,6 @@
             },
 
         });
-
         var modal = Modal({
             'accept_undo': accept_undo,
             'outcome': outcome
@@ -371,7 +348,7 @@
         }
 
         function updateStatus() {
-            var status = '';
+            var s = '';
 
             var moveColor = 'White';
             if (game.turn() === 'b') {
@@ -380,30 +357,30 @@
 
             // checkmate?
             if (game.in_checkmate() === true) {
-                status = 'Game over, ' + moveColor + ' is in checkmate.';
+                s = 'Game over, ' + moveColor + ' is in checkmate.';
                 game_started = false;
             }
 
             // draw?
             else if (game.in_draw() === true) {
-                status = 'Game over, drawn position';
+                s = 'Game over, drawn position';
                 game_started = false;
             }
 
             // game still on
             else {
-                status = moveColor + ' to move';
+                s = moveColor + ' to move';
                 removeHighlightCheck();
 
                 // check?
                 if (game.in_check() === true) {
-                    status += ', ' + moveColor + ' is in check';
+                    s += ', ' + moveColor + ' is in check';
                     highlightCheck();
                 }
             }
 
-            printStatus(status);
-            fenEl.html('🎬&nbsp;<small>' + game.fen() + '</small>');
+            status.printStatus(s);
+            status.printFen(game.fen());
             pgn.printPgn(game.pgn());
             updateView();
         }
@@ -520,23 +497,23 @@
             }
             updateStatus();
             board.position(game.fen());
-            printStatus("Undo accepted, " + statusEl.html());
+            status.printStatus("Undo accepted, " + status.htmlStatus());
         }
 
         function must_login() {
-            printStatus("Please login first!</b>");
+            status.printStatus("<b>Please login first!</b>");
         }
 
         function disconnect() {
-            printStatus("Your opponent have <b>disconnected</b>.");
+            status.printStatus("Your opponent have <b>disconnected</b>.");
         }
 
         function reconnected() {
-            printStatus("Your opponent have <b>reconnected</b>.");
+            status.printStatus("Your opponent have <b>reconnected</b>.");
         }
 
         function outcome(msg) {
-            printStatus("The outcome is: '" + msg + "', click the Start button for a new game");
+            status.printStatus("The outcome is: '" + msg + "', click the Start button for a new game");
             console.log("opponent outcome '" + msg + "'");
             game_started = false;
             clearInterval(runningTimer);
@@ -588,7 +565,7 @@
                 $('#' + WHITE_NAME_ID).html('👓&nbsp;' + msg.User);
                 $('#' + BLACK_NAME_ID).html('🕶&nbsp;' + UserName);
             }
-            $('#' + itemByName(statusItems, gameIDName).id).html('🆔&nbsp;' + msg.GameID);
+            status.printGameId(msg.GameID);
             $('#' + WHITE_ELO_ID).html('🏆&nbsp;' + msg.WhiteElo);
             $('#' + BLACK_ELO_ID).html('🏆&nbsp;' + msg.BlackElo);
 
@@ -626,7 +603,7 @@
         }
 
         function nomatch() {
-            printStatus("No match found");
+            status.printStatus("No match found");
         }
 
 
@@ -655,7 +632,7 @@
                 $('#' + divId).html(html);
             }
             if (msg !== '') {
-                printStatus(msg);
+                status.printStatus(msg);
             }
         }
 
@@ -754,39 +731,6 @@
             return true;
         }
 
-        function itemByName(l, name) {
-            var r = null;
-            l.forEach(function(item, index) {
-                if (item.name == name) {
-                    r = item;
-                }
-            });
-            return r;
-        }
-
-        function printStatus(msg) {
-            statusEl.html('📢&nbsp;' + msg);
-        }
-
-        function statusDivs(l) {
-
-            var html = '';
-            l.forEach(function(item, index) {
-                item.id = item.name + '-' + createId();
-
-                html += '<div id="' + item.id + '"';
-                if (item.class !== undefined) {
-                    html += ' class="' + item.class + '"';
-                }
-                html += ' >' + item.name + '</div>';
-            });
-
-
-            return html;
-        }
-
-
-
         function loginFormDiv() {
             var html = '<div id="' + LOGIN_FORM_ID + '" >';
 
@@ -858,7 +802,7 @@
             html += userDiv(BLACK_PLAYER_ID, BLACK_CLOCK_ID, BLACK_NAME_ID, BLACK_ELO_ID);
             html += pgn.html();
             html += modal.html();
-            html += statusDivs(statusItems);
+            html += status.html();
             html += toolbar.html();
             return html;
         }
@@ -878,16 +822,13 @@
             return ChessBoard(id, cfg);
         };
 
-
-        function initElementRefs() {
-            statusEl = $('#' + itemByName(statusItems, statusName).id);
-            fenEl = $('#' + itemByName(statusItems, fenName).id);
-        }
-
         function initEvents() {
+            window.addEventListener("resize", resize);
+
             buttons.events();
             modal.events();
             toolbar.events();
+            status.events();
         }
 
         var cssStyle = null;
@@ -914,12 +855,13 @@
 
             var w = window.innerWidth - margin;
             var h = Math.floor(w / φ);
-            var fontSize = Math.floor(w / 64);
+
 
             if (window.innerHeight - (2 * margin) < h) {
                 h = window.innerHeight - (2 * margin);
                 w = Math.floor(h * φ);
             }
+            var fontSize = Math.floor(w / 64);
             console.log('resize() margin: ' + margin + ' window: ' + window.innerWidth + 'X' + window.innerHeight +
                 ' chessgame: ' + w + 'X' + h + ' φ: ' + φ + ' w/h: ' + w / h);
 
@@ -943,18 +885,21 @@
             $('#' + WHITE_PLAYER_ID).height(rowHeight);
             $('#' + BLACK_PLAYER_ID).height(rowHeight);
 
-            var whiteTop = 0;
-            var blackTop = 0;
+
+            var whiteTop, blackTop;
+            var quarterRowHeight = (rowHeight >> 2);
+            var topClock = quarterRowHeight + boardBorderWidth;
+            var bottomClock = h - (h >> 3) - topClock;
             if (orientation === 'white') {
-                blackTop = boardBorderWidth;
-                whiteTop = h - (h >> 3);
+                blackTop = topClock;
+                whiteTop = bottomClock;
             } else {
-                whiteTop = boardBorderWidth;
-                blackTop = h - (h >> 3);
+                whiteTop = topClock;
+                blackTop = bottomClock;
             }
 
             var halfRowHeight = (rowHeight >> 1);
-            var quarterRowHeight = (rowHeight >> 2);
+
             var halfRowBorder = (rowHeight & 1);
             toolbar.resize(0, left, itemWidth, quarterRowHeight);
 
@@ -998,41 +943,32 @@
 
             top += rowHeight;
             var pgntop = Math.floor(h / φ);
-            var statusItemHeight = Math.floor((pgntop - top - margin) / statusItems.length);
 
-            statusItems.forEach(function(item, index) {
-                $('#' + item.id).css({ top: top, left: left, position: 'absolute', height: statusItemHeight, width: itemWidth });
-                //console.log('id: ' + item.id + 'top: ' + top + ' left: ' + left);
-                top += statusItemHeight;
-            });
-
-            pgn.resize(pgntop, left, itemWidth, (h - pgntop - (h >> 3)));
+            status.resize(top, left, itemWidth, (pgntop - top - margin));
+            pgn.resize(pgntop, left, itemWidth, (bottomClock - pgntop - margin));
         }
 
         function initDom() {
 
-            // build game and save it in memory
+            // init markup and tie events
             chessgameEl.html(chessGameDiv());
-            initElementRefs();
             initEvents();
 
-
+            // make board + events
             board = makeBoard(BOARD_ID, 'start', 'white');
             $('#' + BOARD_ID).mousedown(mouseDownBoard);
             $('#' + BOARD_ID).mouseup(mouseUpBoard);
 
-
-            printStatus('Choose opponent and click the Start button for a new game');
-            fenEl.html('🎬&nbsp;<small>' + board.fen() + '</small>');
+            status.printStatus('Choose opponent and click the Start button for a new game');
+            status.printFen(board.fen());
             resize();
-            window.addEventListener("resize", resize);
         }
 
         function connectToServer() {
             if (window.WebSocket) {
                 wsConn.connect(onWebSocketMessage);
             } else {
-                printStatus("<b>Your browser does not support WebSockets.</b>");
+                status.printStatus("<b>Your browser does not support WebSockets.</b>");
             }
         }
 
