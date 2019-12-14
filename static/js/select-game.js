@@ -28,10 +28,12 @@
             },
         ];
 
+        var enter = 13;
         var buttons = [{
             name: 'start',
             onclick: startBtn,
-            title: 'Start new game'
+            title: 'Start new game',
+            onkey: enter
         }];
 
         widget.active = states.choose_game | states.browsing;
