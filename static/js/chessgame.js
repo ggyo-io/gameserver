@@ -29,10 +29,16 @@
             orientation = 'white',
             myColor = orientation,
             last_move = "",
-            browsing = false,
-            browsingGame = new Chess(),
-            game_started = false;
+            browsingGame = new Chess();
 
+        var states = {
+            signin: 1 << 0,
+            choose_game: 1 << 1,
+            playing: 1 << 2,
+            browsing: 1 << 3,
+        };
+
+        var state = states.choose_game; // initial
         // DOM elements
         var chessgameEl;
 
@@ -43,16 +49,16 @@
         var pgn = Pgn();
         var players = Players();
         var buttons = Buttons({
-            'game_started': function() { return game_started; },
+            'game_started': function() { return (state == states.playing); },
             'game': function() { return game; },
             'board': function() { return board; },
             'printStatus': status.printStatus,
             'outcome': outcome,
             'browsing': function(val) {
                 if (arguments.length === 0) {
-                    return browsing;
+                    return state == states.browsing;
                 } else {
-                    browsing = val;
+                    if (val) { startBrowsing(); } else { stopBrowsing(); }
                 }
             },
             'browsingGame': function(val) {
@@ -81,6 +87,15 @@
             'outcome': outcome
         });
 
+        var widgets = [
+            status,
+            toolbar,
+            selectGame,
+            pgn,
+            players,
+            buttons,
+            modal
+        ];
 
         // constructor return object
         var widget = {};
@@ -146,7 +161,7 @@
         }
 
         function onMouseoverSquare(square, piece) {
-            if (!game_started) return;
+            if (state != states.playing) return;
 
             // get list of possible moves for this square
             var moves = game.moves({
@@ -188,14 +203,12 @@
         }
 
         var onDragStart = function(source, piece, position, orientation) {
-            console.log("onDragStart game " + game + " browsing " + browsing);
-            if (!game_started) {
+            console.log("onDragStart state " + state);
+            if (state != states.playing) {
                 return false;
             }
 
-            if (browsing == true ||
-                game.game_over() === true ||
-                notMyTurnOrPiece(piece)) {
+            if (notMyTurnOrPiece(piece)) {
                 return false;
             }
         };
@@ -242,7 +255,7 @@
         };
 
         var updateView = function() {
-            if (game_started) {
+            if (state == states.playing) {
                 $('.nogame').css('display', 'none');
                 $('.game').css('display', 'inline');
             } else {
@@ -280,13 +293,13 @@
             // checkmate?
             if (game.in_checkmate() === true) {
                 s = 'Game over, ' + moveColor + ' is in checkmate.';
-                game_started = false;
+                state = states.browsing;
             }
 
             // draw?
             else if (game.in_draw() === true) {
                 s = 'Game over, drawn position';
-                game_started = false;
+                state = states.browsing;
             }
 
             // game still on
@@ -320,7 +333,7 @@
         }
 
         function mouseDownBoard(e) {
-            if (!game_started) return;
+            if (state != states.playing) return;
             if (notMyTurn()) return;
 
             var square = getSquareFromEvent(e);
@@ -355,7 +368,7 @@
         }
 
         function mouseUpBoard(e) {
-            if (!game_started) return;
+            if (state != states.playing) return;
             if (notMyTurn()) return;
             var square = getSquareFromEvent(e);
             if (square === null) return;
@@ -435,7 +448,7 @@
         function outcome(msg) {
             status.printStatus("The outcome is: '" + msg + "', click the Start button for a new game");
             console.log("opponent outcome '" + msg + "'");
-            game_started = false;
+            state = states.browsing;
             players.stopRunningCountdown();
             updateView();
         }
@@ -496,7 +509,7 @@
             players.printBlackClock(msg.BlackClock);
 
             game = new Chess();
-            game_started = true;
+            state = states.playing;
 
             var fen = 'start';
             if (msg.Params !== undefined) {
@@ -576,6 +589,17 @@
             if (toStartMessage !== '') status.printStatus(toStartMessage);
         }
 
+        var oldState;
+
+        function startBrowsing() {
+            oldState = state;
+            state = states.browsing;
+        }
+
+        function stopBrowsing() {
+            state = oldState;
+        }
+
         //------------------------------------------------------------------------------
         // Markup/Init functions
         //------------------------------------------------------------------------------
@@ -600,26 +624,28 @@
         function loginFormDiv() {
             var html = '<div id="' + LOGIN_FORM_ID + '" >';
 
-            var form = itemByName(loginForms, login);
             var name = 'Anonymous';
-            if (UserName !== '') {
-                form = itemByName(loginForms, logout);
+            if (UserName === '') {
+                html += '<a href="/signin">Sign in</a>'
+            } else {
+                const form = itemByName(loginForms, logout);
                 name = UserName;
+                html += 'Hello, <i>' + name + '</i>';
+
+                html += '<form action="' + form.action + '" method="' + form.method + '">';
+
+                form.inputs.forEach(function(item, index) {
+                    html += '<input type="' + item.type + '"';
+                    if (item.type !== submitType) {
+                        html += ' placeholder="' + item.type + '" name="' + item.type + '"';
+                    } else {
+                        html += ' value="' + item.submit + '"';
+                    }
+                    html += '/>';
+                });
+                html += '</form>';
             }
-            html += 'Hello, <i>' + name + '</i>';
-
-            html += '<form action="' + form.action + '" method="' + form.method + '">';
-
-            form.inputs.forEach(function(item, index) {
-                html += '<input type="' + item.type + '"';
-                if (item.type !== submitType) {
-                    html += ' placeholder="' + item.type + '" name="' + item.type + '"';
-                } else {
-                    html += ' value="' + item.submit + '"';
-                }
-                html += '/>';
-            });
-            html += '</form></div>';
+            html += '</div>';
 
             return html;
         }
@@ -723,6 +749,59 @@
             pgn.resize(pgntop, left, itemWidth, (players.bottomClock() - pgntop - margin));
         }
 
+        function loginFormDiv() {
+            return '<div class="hzbox">' +
+                '<div id="errMsg"></div>' +
+                '<form id="loginForm" class="hzbox" action="/login" method="POST">' +
+                '<label for="user">Username</label>' +
+                '<input name="username" id="user" autofocus="autofocus" required="required"/>' +
+                '<label for="pwd">Password</label>' +
+                '<input name="password" type="password" id="pwd" required="required"/>' +
+                '<input name="Sign in" type="submit" value="Sign in"/>' +
+                '<div>' +
+                '<a href="/signup">Register</a>&nbsp;&nbsp;' +
+                '<a href="/forgotpwd">Forgot Password</a>' +
+                '</div>' +
+                '</form>' +
+                '</div>';
+        }
+
+        function registerFormDiv() {
+            return '<div class="hzbox">' +
+                '<div id="errMsg"></div>' +
+                '<form id="registerForm" class="hzbox" action="/register" method="POST">' +
+                '<label for="user">Username</label>' +
+                '<input name="username" id="user" autofocus="autofocus" required="required"/>' +
+                '<label for="pwd">Password</label>' +
+                '<input name="password" type="password" id="pwd" required="required" />' +
+                '<label for="email">Email (for password reset)</label>' +
+                '<input name="email" id="email" required="required" type="email"/>' +
+
+
+                '<input name="Register" type="submit" value="Register"/>' +
+                '<div>' +
+                '<a href="/signin">Sign in</a>&nbsp;&nbsp;' +
+                '<a href="/forgotpwd">Forgot Password</a>' +
+                '</div>' +
+                '</form>' +
+                '</div>';
+        }
+
+        function displayErrorMessage() {
+            var urlQuery = window.location.search;
+            var errIdx = urlQuery.indexOf("err=")
+            if (errIdx != -1) {
+                var eqIdx = urlQuery.indexOf('=', errIdx);
+                if (eqIdx != -1) {
+                    var ampIdx = urlQuery.indexOf('&', errIdx);
+                    var errorMessage = ampIdx == -1 ? urlQuery.substring(eqIdx + 1) : urlQuery.substring(eqIdx + 1, ampIdx);
+                    $('#errMsg').html(
+                        errorMessage
+                    ).css('display', 'inline');
+                }
+            }
+        }
+
         function initDom() {
 
             // init markup and tie events
@@ -736,6 +815,7 @@
 
             status.printStatus('Choose opponent and click the Start button for a new game');
             status.printFen(board.fen());
+
             resize();
         }
 

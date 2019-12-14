@@ -21,13 +21,13 @@
             var html = '<div id="' + id + '">' +
                 '<img id="' + menuId + '" class="' + buttonClass + '" src="img/menu.svg" title="Menu"/>';
             if (UserName !== '') {
-
                 html += '<span id="' + nameId + '" title="Hello, ' + UserName + '!" >' + UserName + '</span>';
                 html += '<img id="' + logoutId + '" class="' + buttonClass + '" src="img/gear.svg" title="Sign out"/>';
                 html += '<form id="' + formId + '" action="/logout" method="GET"/>';
 
             } else {
                 //TODO: implement anon/login
+                html += '<a href="/signin">Sign in</a>';
 
             }
             html += '</div>';
@@ -38,8 +38,8 @@
             $('#' + id).css({ top: top, left: left, position: 'absolute', width: width, height: height, 'font-size': height });
             $('#' + id + ' img ').attr('width', height);
             $('#' + id + ' img ').attr('height', height);
-            $('#' + logoutId).css({ left: width - height, position: 'absolute' });
             if (UserName !== '') {
+                $('#' + logoutId).css({ left: width - height, position: 'absolute' });
                 $('#' + nameId).css({ left: (width - height - (height >> 2) - $('#' + nameId).outerWidth(true)), position: 'absolute' });
             }
         };

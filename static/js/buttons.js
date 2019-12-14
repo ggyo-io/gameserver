@@ -179,11 +179,11 @@
             if (widget.browsing() === false) {
                 widget.browsing(true);
                 widget.printStatus("Browsing");
-                var browsingGame = new Chess();
+                var bg = new Chess();
                 widget.game().history().forEach(function(item, index) {
-                    browsingGame.move(item);
+                    bg.move(item);
                 });
-                widget.browsingGame(browsingGame);
+                widget.browsingGame(bg);
             }
 
             widget.browsingGame().undo();
