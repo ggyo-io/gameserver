@@ -1,5 +1,22 @@
 /* game */
 
+:root {
+    --light: #fff;
+    --dark: #404040;
+    --shadow: rgba(104, 104, 104, 0.8);
+}
+
+html {
+    box-sizing: border-box;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    /* match chessboard */
+    color: var(--dark);
+}
+
+body {
+    background: #ccc;
+}
+
 .highlight-white-7cce {
     box-shadow: inset 0 0 3px 3px yellow;
 }

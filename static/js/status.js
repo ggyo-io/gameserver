@@ -25,6 +25,9 @@
 
         var id = 'status-' + createId();
 
+        widget.active = states.choose_game | states.playing | states.browsing;
+        widget.id = function() { return id; };
+
         var styles = [
             //createCssRule('#' + id + ' {overflow: scroll;}')
         ];

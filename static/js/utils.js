@@ -45,4 +45,11 @@
         return r;
     };
 
+    window.states = {
+        signin: 1 << 0,
+        choose_game: 1 << 1,
+        playing: 1 << 2,
+        browsing: 1 << 3,
+    };
+
 })(); // end anonymous wrapper

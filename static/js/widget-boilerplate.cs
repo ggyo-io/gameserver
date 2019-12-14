@@ -12,6 +12,10 @@
             //createCssRule('#' + id + ' {overflow: scroll;}')
         ];
 
+        // bitmap of states defined in utils.js for now
+        widget.active = states.signin;
+        widget.id = function() { return id; };
+
         widget.html = function() {
             return '<div id="' + id + '"></div>';
         };

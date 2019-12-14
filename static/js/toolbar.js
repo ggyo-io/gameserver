@@ -11,6 +11,10 @@
             menuId = 'menu-' + createId(),
             buttonClass = "button-" + createId();
 
+
+        widget.active = states.choose_game | states.playing | states.browsing;
+        widget.id = function() { return id; };
+
         var styles = [
             createCssRule('#' + id + '  {display: flex; align-items: center;}'),
             createCssRule('.' + buttonClass +

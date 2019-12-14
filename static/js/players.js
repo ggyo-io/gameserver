@@ -22,6 +22,9 @@
             //createCssRule('#' + id + ' {overflow: scroll;}')
         ];
 
+        widget.active = states.playing | states.browsing;
+        widget.id = function() { return id; };
+
         function userDiv(id, clockId, userId, eloId) {
             var html = '<div id="' + id + '" class="game">';
             html += '<div id="' + clockId + '">⌛&nbsp;00:00</div>';
@@ -49,15 +52,12 @@
         var bottomClock;
         widget.bottomClock = function() { return bottomClock; };
         widget.resize = function(boardBorderWidth, margin, itemWidth, rowHeight, left, h, orientation) {
-            $('#' + WHITE_PLAYER_ID).height(rowHeight);
-            $('#' + BLACK_PLAYER_ID).height(rowHeight);
 
             var whiteTop, blackTop;
-            var halfRowHeight = (rowHeight >> 1);
             var halfRowBorder = (rowHeight & 1);
             var quarterRowHeight = (rowHeight >> 2);
             var topClock = quarterRowHeight + boardBorderWidth;
-            bottomClock = h - (h >> 3) - topClock;
+            bottomClock = h - (h >> 3);
             if (orientation === 'white') {
                 blackTop = topClock;
                 whiteTop = bottomClock;
@@ -65,9 +65,10 @@
                 whiteTop = topClock;
                 blackTop = bottomClock;
             }
+            var clockHeight = rowHeight - quarterRowHeight - 2 * boardBorderWidth;
 
-            $('#' + WHITE_CLOCK_ID).css({ top: whiteTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
-            $('#' + BLACK_CLOCK_ID).css({ top: blackTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
+            $('#' + WHITE_CLOCK_ID).css({ top: whiteTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (clockHeight)) });
+            $('#' + BLACK_CLOCK_ID).css({ top: blackTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (clockHeight)) });
 
             // have to make the user div visible to measure text width
             var clockDisplay = $('#' + WHITE_PLAYER_ID).css('display');
@@ -78,10 +79,10 @@
             var userLeft = left + clockWidth + margin;
 
             console.log("clock width: " + clockWidth + " left: " + left + " userLeft: " + userLeft);
-            $('#' + WHITE_NAME_ID).css({ top: whiteTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
-            $('#' + BLACK_NAME_ID).css({ top: blackTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
-            $('#' + WHITE_ELO_ID).css({ top: whiteTop + halfRowHeight + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
-            $('#' + BLACK_ELO_ID).css({ top: blackTop + halfRowHeight + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
+            $('#' + WHITE_NAME_ID).css({ top: whiteTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (clockHeight >> 1)) });
+            $('#' + BLACK_NAME_ID).css({ top: blackTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (clockHeight >> 1)) });
+            $('#' + WHITE_ELO_ID).css({ top: whiteTop + (clockHeight >> 1) + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (clockHeight >> 1)) });
+            $('#' + BLACK_ELO_ID).css({ top: blackTop + (clockHeight >> 1) + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (clockHeight >> 1)) });
             $('#' + WHITE_PLAYER_ID).width(itemWidth);
             $('#' + BLACK_PLAYER_ID).width(itemWidth);
 

@@ -11,8 +11,19 @@
             createCssRule('#' + id + ' {overflow: scroll;}')
         ];
 
+        widget.active = states.playing | states.browsing;
+        widget.id = function() { return id; };
+
         widget.html = function() {
             return '<div id="' + id + '"></div>';
+        };
+
+        // event, say buttons, handler initialization
+        widget.events = function() {
+            // jquery ui tooltips
+            $(function() {
+                $('#' + id).tooltip();
+            });
         };
 
         widget.printPgn = function(pgn) {

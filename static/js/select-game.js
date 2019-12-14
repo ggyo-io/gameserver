@@ -3,7 +3,7 @@
 
     window.SelectGame = function(cfg) {
 
-        var widget = {};
+        var widget = cfg;
 
         var id = 'select-game-' + createId(),
             ulClass = 'horiz-ul-' + createId(),
@@ -28,6 +28,14 @@
             },
         ];
 
+        var buttons = [{
+            name: 'start',
+            onclick: startBtn,
+            title: 'Start new game'
+        }];
+
+        widget.active = states.choose_game | states.browsing;
+        widget.id = function() { return id; };
 
         var styles = [
             createCssRule('.' + ulClass + '{' +
@@ -52,6 +60,11 @@
                 });
                 html += '</select></li>';
             });
+            buttons.forEach(function(item, index) {
+                html += '<li class="' + liClass + '" >';
+                html += '<input id="' + item.id + '" type="button" value="' + item.name + '">';
+                html += '</li>';
+            });
             html += '</ul></div>';
             return html;
         };
@@ -62,6 +75,25 @@
             $(function() {
                 $('#' + id).tooltip();
             });
+
+            buttons.forEach(function(item, index) {
+                $('#' + item.id).on('click', item.onclick);
+                if (item.onkey !== undefined) {
+                    var k = item.onkey;
+                    $(document).keydown(function(e) {
+                        switch (e.which) {
+                            case k:
+                                break;
+
+                            default:
+                                return; // exit this handler for other keys
+                        }
+                        e.preventDefault(); // prevent the default action (scroll / move caret)
+                        item.onclick();
+                    });
+                } // item.onkey
+            }); // buttons forEach
+
         };
 
 
@@ -100,6 +132,30 @@
             cssStyle.appendChild(rules);
             document.getElementsByTagName("head")[0].appendChild(cssStyle);
         };
+
+        function startBtn() {
+            if (widget.game_started()) {
+                printStatus("Ignore start, Move! The game is not over yet, resign if you'd like...");
+                return;
+            }
+
+            widget.board().start();
+            widget.printStatus("Waiting for a match...");
+
+            var vals = widget.selected();
+            var foeParam = vals[0];
+            var colorParam = vals[1];
+            var tcParam = vals[2];
+
+            console.log("start with foe: " + foeParam + " color: " + colorParam + " time control: " + tcParam);
+            wsConn.send({
+                Cmd: "start",
+                Params: foeParam,
+                Color: colorParam,
+                TimeControl: tcParam
+            });
+        }
+
 
         return widget;
     }; // window.SelectGame

@@ -31,21 +31,18 @@
             last_move = "",
             browsingGame = new Chess();
 
-        var states = {
-            signin: 1 << 0,
-            choose_game: 1 << 1,
-            playing: 1 << 2,
-            browsing: 1 << 3,
-        };
-
-        var state = states.choose_game; // initial
         // DOM elements
         var chessgameEl;
 
         // widgets
         var status = Status();
         var toolbar = ToolBar();
-        var selectGame = SelectGame();
+        var selectGame = SelectGame({
+            'game_started': function() { return (state == states.playing); },
+            'game': function() { return game; },
+            'board': function() { return board; },
+            'printStatus': status.printStatus
+        });
         var pgn = Pgn();
         var players = Players();
         var buttons = Buttons({
@@ -79,13 +76,12 @@
                 }
             },
             'onResize': resize,
-            'selectNewGame': selectGame.selected,
-
         });
         var modal = Modal({
             'accept_undo': accept_undo,
             'outcome': outcome
         });
+        var signin = SignIn();
 
         var widgets = [
             status,
@@ -94,7 +90,8 @@
             pgn,
             players,
             buttons,
-            modal
+            modal,
+            signin
         ];
 
         // constructor return object
@@ -106,8 +103,7 @@
 
         // Top level elements
         var
-            BOARD_ID = 'board-' + createId(),
-            LOGIN_FORM_ID = 'loginform-' + createId();
+            BOARD_ID = 'board-' + createId();
 
         //------------------------------------------------------------------------------
         // Board Handlers
@@ -252,17 +248,6 @@
                 Cmd: 'move',
                 Params: last_move
             });
-        };
-
-        var updateView = function() {
-            if (state == states.playing) {
-                $('.nogame').css('display', 'none');
-                $('.game').css('display', 'inline');
-            } else {
-                players.stopRunningCountdown();
-                $('.nogame').css('display', 'inline');
-                $('.game').css('display', 'none');
-            }
         };
 
         function removeHighlightCheck() {
@@ -621,34 +606,6 @@
             return true;
         }
 
-        function loginFormDiv() {
-            var html = '<div id="' + LOGIN_FORM_ID + '" >';
-
-            var name = 'Anonymous';
-            if (UserName === '') {
-                html += '<a href="/signin">Sign in</a>'
-            } else {
-                const form = itemByName(loginForms, logout);
-                name = UserName;
-                html += 'Hello, <i>' + name + '</i>';
-
-                html += '<form action="' + form.action + '" method="' + form.method + '">';
-
-                form.inputs.forEach(function(item, index) {
-                    html += '<input type="' + item.type + '"';
-                    if (item.type !== submitType) {
-                        html += ' placeholder="' + item.type + '" name="' + item.type + '"';
-                    } else {
-                        html += ' value="' + item.submit + '"';
-                    }
-                    html += '/>';
-                });
-                html += '</form>';
-            }
-            html += '</div>';
-
-            return html;
-        }
 
         function boardDiv() {
             return '<div id="' + BOARD_ID + '" ></div>';
@@ -657,7 +614,7 @@
 
         function chessGameDiv() {
             var html = boardDiv();
-            //html += loginFormDiv();
+            html += signin.html();
             html += selectGame.html();
             html += buttons.html();
             html += players.html();
@@ -685,12 +642,9 @@
 
         function initEvents() {
             window.addEventListener("resize", resize);
-
-            players.events();
-            buttons.events();
-            modal.events();
-            toolbar.events();
-            status.events();
+            widgets.forEach(function(item, index) {
+                item.events();
+            });
         }
 
         function resize() {
@@ -732,75 +686,22 @@
             players.resize(boardBorderWidth, margin, itemWidth, rowHeight, left, h, orientation);
 
             var top = boardBorderWidth + rowHeight;
-            $('#' + LOGIN_FORM_ID).css({ top: top, left: left, position: 'absolute', width: itemWidth, height: rowHeight });
-
-            top += rowHeight;
             selectGame.resize(top, left, itemWidth, fontSize);
 
             var halfRowHeight = (rowHeight >> 1);
             var halfRowBorder = (rowHeight & 1);
-            top += halfRowHeight + halfRowBorder;
+
+            top += $('#' + selectGame.id()).height() + margin;
             buttons.resize(top, left, itemWidth, halfRowHeight, fontSize);
 
-            top += rowHeight;
+            top += $('#' + buttons.id()).height() + margin;
             var pgntop = Math.floor(h / φ);
 
             status.resize(top, left, itemWidth, (pgntop - top - margin));
             pgn.resize(pgntop, left, itemWidth, (players.bottomClock() - pgntop - margin));
+            signin.resize(0, 0, w, h);
         }
 
-        function loginFormDiv() {
-            return '<div class="hzbox">' +
-                '<div id="errMsg"></div>' +
-                '<form id="loginForm" class="hzbox" action="/login" method="POST">' +
-                '<label for="user">Username</label>' +
-                '<input name="username" id="user" autofocus="autofocus" required="required"/>' +
-                '<label for="pwd">Password</label>' +
-                '<input name="password" type="password" id="pwd" required="required"/>' +
-                '<input name="Sign in" type="submit" value="Sign in"/>' +
-                '<div>' +
-                '<a href="/signup">Register</a>&nbsp;&nbsp;' +
-                '<a href="/forgotpwd">Forgot Password</a>' +
-                '</div>' +
-                '</form>' +
-                '</div>';
-        }
-
-        function registerFormDiv() {
-            return '<div class="hzbox">' +
-                '<div id="errMsg"></div>' +
-                '<form id="registerForm" class="hzbox" action="/register" method="POST">' +
-                '<label for="user">Username</label>' +
-                '<input name="username" id="user" autofocus="autofocus" required="required"/>' +
-                '<label for="pwd">Password</label>' +
-                '<input name="password" type="password" id="pwd" required="required" />' +
-                '<label for="email">Email (for password reset)</label>' +
-                '<input name="email" id="email" required="required" type="email"/>' +
-
-
-                '<input name="Register" type="submit" value="Register"/>' +
-                '<div>' +
-                '<a href="/signin">Sign in</a>&nbsp;&nbsp;' +
-                '<a href="/forgotpwd">Forgot Password</a>' +
-                '</div>' +
-                '</form>' +
-                '</div>';
-        }
-
-        function displayErrorMessage() {
-            var urlQuery = window.location.search;
-            var errIdx = urlQuery.indexOf("err=")
-            if (errIdx != -1) {
-                var eqIdx = urlQuery.indexOf('=', errIdx);
-                if (eqIdx != -1) {
-                    var ampIdx = urlQuery.indexOf('&', errIdx);
-                    var errorMessage = ampIdx == -1 ? urlQuery.substring(eqIdx + 1) : urlQuery.substring(eqIdx + 1, ampIdx);
-                    $('#errMsg').html(
-                        errorMessage
-                    ).css('display', 'inline');
-                }
-            }
-        }
 
         function initDom() {
 
@@ -818,6 +719,23 @@
 
             resize();
         }
+        var updateView = function() {
+            widgets.forEach(function(item, index) {
+                if (item.active === undefined) return;
+                if (item.active & state) $('#' + item.id()).show();
+                else $('#' + item.id()).hide();
+            });
+            /*
+            if (state == states.playing) {
+                $('.nogame').css('display', 'none');
+                $('.game').css('display', 'inline');
+            } else {
+                players.stopRunningCountdown();
+                $('.nogame').css('display', 'inline');
+                $('.game').css('display', 'none');
+            }
+            */
+        };
 
         function connectToServer() {
             if (window.WebSocket) {
@@ -827,16 +745,22 @@
             }
         }
 
+        var state = states.signin; // initial
+        function initState() {
+            if (UserName != '') state = states.choose_game;
+            if (PGN !== '') {
+                state = states.browsing;
+                showFinishedGame(PGN);
+            }
+        }
+
         function init() {
             if (initContainerEl() !== true) return;
 
+            initState();
             initDom();
             updateView();
             connectToServer();
-
-            if (PGN !== '') {
-                showFinishedGame(PGN);
-            }
         }
 
         // go time

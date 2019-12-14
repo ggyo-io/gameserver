@@ -21,11 +21,6 @@
         // Markup model
         //------------------------------------------------------------------------------ 
         var buttons = [{
-                name: 'start',
-                class: 'nogame',
-                onclick: startBtn
-            },
-            {
                 name: 'undo',
                 class: 'game',
                 onclick: undoBtn,
@@ -66,6 +61,8 @@
             createCssRule('.' + liClass + ' {float: left;}')
         ];
 
+        widget.active = states.choose_game | states.playing | states.browsing;
+        widget.id = function() { return id; };
 
         widget.html = function() {
             var html = '<div id="' + id + '" ><ul class="' + ulClass + '" >';
@@ -109,28 +106,6 @@
         //------------------------------------------------------------------------------
         // Button Handlers
         //------------------------------------------------------------------------------
-        function startBtn() {
-            if (widget.game_started()) {
-                printStatus("Ignore start, Move! The game is not over yet, resign if you'd like...");
-                return;
-            }
-
-            widget.board().start();
-            widget.printStatus("Waiting for a match...");
-
-            var vals = widget.selectNewGame();
-            var foeParam = vals[0];
-            var colorParam = vals[1];
-            var tcParam = vals[2];
-
-            console.log("start with foe: " + foeParam + " color: " + colorParam + " time control: " + tcParam);
-            wsConn.send({
-                Cmd: "start",
-                Params: foeParam,
-                Color: colorParam,
-                TimeControl: tcParam
-            });
-        }
 
         function undoBtn() {
             if (!widget.game_started()) {
