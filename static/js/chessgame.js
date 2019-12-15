@@ -688,10 +688,8 @@
             var top = boardBorderWidth + rowHeight;
             selectGame.resize(top, left, itemWidth, fontSize);
 
-            var halfRowHeight = (rowHeight >> 1);
-            var halfRowBorder = (rowHeight & 1);
-
             top += $('#' + selectGame.id()).height() + margin;
+            var halfRowHeight = (rowHeight >> 1);
             buttons.resize(top, left, itemWidth, halfRowHeight, fontSize);
 
             top += $('#' + buttons.id()).height() + margin;

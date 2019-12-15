@@ -7,7 +7,8 @@
 
         var id = 'buttons-' + createId(),
             ulClass = 'horiz-ul-' + createId(),
-            liClass = 'horiz-li-' + createId();
+            liClass = 'horiz-li-' + createId(),
+            btnClass = 'button-' + createId();
 
         //------------------------------------------------------------------------------
         // Keyboard keys
@@ -24,41 +25,59 @@
                 name: 'undo',
                 class: 'game',
                 onclick: undoBtn,
+                title: 'request undo'
             },
             {
                 name: 'resign',
                 class: 'game',
-                onclick: resignBtn
+                onclick: resignBtn,
+                title: 'resign'
             },
             {
                 name: 'draw',
                 class: 'game',
-                onclick: drawBtn
+                onclick: drawBtn,
+                title: 'offer draw'
             },
             {
-                name: '⬅',
+                name: '←',
                 onclick: leftBtn,
-                onkey: leftArrow
+                onkey: leftArrow,
+                title: 'go back'
             },
             {
-                name: '➡',
+                name: '→',
                 onclick: rightBtn,
-                onkey: rightArrow
+                onkey: rightArrow,
+                title: 'go forward'
             },
             {
-                name: '⇄',
+                name: '↔',
                 onclick: flipBtn,
-                class: 'game'
+                class: 'game',
+                title: 'flip board'
             }
         ];
 
 
         var styles = [
             createCssRule('.' + ulClass + '{' +
+                'display: grid;' +
+                'grid-template-columns: repeat(' + buttons.length + ',1fr);' +
                 'list-style-type: none;' +
-                'margin: 0;' +
                 'padding: 0;}'),
-            createCssRule('.' + liClass + ' {float: left;}')
+
+            createCssRule('.' + btnClass + '{' +
+                'background: var(--primary);' +
+                'color: var(--dark);' +
+                'box-shadow: var(--shadow);' +
+                'display: block;' +
+                'text-align: center;}'),
+
+            createCssRule('.' + btnClass + ':hover{' +
+                'background: var(--dark);' +
+                'color: var(--light);}')
+
         ];
 
         widget.active = states.choose_game | states.playing | states.browsing;
@@ -68,11 +87,9 @@
             var html = '<div id="' + id + '" ><ul class="' + ulClass + '" >';
             buttons.forEach(function(item, index) {
                 item.id = item.name + '-' + createId();
-                html += '<li  class="' + liClass + '" ><input id="' + item.id + '" type="button" value="' + item.name + '"';
-                if (item.class !== undefined) {
-                    html += ' class="' + item.class + '"';
-                }
-                html += '></li>';
+                html += '<li  class="' + liClass + '" >';
+                html += '<a id="' + item.id + '" title="' + item.title + '" class="' + btnClass + '">' + item.name + '</a>';
+                html += '</li>';
             });
             html += '</ul></div>';
 

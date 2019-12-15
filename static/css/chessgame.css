@@ -1,6 +1,7 @@
 /* game */
 
 :root {
+    --primary: #ddd;
     --light: #fff;
     --dark: #404040;
     --shadow: rgba(104, 104, 104, 0.8);
