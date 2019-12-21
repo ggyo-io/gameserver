@@ -6,140 +6,18 @@
         cfg = cfg || {};
 
         //------------------------------------------------------------------------------
-        // Keyboard keys
-        //------------------------------------------------------------------------------ 
-        // https://stackoverflow.com/questions/1402698/binding-arrow-keys-in-js-jquery
-
-        var leftArrow = 37,
-            rightArrow = 39;
-
-        //------------------------------------------------------------------------------
-        // Markup model
-        //------------------------------------------------------------------------------ 
-        var buttons = [{
-                name: 'start',
-                class: 'nogame',
-                onclick: startBtn
-            },
-            {
-                name: 'undo',
-                class: 'game',
-                onclick: undoBtn,
-            },
-            {
-                name: 'resign',
-                class: 'game',
-                onclick: resignBtn
-            },
-            {
-                name: 'draw',
-                class: 'game',
-                onclick: drawBtn
-            },
-            {
-                name: '⬅',
-                onclick: leftBtn,
-                onkey: leftArrow
-            },
-            {
-                name: '➡',
-                onclick: rightBtn,
-                onkey: rightArrow
-            },
-            {
-                name: '⇄',
-                onclick: flipBtn,
-                class: 'game'
-            }
-        ];
-
-
-        var statusName = '📢';
-        var gameIDName = '🆔';
-        var fenName = '🎬';
-        var statusItems = [{
-                name: statusName
-            },
-            {
-                name: gameIDName,
-                class: 'game'
-            },
-            {
-                name: fenName
-            },
-        ];
-
-        var selectOpponent = 'Select_opponent';
-        var selectColor = 'Color';
-        var selectTimeControl = 'Time_Control';
-        var selectNewGame = [{
-                name: selectOpponent,
-                options: ['stockfish', 'lc0', 'human']
-            },
-            {
-                name: selectColor,
-                options: ['any', 'white', 'black']
-            },
-            {
-                name: selectTimeControl,
-                options: ['900+15', '300+5', '60+1']
-            },
-        ];
-
-        var login = "login";
-        var logout = "logout";
-        var emailType = 'email';
-        var passwordType = 'password';
-        var submitType = 'submit';
-
-        var loginForms = [{
-                name: login,
-                action: '/login',
-                method: 'POST',
-                inputs: [{
-                        type: emailType
-                    },
-                    {
-                        type: passwordType
-                    },
-                    {
-                        type: submitType,
-                        submit: 'Log In'
-                    }
-                ]
-            },
-            {
-                name: logout,
-                action: '/logout',
-                method: 'GET',
-                inputs: [{
-                    type: submitType,
-                    submit: 'Sign Out'
-                }]
-            }
-        ];
-
-        //------------------------------------------------------------------------------
         // Constants
         //------------------------------------------------------------------------------
 
         // use unique class names to prevent clashing with anything else on the page
         // and simplify selectors
         var CSS = {
-            hotizUl: 'horiz-ul-3d5f',
-            horizLi: 'horiz-li-7ba0',
-            scrollable: 'scrollable-136f',
-            styledSelect: 'styled-select-41bd',
             squareClass: 'square-55d63',
             blackSquare: 'black-3c85d',
             highlightWhite: 'highlight-white-7cce',
             highlightBlack: 'highlight-black-03bf',
             highlightCheck: 'highlight-check-f5f6',
-            highlightPurple: 'highlight-purple-08ac',
-            modal: 'modal-4d1f',
-            modalContent: 'modal-content-59a5',
-            closeYes: 'close-yes-71e5',
-            closeNo: 'close-no-e712'
+            highlightPurple: 'highlight-purple-08ac'
         };
 
         //------------------------------------------------------------------------------
@@ -151,20 +29,70 @@
             orientation = 'white',
             myColor = orientation,
             last_move = "",
-            browsing = false,
-            browsingGame = new Chess(),
-            statusEl = null,
-            fenEl = null,
-            modalEl = null,
-            offerEl = null,
-            game_started = false,
-            offerParams = null,
-            runningTimer = null,
-            nextDistance = null,
-            cssStyle = null;
+            browsingGame = new Chess();
 
         // DOM elements
         var chessgameEl;
+
+        // widgets
+        var status = Status();
+        var toolbar = ToolBar();
+        var selectGame = SelectGame({
+            'game_started': function() { return (state == states.playing); },
+            'game': function() { return game; },
+            'board': function() { return board; },
+            'printStatus': status.printStatus
+        });
+        var pgn = Pgn();
+        var players = Players();
+        var buttons = Buttons({
+            'game_started': function() { return (state == states.playing); },
+            'game': function() { return game; },
+            'board': function() { return board; },
+            'printStatus': status.printStatus,
+            'outcome': outcome,
+            'browsing': function(val) {
+                if (arguments.length === 0) {
+                    return state == states.browsing;
+                } else {
+                    if (val) { startBrowsing(); } else { stopBrowsing(); }
+                }
+            },
+            'browsingGame': function(val) {
+                if (arguments.length === 0) {
+                    return browsingGame;
+                } else {
+                    browsingGame = val;
+                }
+            },
+            'printPgn': pgn.printPgn,
+            'printFen': status.printFen,
+            'updateStatus': updateStatus,
+            'orientation': function(val) {
+                if (arguments.length === 0) {
+                    return orientation;
+                } else {
+                    orientation = val;
+                }
+            },
+            'onResize': resize,
+        });
+        var modal = Modal({
+            'accept_undo': accept_undo,
+            'outcome': outcome
+        });
+        var signin = SignIn();
+
+        var widgets = [
+            status,
+            toolbar,
+            selectGame,
+            pgn,
+            players,
+            buttons,
+            modal,
+            signin
+        ];
 
         // constructor return object
         var widget = {};
@@ -175,35 +103,7 @@
 
         // Top level elements
         var
-            BOARD_ID = 'board-' + createId(),
-            WHITE_PLAYER_ID = 'white-player-' + createId(),
-            WHITE_NAME_ID = 'white-name-' + createId(),
-            WHITE_ELO_ID = 'white-elo-' + createId(),
-            WHITE_CLOCK_ID = 'white-clock-' + createId(),
-            BLACK_PLAYER_ID = 'black-player-' + createId(),
-            BLACK_NAME_ID = 'black-name-' + createId(),
-            BLACK_ELO_ID = 'black-elo-' + createId(),
-            BLACK_CLOCK_ID = 'black-clock-' + createId(),
-            SELECT_GAME_ID = 'select-game-' + createId(),
-            BUTTONS_ID = 'buttons-' + createId(),
-            LOGIN_FORM_ID = 'loginform-' + createId(),
-            MODAL_ID = 'modal-' + createId(),
-            OFFER_ID = 'offer-' + createId(),
-            OFFER_YES_ID = 'offer-yes-' + createId(),
-            OFFER_NO_ID = 'offer-yes-' + createId(),
-            PGN_ID = 'pgn-' + createId();
-
-        //------------------------------------------------------------------------------
-        // JS Util Functions
-        //------------------------------------------------------------------------------
-
-        // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-        function createId() {
-            return 'xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx'.replace(/x/g, function(c) {
-                var r = Math.random() * 16 | 0;
-                return r.toString(16);
-            });
-        }
+            BOARD_ID = 'board-' + createId();
 
         //------------------------------------------------------------------------------
         // Board Handlers
@@ -257,7 +157,7 @@
         }
 
         function onMouseoverSquare(square, piece) {
-            if (!game_started) return;
+            if (state != states.playing) return;
 
             // get list of possible moves for this square
             var moves = game.moves({
@@ -299,14 +199,12 @@
         }
 
         var onDragStart = function(source, piece, position, orientation) {
-            console.log("onDragStart game " + game + " browsing " + browsing);
-            if (!game_started) {
+            console.log("onDragStart state " + state);
+            if (state != states.playing) {
                 return false;
             }
 
-            if (browsing == true ||
-                game.game_over() === true ||
-                notMyTurnOrPiece(piece)) {
+            if (notMyTurnOrPiece(piece)) {
                 return false;
             }
         };
@@ -352,17 +250,6 @@
             });
         };
 
-        var updateView = function() {
-            if (game_started) {
-                $('.nogame').css('display', 'none');
-                $('.game').css('display', 'inline');
-            } else {
-                clearInterval(runningTimer);
-                $('.nogame').css('display', 'inline');
-                $('.game').css('display', 'none');
-            }
-        };
-
         function removeHighlightCheck() {
             $('#' + BOARD_ID).find('.' + CSS.squareClass)
                 .removeClass(CSS.highlightCheck);
@@ -380,8 +267,8 @@
             }
         }
 
-        var updateStatus = function() {
-            var status = '';
+        function updateStatus() {
+            var s = '';
 
             var moveColor = 'White';
             if (game.turn() === 'b') {
@@ -390,172 +277,32 @@
 
             // checkmate?
             if (game.in_checkmate() === true) {
-                status = 'Game over, ' + moveColor + ' is in checkmate.';
-                game_started = false;
+                s = 'Game over, ' + moveColor + ' is in checkmate.';
+                state = states.browsing;
             }
 
             // draw?
             else if (game.in_draw() === true) {
-                status = 'Game over, drawn position';
-                game_started = false;
+                s = 'Game over, drawn position';
+                state = states.browsing;
             }
 
             // game still on
             else {
-                status = moveColor + ' to move';
+                s = moveColor + ' to move';
                 removeHighlightCheck();
 
                 // check?
                 if (game.in_check() === true) {
-                    status += ', ' + moveColor + ' is in check';
+                    s += ', ' + moveColor + ' is in check';
                     highlightCheck();
                 }
             }
 
-            printStatus(status);
-            fenEl.html('🎬&nbsp;<small>' + game.fen() + '</small>');
-            $('#' + PGN_ID).html(printPgn(game.pgn()));
+            status.printStatus(s);
+            status.printFen(game.fen());
+            pgn.printPgn(game.pgn());
             updateView();
-        };
-
-        //------------------------------------------------------------------------------
-        // Button Handlers
-        //------------------------------------------------------------------------------
-        function startBtn() {
-            if (game_started) {
-                printStatus("Ignore start, Move! The game is not over yet, resign if you'd like...");
-                return;
-            }
-
-            board.start();
-            printStatus("Waiting for a match...");
-
-            var el1 = document.getElementById(itemByName(selectNewGame, selectOpponent).id);
-            var foeParam = el1.options[el1.selectedIndex].value;
-            var el2 = document.getElementById(itemByName(selectNewGame, selectColor).id);
-            var colorParam = el2.options[el2.selectedIndex].value;
-            var el3 = document.getElementById(itemByName(selectNewGame, selectTimeControl).id);
-            var tcParam = el3.options[el3.selectedIndex].value;
-
-            console.log("start with foe: " + foeParam + " color: " + colorParam + " time control: " + tcParam);
-            wsConn.send({
-                Cmd: "start",
-                Params: foeParam,
-                Color: colorParam,
-                TimeControl: tcParam
-            });
-        }
-
-        function undoBtn() {
-            if (!game_started) {
-                return;
-            }
-            if (game.history().length < 2) {
-                printStatus("Too short for undo, " + statusEl.html());
-                return;
-            }
-            wsConn.send({
-                Cmd: "undo"
-            });
-        }
-
-
-        function resignBtn() {
-            if (game_started === false) {
-                return;
-            }
-
-            console.log("Resigned");
-            wsConn.send({
-                Cmd: "outcome",
-                Params: "resign"
-            });
-            outcome('You have resigned');
-        }
-
-        function drawBtn() {
-            if (game == null) {
-                return;
-            }
-            printStatus("You have offered a draw, waiting for response");
-            console.log("Draw offer");
-            wsConn.send({
-                Cmd: "offer",
-                Params: "draw"
-            });
-        }
-
-        function leftBtn() {
-            if (game == null) {
-                return;
-            }
-
-            if (browsing === false) {
-                browsing = true;
-                printStatus("Browsing");
-                browsingGame = new Chess();
-                game.history().forEach(function(item, index) {
-                    browsingGame.move(item);
-                });
-            }
-
-            browsingGame.undo();
-            board.position(browsingGame.fen());
-            fenEl.html('🎬&nbsp;<small>' + browsingGame.fen() + '</small>');
-            $('#' + PGN_ID).html(printPgn(browsingGame.pgn()));
-
-        }
-
-        function rightBtn() {
-            if (game == null) {
-                return;
-            }
-            if (browsing === false) {
-                return;
-            }
-            browsingGame.move(game.history()[browsingGame.history().length]);
-            board.position(browsingGame.fen());
-            fenEl.html(('🎬&nbsp;<small>' + browsingGame.fen()) + '</small>');
-            $('#' + PGN_ID).html(printPgn(browsingGame.pgn()));
-            if (browsingGame.history().length === game.history().length) {
-                browsing = false;
-                browsingGame = null;
-                updateStatus();
-            }
-        }
-
-        function flipBtn() {
-            if (orientation === 'white') {
-                orientation = 'black';
-            } else {
-                orientation = 'white';
-            }
-            board.flip();
-            resize();
-        }
-
-        function offerYesBtn() {
-            console.log("Offer accepted: " + offerParams);
-
-            if (offerParams === 'draw') {
-                outcome(offerParams + ' is accepted');
-                wsConn.send({
-                    Cmd: "outcome",
-                    Params: offerParams
-                });
-            } else if (offerParams === 'undo') {
-                var msg = {
-                    Cmd: 'accept_undo',
-                    Params: '2'
-                };
-                wsConn.send(msg);
-                accept_undo(msg);
-            }
-            modalEl.hide(); // make invisible
-        }
-
-        function offerNoBtn() {
-            modalEl.hide(); // make invisible
         }
 
         var clickMoveFrom = null;
@@ -571,7 +318,7 @@
         }
 
         function mouseDownBoard(e) {
-            if (!game_started) return;
+            if (state != states.playing) return;
             if (notMyTurn()) return;
 
             var square = getSquareFromEvent(e);
@@ -590,10 +337,8 @@
 
             }
 
-
-            var piece = e.target.getAttribute('data-piece');
-
             // parent has data-square - a piece being clicked
+            var piece = e.target.getAttribute('data-piece');
             if (e.target.parentElement.hasAttribute('data-square') &&
                 !notMyTurnOrPiece(piece)) {
                 $('#' + BOARD_ID).find('.square-' + clickMoveFrom)
@@ -608,7 +353,7 @@
         }
 
         function mouseUpBoard(e) {
-            if (!game_started) return;
+            if (state != states.playing) return;
             if (notMyTurn()) return;
             var square = getSquareFromEvent(e);
             if (square === null) return;
@@ -645,7 +390,7 @@
             } else if (msg.Cmd == "outcome") {
                 outcome(msg.Params);
             } else if (msg.Cmd == "offer") {
-                offer(msg.Params); // make visible
+                modal.offer(msg.Params); // make visible
             } else if (msg.Cmd == "disconnect") {
                 disconnect();
             } else if (msg.Cmd == "reconnected") {
@@ -657,7 +402,7 @@
             } else if (msg.Cmd == "accept_undo") {
                 accept_undo(msg);
             } else if (msg.Cmd == "undo") {
-                offer(msg.Cmd);
+                modal.offer(msg.Cmd);
             } else {
                 console.log("Unknown command: '" + msg.Cmd + "'");
             }
@@ -670,33 +415,26 @@
             }
             updateStatus();
             board.position(game.fen());
-            printStatus("Undo accepted, " + statusEl.html());
+            status.printStatus("Undo accepted, " + status.htmlStatus());
         }
 
         function must_login() {
-            printStatus("Please login first!</b>");
+            status.printStatus("<b>Please login first!</b>");
         }
 
         function disconnect() {
-            printStatus("Your opponent have <b>disconnected</b>.");
+            status.printStatus("Your opponent have <b>disconnected</b>.");
         }
 
         function reconnected() {
-            printStatus("Your opponent have <b>reconnected</b>.");
-        }
-
-
-        function offer(offer) {
-            offerParams = offer;
-            offerEl.html(offerParams);
-            modalEl.show();
+            status.printStatus("Your opponent have <b>reconnected</b>.");
         }
 
         function outcome(msg) {
-            printStatus("The outcome is: '" + msg + "', click the Start button for a new game");
+            status.printStatus("The outcome is: '" + msg + "', click the Start button for a new game");
             console.log("opponent outcome '" + msg + "'");
-            game_started = false;
-            clearInterval(runningTimer);
+            state = states.browsing;
+            players.stopRunningCountdown();
             updateView();
         }
 
@@ -738,22 +476,25 @@
                 resize();
             }
             orientation = myColor;
+            var whiteName, blackName;
             if (orientation === 'white') {
-                $('#' + WHITE_NAME_ID).html('👓&nbsp;' + UserName);
-                $('#' + BLACK_NAME_ID).html('🕶&nbsp;' + msg.User);
+                whiteName = UserName;
+                blackName = msg.User;
             } else {
-                $('#' + WHITE_NAME_ID).html('👓&nbsp;' + msg.User);
-                $('#' + BLACK_NAME_ID).html('🕶&nbsp;' + UserName);
+                whiteName = msg.User;
+                blackName = UserName;
             }
-            $('#' + itemByName(statusItems, gameIDName).id).html('🆔&nbsp;' + msg.GameID);
-            $('#' + WHITE_ELO_ID).html('🏆&nbsp;' + msg.WhiteElo);
-            $('#' + BLACK_ELO_ID).html('🏆&nbsp;' + msg.BlackElo);
+            status.printGameId(msg.GameID);
 
-            printClock(WHITE_CLOCK_ID, msg.WhiteClock, '');
-            printClock(BLACK_CLOCK_ID, msg.BlackClock, '');
+            players.printWhiteName(whiteName);
+            players.printBlackName(blackName);
+            players.printWhiteElo(msg.WhiteElo);
+            players.printBlackElo(msg.BlackElo);
+            players.printWhiteClock(msg.WhiteClock);
+            players.printBlackClock(msg.BlackClock);
 
             game = new Chess();
-            game_started = true;
+            state = states.playing;
 
             var fen = 'start';
             if (msg.Params !== undefined) {
@@ -783,111 +524,65 @@
         }
 
         function nomatch() {
-            printStatus("No match found");
-        }
-
-
-
-        //------------------------------------------------------------------------------
-        // Countdown functions
-        //------------------------------------------------------------------------------
-        function pad(num) {
-            var n = num.toString();
-            if (n.length === 1) {
-                n = '0' + n;
-            }
-
-            return n;
-        }
-
-        function printClock(divId, distance, msg) {
-            /*
-                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            */
-            if (distance >= 0) {
-                var minutes = pad(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)));
-                var seconds = pad(Math.floor((distance % (1000 * 60)) / 1000));
-                var html = '⌛&nbsp;' + minutes + ':' + seconds;
-                $('#' + divId).html(html);
-            }
-            if (msg !== '') {
-                printStatus(msg);
-            }
-        }
-
-        function startCountdown(elementId, distance, msg) {
-            var clock = elementId;
-            var countDownDate = new Date().getTime() + distance;
-
-            var msgPrefix = msg;
-
-            // Update the count down every 10 times a second
-            var timer = setInterval(function() {
-
-                // Get today's date and time
-                var now = new Date().getTime();
-
-                // Find the distance between now and the count down date
-                distance = countDownDate - now;
-
-                printClock(clock, distance, msgPrefix);
-
-                if (distance < 0) {
-                    clearInterval(timer);
-                    printClock(clock, 0, msgPrefix + "EXPIRED");
-                }
-            }, 100);
-
-            return timer;
+            status.printStatus("No match found");
         }
 
         function pushGameClock(msg) {
             if (game.game_over() === true) {
-                clearInterval(runningTimer);
+                players.stopRunningCountdown();
                 return;
             }
 
-            var toStart, toStartMessage = '',
+            var startCountdown, toStartMessage = '',
                 startDistance;
 
             if (game.turn() === 'w') {
-                toStart = WHITE_CLOCK_ID;
+                startCountdown = players.startWhiteCountdown;
                 if (game.history().length < 2) {
                     toStartMessage = 'White first move';
                     startDistance = 30 * 1000;
                 } else {
                     if (msg == null) {
-                        startDistance = nextDistance;
+                        startDistance = players.nextDistance();
                     } else {
                         startDistance = msg.WhiteClock;
                     }
                 }
                 if (msg !== null) {
-                    nextDistance = msg.BlackClock;
+                    players.nextDistance(msg.BlackClock);
                 }
 
             } else {
-                toStart = BLACK_CLOCK_ID;
+                startCountdown = players.startBlackCountdown;
                 if (game.history().length < 2) {
                     toStartMessage = 'Black first move';
                     startDistance = 30 * 1000;
                 } else {
                     if (msg == null) {
-                        startDistance = nextDistance;
+                        startDistance = players.nextDistance();
                     } else {
                         startDistance = msg.BlackClock;
                     }
                 }
                 if (msg !== null) {
-                    nextDistance = msg.WhiteClock;
+                    players.nextDistance(msg.WhiteClock);
                 }
 
             }
 
-            clearInterval(runningTimer);
-            console.log('start timer for el ' + toStart + ' msg: ' + toStartMessage + ' distance: ' + startDistance);
-            runningTimer = startCountdown(toStart, startDistance, toStartMessage);
+            startCountdown(startDistance);
+            if (toStartMessage !== '') status.printStatus(toStartMessage);
+        }
+
+        var oldState;
+
+        function startBrowsing() {
+            oldState = state;
+            state = states.browsing;
+        }
+
+        function stopBrowsing() {
+            state = oldState;
         }
 
         //------------------------------------------------------------------------------
@@ -911,152 +606,6 @@
             return true;
         }
 
-        function itemByName(l, name) {
-            var r = null;
-            l.forEach(function(item, index) {
-                if (item.name == name) {
-                    r = item;
-                }
-            });
-            return r;
-        }
-
-        function pgnDiv() {
-            return '<div class="' + CSS.scrollable + '" id="' + PGN_ID + '"></div>';
-        }
-
-        function printPgn(pgn) {
-            var html = '<ol>';
-            var moves = pgn.split(' ');
-
-            var liOpen = false;
-            moves.forEach(function(item, index) {
-                if ((index % 3) === 0) return; // ignore move number
-
-                if (liOpen === false) {
-                    html += '<li>';
-                    liOpen = true;
-                }
-                if (((index + 1) % 3) === 0) {
-                    html += '&nbsp;';
-                }
-                html += moves[index];
-                if (((index + 1) % 3) === 0) {
-                    html += '</li>';
-                    liOpen = false;
-                }
-            });
-            if (liOpen === true) {
-                html += '</li>';
-            }
-            html += '</ol>';
-            return html;
-        }
-
-        function printStatus(msg) {
-            statusEl.html('📢&nbsp;' + msg);
-        }
-
-        function statusDivs(l) {
-
-            var html = '';
-            l.forEach(function(item, index) {
-                item.id = item.name + '-' + createId();
-
-                html += '<div id="' + item.id + '"';
-                if (item.class !== undefined) {
-                    html += ' class="' + item.class + '"';
-                }
-                html += ' >' + item.name + '</div>';
-            });
-
-
-            return html;
-        }
-
-        function userProfileDiv() {
-            var html = '<div id="' + LOGIN_FORM_ID + '" >';
-
-            var name = 'Anonymous';
-            if (UserName === '') {
-                html += '<a href="/signin">Sign in</a>'
-            } else {
-                const form = itemByName(loginForms, logout);
-                name = UserName;
-                html += 'Hello, <i>' + name + '</i>';
-
-                html += '<form action="' + form.action + '" method="' + form.method + '">';
-
-                form.inputs.forEach(function (item, index) {
-                    html += '<input type="' + item.type + '"';
-                    if (item.type !== submitType) {
-                        html += ' placeholder="' + item.type + '" name="' + item.type + '"';
-                    } else {
-                        html += ' value="' + item.submit + '"';
-                    }
-                    html += '/>';
-                });
-                html += '</form>';
-            }
-            html += '</div>';
-
-            return html;
-        }
-
-        function modalDiv() {
-            var html = '<div id="' + MODAL_ID + '" class="' + CSS.modal + '">' +
-                '<div class="' + CSS.modalContent + '">' +
-                '<p>Opponent offer: <span id="' + OFFER_ID + '"></span></p>' +
-                '<span id="' + OFFER_YES_ID + '" class="' + CSS.closeYes + '">✓</span>' +
-                '<span id="' + OFFER_NO_ID + '"  class="' + CSS.closeNo + '">×</span>' +
-                '</div></div>';
-            return html;
-        }
-
-        function selectGameDiv() {
-            var html = '<div id="' + SELECT_GAME_ID + '" ><ul class="' + CSS.hotizUl + '">';
-            selectNewGame.forEach(function(item, index) {
-                item.id = item.name + '-' + createId();
-                html += '<li class="' + CSS.horizLi + '" ><select id="' + item.id + '" class="nogame">';
-                item.options.forEach(function(item, index) {
-                    html += '<option value="' + item + '"';
-                    if (index === 0) {
-                        html += '  selected';
-                    }
-                    html += '>' + item + '</option>';
-                });
-                html += '</select></li>';
-            });
-            html += '</ul></div>';
-
-            return html;
-        }
-
-        function userDiv(id, clockId, userId, eloId) {
-            var html = '<div id="' + id + '" class="game">';
-            html += '<div id="' + clockId + '">⌛&nbsp;00:00</div>';
-            html += '<div id="' + userId + '">👓&nbsp;</div>';
-            html += '<div id="' + eloId + '">🏆&nbsp;</div>';
-            html += '</div>';
-
-            return html;
-        }
-
-
-        function buttonsDiv() {
-            var html = '<div id="' + BUTTONS_ID + '" ><ul class="' + CSS.hotizUl + '" >';
-            buttons.forEach(function(item, index) {
-                item.id = item.name + '-' + createId();
-                html += '<li  class="' + CSS.horizLi + '" ><input id="' + item.id + '" type="button" value="' + item.name + '"';
-                if (item.class !== undefined) {
-                    html += ' class="' + item.class + '"';
-                }
-                html += '></li>';
-            });
-            html += '</ul></div>';
-
-            return html;
-        }
 
         function boardDiv() {
             return '<div id="' + BOARD_ID + '" ></div>';
@@ -1065,14 +614,14 @@
 
         function chessGameDiv() {
             var html = boardDiv();
-            html += userProfileDiv();
-            html += selectGameDiv();
-            html += buttonsDiv();
-            html += userDiv(WHITE_PLAYER_ID, WHITE_CLOCK_ID, WHITE_NAME_ID, WHITE_ELO_ID);
-            html += userDiv(BLACK_PLAYER_ID, BLACK_CLOCK_ID, BLACK_NAME_ID, BLACK_ELO_ID);
-            html += pgnDiv();
-            html += statusDivs(statusItems);
-            html += modalDiv();
+            html += signin.html();
+            html += selectGame.html();
+            html += buttons.html();
+            html += players.html();
+            html += pgn.html();
+            html += modal.html();
+            html += status.html();
+            html += toolbar.html();
             return html;
         }
 
@@ -1091,59 +640,11 @@
             return ChessBoard(id, cfg);
         };
 
-
-        function initElementRefs() {
-            statusEl = $('#' + itemByName(statusItems, statusName).id);
-            fenEl = $('#' + itemByName(statusItems, fenName).id);
-            offerEl = $('#' + OFFER_ID);
-            modalEl = $('#' + MODAL_ID);
-        }
-
-        function initButtonHandlers() {
-            buttons.forEach(function(item, index) {
-                $('#' + item.id).on('click', item.onclick);
-                if (item.onkey !== undefined) {
-                    var k = item.onkey;
-                    $(document).keydown(function(e) {
-                        switch (e.which) {
-                            case k:
-                                break;
-
-                            default:
-                                return; // exit this handler for other keys
-                        }
-                        e.preventDefault(); // prevent the default action (scroll / move caret)
-                        item.onclick();
-                    });
-                }
+        function initEvents() {
+            window.addEventListener("resize", resize);
+            widgets.forEach(function(item, index) {
+                item.events();
             });
-
-            // Modal buttons
-            $('#' + OFFER_YES_ID).on('click', offerYesBtn);
-            $('#' + OFFER_NO_ID).on('click', offerNoBtn);
-        }
-
-        // Addition to jQuery to get the inner text width
-        $.fn.textWidth = function() {
-            var text = $(this).html();
-            $(this).html('<span>' + text + '</span>');
-            var width = $(this).find('span:first').width();
-            $(this).html(text);
-            console.log('textWidth text:' + text);
-            return width;
-        };
-
-        function styleRule(f, h) {
-            if (cssStyle !== null) {
-                document.getElementsByTagName("head")[0].removeChild(cssStyle);
-            }
-            cssStyle = document.createElement('style');
-            cssStyle.type = 'text/css';
-            var rules = document.createTextNode('.' + CSS.styledSelect + ' select {font-size: ' + f + 'px;height: ' + h + 'px;}');
-            cssStyle.appendChild(rules);
-            document.getElementsByTagName("head")[0].appendChild(cssStyle);
-
-            return CSS.styledSelect;
         }
 
         function resize() {
@@ -1154,12 +655,12 @@
 
             var w = window.innerWidth - margin;
             var h = Math.floor(w / φ);
-            var fontSize = Math.floor(w / 64);
 
             if (window.innerHeight - (2 * margin) < h) {
                 h = window.innerHeight - (2 * margin);
                 w = Math.floor(h * φ);
             }
+            var fontSize = Math.floor(w / 64);
             console.log('resize() margin: ' + margin + ' window: ' + window.innerWidth + 'X' + window.innerHeight +
                 ' chessgame: ' + w + 'X' + h + ' φ: ' + φ + ' w/h: ' + w / h);
 
@@ -1180,168 +681,83 @@
             var left = $('#' + BOARD_ID).outerWidth(true) + margin;
             var itemWidth = w - left - margin;
 
-            $('#' + WHITE_PLAYER_ID).height(rowHeight);
-            $('#' + BLACK_PLAYER_ID).height(rowHeight);
-
-            var whiteTop = 0;
-            var blackTop = 0;
-            if (orientation === 'white') {
-                blackTop = boardBorderWidth;
-                whiteTop = h - (h >> 3);
-            } else {
-                whiteTop = boardBorderWidth;
-                blackTop = h - (h >> 3);
-            }
-
-            var halfRowHeight = (rowHeight >> 1);
-            var halfRowBorder = (rowHeight & 1);
-            $('#' + WHITE_CLOCK_ID).css({ top: whiteTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
-            $('#' + BLACK_CLOCK_ID).css({ top: blackTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (rowHeight - 2 * boardBorderWidth)) });
-
-            // have to make the user div visible to measure text width
-            var clockDisplay = $('#' + WHITE_PLAYER_ID).css('display');
-            $('#' + WHITE_PLAYER_ID).css('display', 'inline');
-            var clockWidth = $('#' + WHITE_CLOCK_ID).textWidth();
-            $('#' + WHITE_PLAYER_ID).css('display', clockDisplay);
-
-            var userLeft = left + clockWidth + margin;
-            console.log("clock width: " + clockWidth + " left: " + left + " userLeft: " + userLeft);
-            $('#' + WHITE_NAME_ID).css({ top: whiteTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
-            $('#' + BLACK_NAME_ID).css({ top: blackTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
-            $('#' + WHITE_ELO_ID).css({ top: whiteTop + halfRowHeight + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
-            $('#' + BLACK_ELO_ID).css({ top: blackTop + halfRowHeight + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (halfRowHeight - 2 * halfRowBorder)) });
-            $('#' + WHITE_PLAYER_ID).width(itemWidth);
-            $('#' + BLACK_PLAYER_ID).width(itemWidth);
-
+            var quarterRowHeight = (rowHeight >> 2);
+            toolbar.resize(0, left, itemWidth, quarterRowHeight);
+            players.resize(boardBorderWidth, margin, itemWidth, rowHeight, left, h, orientation);
 
             var top = boardBorderWidth + rowHeight;
+            selectGame.resize(top, left, itemWidth, fontSize);
 
-            $('#' + LOGIN_FORM_ID).css({ top: top, left: left, position: 'absolute', width: itemWidth, height: rowHeight });
+            top += $('#' + selectGame.id()).height() + margin;
+            var halfRowHeight = (rowHeight >> 1);
+            buttons.resize(top, left, itemWidth, halfRowHeight, fontSize);
 
-
-            //console.log('id: ' + LOGIN_FORM_ID + 'top: ' + top + ' left: ' + left);
-            top += rowHeight;
-            $('#' + SELECT_GAME_ID).css({ top: top, left: left, position: 'absolute', width: itemWidth });
-
-            // for some strange reason, select option font size could be
-            // changed only by external stylesheet
-            var elemHeight = Math.floor(φ * fontSize);
-            $('#' + SELECT_GAME_ID).addClass(styleRule(fontSize, elemHeight));
-
-            //console.log('id: ' + SELECT_GAME_ID + 'top: ' + top + ' left: ' + left);
-            top += halfRowHeight + halfRowBorder;
-            $('#' + BUTTONS_ID).css({ top: top, left: left, position: 'absolute', width: itemWidth, height: halfRowHeight });
-            buttons.forEach(function(item, index) {
-                $('#' + item.id).css({ 'font-size': fontSize });
-            });
-            //console.log('id: ' + BUTTONS_ID + 'top: ' + top + ' left: ' + left);
-
-            top += rowHeight;
+            top += $('#' + buttons.id()).height() + margin;
             var pgntop = Math.floor(h / φ);
-            var statusItemHeight = Math.floor((pgntop - top - margin) / statusItems.length);
 
-            statusItems.forEach(function(item, index) {
-                $('#' + item.id).css({ top: top, left: left, position: 'absolute', height: statusItemHeight, width: itemWidth });
-                //console.log('id: ' + item.id + 'top: ' + top + ' left: ' + left);
-                top += statusItemHeight;
-            });
-
-            $('#' + PGN_ID).css({ top: pgntop, left: left, position: 'absolute', height: (h - pgntop - (h >> 3)), width: itemWidth });
-        }
-
-        function loginFormDiv() {
-            return '<div class="hzbox">' +
-                '<div id="errMsg"></div>' +
-            '<form id="loginForm" class="hzbox" action="/login" method="POST">' +
-            '<label for="user">Username</label>' +
-            '<input name="username" id="user" autofocus="autofocus" required="required"/>' +
-            '<label for="pwd">Password</label>' +
-            '<input name="password" type="password" id="pwd" required="required"/>' +
-            '<input name="Sign in" type="submit" value="Sign in"/>' +
-            '<div>' +
-            '<a href="/signup">Register</a>&nbsp;&nbsp;' +
-            '<a href="/forgotpwd">Forgot Password</a>' +
-            '</div>' +
-            '</form>' +
-            '</div>';
-        }
-
-        function registerFormDiv() {
-            return '<div class="hzbox">' +
-                '<div id="errMsg"></div>' +
-                '<form id="registerForm" class="hzbox" action="/register" method="POST">' +
-                '<label for="user">Username</label>' +
-                '<input name="username" id="user" autofocus="autofocus" required="required"/>' +
-                '<label for="pwd">Password</label>' +
-                '<input name="password" type="password" id="pwd" required="required" />' +
-                '<label for="email">Email (for password reset)</label>' +
-                '<input name="email" id="email" required="required" type="email"/>' +
-
-
-                '<input name="Register" type="submit" value="Register"/>' +
-                '<div>' +
-                '<a href="/signin">Sign in</a>&nbsp;&nbsp;' +
-                '<a href="/forgotpwd">Forgot Password</a>' +
-                '</div>' +
-                '</form>' +
-                '</div>';
-        }
-
-        function displayErrorMessage() {
-            var url = new URL(window.location.href);
-            var errorMessage = url.searchParams.get("err");
-            if (errorMessage) {
-                $('#errMsg').html(
-                    "Error: " + decodeURI(errorMessage)
-                ).css('display', 'inline');
-            }
+            status.resize(top, left, itemWidth, (pgntop - top - margin));
+            pgn.resize(pgntop, left, itemWidth, (players.bottomClock() - pgntop - margin));
+            signin.resize(0, 0, w, h);
         }
 
         function initDom() {
 
-            // build game and save it in memory
-            if (window.location.pathname == "/signin") {
-                chessgameEl.html(loginFormDiv());
-            } else if (window.location.pathname == "/signup") {
-                chessgameEl.html(registerFormDiv());
-            } else {
-                chessgameEl.html(chessGameDiv());
-                initElementRefs();
-                initButtonHandlers();
+            // init markup and tie events
+            chessgameEl.html(chessGameDiv());
+            initEvents();
 
+            // make board + events
+            board = makeBoard(BOARD_ID, 'start', 'white');
+            $('#' + BOARD_ID).mousedown(mouseDownBoard);
+            $('#' + BOARD_ID).mouseup(mouseUpBoard);
 
-                board = makeBoard(BOARD_ID, 'start', 'white');
-                $('#' + BOARD_ID).mousedown(mouseDownBoard);
-                $('#' + BOARD_ID).mouseup(mouseUpBoard);
-
-
-                printStatus('Choose opponent and click the Start button for a new game');
-                fenEl.html('🎬&nbsp;<small>' + board.fen() + '</small>');
-            }
-            displayErrorMessage();
+            status.printStatus('Choose opponent and click the Start button for a new game');
+            status.printFen(board.fen());
 
             resize();
-            window.addEventListener("resize", resize);
         }
+        var updateView = function() {
+            widgets.forEach(function(item, index) {
+                if (item.active === undefined) return;
+                if (item.active & state) $('#' + item.id()).show();
+                else $('#' + item.id()).hide();
+            });
+            /*
+            if (state == states.playing) {
+                $('.nogame').css('display', 'none');
+                $('.game').css('display', 'inline');
+            } else {
+                players.stopRunningCountdown();
+                $('.nogame').css('display', 'inline');
+                $('.game').css('display', 'none');
+            }
+            */
+        };
 
         function connectToServer() {
             if (window.WebSocket) {
                 wsConn.connect(onWebSocketMessage);
             } else {
-                printStatus("<b>Your browser does not support WebSockets.</b>");
+                status.printStatus("<b>Your browser does not support WebSockets.</b>");
+            }
+        }
+
+        var state = states.signin; // initial
+        function initState() {
+            if (UserName != '') state = states.choose_game;
+            if (PGN !== '') {
+                state = states.browsing;
+                showFinishedGame(PGN);
             }
         }
 
         function init() {
             if (initContainerEl() !== true) return;
 
+            initState();
             initDom();
             updateView();
             connectToServer();
-
-            if (PGN !== '') {
-                showFinishedGame(PGN);
-            }
         }
 
         // go time
@@ -1352,6 +768,5 @@
     }; // end of window['ChessGame']
 
     var chessgame = ChessGame('chessgame', {});
-
 
 })(); // end anonymous wrapper

@@ -83,23 +83,24 @@ func findGame(id string) *Game {
 }
 
 func register(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("username")
-	pass := r.FormValue("password")
+	name := r.FormValue("username-r")
+	pass := r.FormValue("password-r")
 	email := r.FormValue("email")
-	if name == "" || pass == "" || email == "" || !strings.Contains(email, "@") || !strings.Contains(email, "."){
-		http.Redirect(w, r, "/register?err=invalid input", 302)
+
+	if name == "" || pass == "" || email == "" || !strings.Contains(email, "@") || !strings.Contains(email, ".") {
+		http.Redirect(w, r, "/?err=invalid input", 302)
 		return
 	}
 
 	if existingUser := findUserByName(name); existingUser != nil {
-		http.Redirect(w, r, "/signup?err=user taken", 302)
+		http.Redirect(w, r, "/?err=user taken", 302)
 		return
 	}
 
-	user := &User{Name:name, Password:shastr(pass), Email:email}
+	user := &User{Name: name, Password: shastr(pass), Email: email}
 	if err := db.Create(user).Error; err != nil {
 		log.Print("Error creating a user", err)
-		http.Redirect(w, r, "/signup?err=create failed", 302)
+		http.Redirect(w, r, "/?err=create failed", 302)
 	}
 	// Success!
 	setSession(name, w, r)
@@ -108,14 +109,14 @@ func register(w http.ResponseWriter, r *http.Request) {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("username")
-	pass := r.FormValue("password")
+	name := r.FormValue("username-s")
+	pass := r.FormValue("password-s")
 	if name == "" || pass == "" {
-		http.Redirect(w, r, "/signin?err=invalid input", 302)
+		http.Redirect(w, r, "/?err=invalid input", 302)
 		return
 	}
 	if findUserByNameAndPass(name, pass) == nil {
-		http.Redirect(w, r, "/signin?err=no such user", 302)
+		http.Redirect(w, r, "/?err=no such user", 302)
 		return
 	}
 	// Success!
