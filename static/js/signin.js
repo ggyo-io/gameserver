@@ -5,15 +5,57 @@
 
         var widget = {};
 
-        var id = 'sign-in-' + createId();
-
+        var id = 'sign-in-' + createId(),
+            err_msg_id = 'err-msg-' + createId(),
+            forms_id = 'forms-' + createId();
 
         var styles = [
             // Add some
             createCssRule('#' + id + '{' +
+
+                'background: var(--primary);' +
+                'color: var(--dark);' +
+                'box-shadow: var(--shadow);' +
+                'text-align: center;' +
+                '}'),
+
+            // div containing error message
+            createCssRule('#' + err_msg_id + '{' +
+                'display: block;' +
+                'text-align: center;' +
+                '}'),
+
+            // div containing login and register form side by side
+            createCssRule('#' + forms_id + '{' +
                 'display: grid;' +
-                'background: var(--shadow);' +
-                '}')
+                'grid-template-columns: 1fr 1fr;' +
+                'grid-gap: 5%;' +
+                '}'),
+
+            // format inputs
+            createCssRule('#' + id +
+                /* Full-width input fields */
+                ' input[type=text], input[type=password], input[type=email] {' +
+                '    width: 100%;' +
+                '    display: inline-block;' +
+                '    background-color: var(--light) !important;' +
+                '  }'),
+            /* Set a style for all buttons */
+            createCssRule('#' + id +
+                ' button {' +
+                '    background: var(--light);' +
+                '    color: var(--dark);' +
+                '    box-shadow: var(--shadow);' +
+                '    cursor: pointer;' +
+                '    display: block;' +
+                '    text-align: center;' +
+                '    width: 100%;' +
+                '  }'),
+            createCssRule('#' + id +
+                ' button:hover{' +
+                '    background: var(--dark);' +
+                '    color: var(--light);}'),
+
         ];
 
         widget.active = states.signin;
@@ -22,30 +64,38 @@
 
         widget.html = function() {
             var html = '<div id="' + id + '">' +
-                '<div id="errMsg"></div>' +
+                '<div id="' + err_msg_id + '"></div>' +
+
+                '<div id="' + forms_id + '">' + /* forms */
                 //Login
-                '<form id="loginForm"  action="/login" method="POST">' +
-                '<label for="user">Username</label>' +
-                '<input name="username" id="user" autofocus="autofocus" required="required"/>' +
-                '<label for="pwd">Password</label>' +
-                '<input name="password" type="password" id="pwd" required="required"/>' +
-                '<input name="Sign in" type="submit" value="Sign in"/>' +
-                '</form>' +
+                '<form action="/login" method="post">' +
+                '<div>' +
+                '<label for="username-s"><b>Username</b></label>' +
+                '<input type="text" placeholder="Enter Username" name="username-s" required>' +
 
+                '<label for="password-s"><b>Password</b></label>' +
+                '<input type="password" placeholder="Enter Password" name="password-s" required>' +
+
+                '<button type="submit">Login</button>' +
+                '</div>' +
+                '</form>' +
                 // register
-                '<form id="registerForm" action="/register" method="POST">' +
-                '<label for="user">Username</label>' +
-                '<input name="username" id="user" autofocus="autofocus" required="required"/>' +
-                '<label for="pwd">Password</label>' +
-                '<input name="password" type="password" id="pwd" required="required" />' +
-                '<label for="email">Email (for password reset)</label>' +
-                '<input name="email" id="email" required="required" type="email"/>' +
-                '<input name="Register" type="submit" value="Register"/>' +
+                '<form action="/register" method="post">' +
+                '<div>' +
+                '<label for="username-r"><b>Username</b></label>' +
+                '<input type="text" placeholder="Enter Username" name="username-r" required>' +
 
-                // Forgot password
+                '<label for="password-r"><b>Password</b></label>' +
+                '<input type="password" placeholder="Enter Password" name="password-r" required>' +
 
+                '<label for="email"><b>Email</b></label>' +
+                '<input type="email" placeholder="Enter Email" name="email" required="required" />' +
+
+                '<button type="submit">Register</button>' +
+                '</div>' +
                 '</form>' +
-                '</div>';
+                '</div>' + /* end of forms div */
+                '</div>'; /* end of signin/register */
             return html;
         };
 
@@ -55,7 +105,7 @@
             $(function() {
                 $('#' + id).tooltip();
             });
-            $('#' + id).hide();
+
             displayErrorMessage();
         };
 
@@ -73,9 +123,9 @@
                 if (eqIdx != -1) {
                     var ampIdx = urlQuery.indexOf('&', errIdx);
                     var errorMessage = ampIdx == -1 ? urlQuery.substring(eqIdx + 1) : urlQuery.substring(eqIdx + 1, ampIdx);
-                    $('#errMsg').html(
+                    $('#' + err_msg_id).html(
                         errorMessage
-                    ).css('display', 'inline');
+                    ).show();
                 }
             }
         }
