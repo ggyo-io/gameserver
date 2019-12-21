@@ -13,23 +13,40 @@
             BLACK_PLAYER_ID = 'black-player-' + createId(),
             BLACK_NAME_ID = 'black-name-' + createId(),
             BLACK_ELO_ID = 'black-elo-' + createId(),
-            BLACK_CLOCK_ID = 'black-clock-' + createId();
+            BLACK_CLOCK_ID = 'black-clock-' + createId(),
+            clock = 'clock-' + createId(),
+            elo = 'elo-' + createId(),
+            name = 'name-' + createId(),
+            sf = 'small-fonts-' + createId();
 
         var runningTimer = null,
             nextDistance = null;
 
         var styles = [
-            //createCssRule('#' + id + ' {overflow: scroll;}')
+            createCssRule('#' + WHITE_PLAYER_ID + ', #' + BLACK_PLAYER_ID + ' {' +
+                'display:grid;' +
+                'grid-template-areas: ' +
+                "'clock name' " +
+                "'clock elo';" +
+                'grid-auto-columns: min-content;' +
+                'grid-auto-rows: min-content;' +
+                'margin: auto;' +
+                '}'
+            ),
+            createCssRule('.' + clock + '{grid-area:clock;}'),
+            createCssRule('.' + name + '{grid-area:name;}'),
+            createCssRule('.' + elo + '{grid-area:elo;}'),
+            createCssRule('.' + sf + '{font-size:0.4em;}')
         ];
 
         widget.active = states.playing | states.browsing;
         widget.id = function() { return id; };
 
         function userDiv(id, clockId, userId, eloId) {
-            var html = '<div id="' + id + '" class="game">';
-            html += '<div id="' + clockId + '">⌛&nbsp;00:00</div>';
-            html += '<div id="' + userId + '">👓&nbsp;</div>';
-            html += '<div id="' + eloId + '">🏆&nbsp;</div>';
+            var html = '<div id="' + id + '">';
+            html += '<div id="' + clockId + '" class="' + clock + '">⌛&nbsp;00:00&nbsp;</div>';
+            html += '<div id="' + userId + '" class="' + name + ' ' + sf + '">👓&nbsp;</div>';
+            html += '<div id="' + eloId + '" class="' + elo + ' ' + sf + '">🏆&nbsp;</div>';
             html += '</div>';
 
             return html;
@@ -51,10 +68,9 @@
 
         var bottomClock;
         widget.bottomClock = function() { return bottomClock; };
-        widget.resize = function(boardBorderWidth, margin, itemWidth, rowHeight, left, h, orientation) {
+        widget.resize = function(boardBorderWidth, itemWidth, rowHeight, left, h, orientation) {
 
             var whiteTop, blackTop;
-            var halfRowBorder = (rowHeight & 1);
             var quarterRowHeight = (rowHeight >> 2);
             var topClock = quarterRowHeight + boardBorderWidth;
             bottomClock = h - (h >> 3);
@@ -67,24 +83,8 @@
             }
             var clockHeight = rowHeight - quarterRowHeight - 2 * boardBorderWidth;
 
-            $('#' + WHITE_CLOCK_ID).css({ top: whiteTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (clockHeight)) });
-            $('#' + BLACK_CLOCK_ID).css({ top: blackTop, left: left, position: 'absolute', 'font-size': Math.floor(0.8 * (clockHeight)) });
-
-            // have to make the user div visible to measure text width
-            var clockDisplay = $('#' + WHITE_PLAYER_ID).css('display');
-            $('#' + WHITE_PLAYER_ID).css('display', 'inline');
-            var clockWidth = $('#' + WHITE_CLOCK_ID).textWidth();
-            $('#' + WHITE_PLAYER_ID).css('display', clockDisplay);
-
-            var userLeft = left + clockWidth + margin;
-
-            console.log("clock width: " + clockWidth + " left: " + left + " userLeft: " + userLeft);
-            $('#' + WHITE_NAME_ID).css({ top: whiteTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (clockHeight >> 1)) });
-            $('#' + BLACK_NAME_ID).css({ top: blackTop, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (clockHeight >> 1)) });
-            $('#' + WHITE_ELO_ID).css({ top: whiteTop + (clockHeight >> 1) + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (clockHeight >> 1)) });
-            $('#' + BLACK_ELO_ID).css({ top: blackTop + (clockHeight >> 1) + halfRowBorder, left: userLeft, position: 'absolute', 'font-size': Math.floor(0.5 * (clockHeight >> 1)) });
-            $('#' + WHITE_PLAYER_ID).width(itemWidth);
-            $('#' + BLACK_PLAYER_ID).width(itemWidth);
+            $('#' + WHITE_PLAYER_ID).css({ top: whiteTop, left: left, position: 'absolute', 'font-size': (0.8 * (clockHeight)), width: itemWidth });
+            $('#' + BLACK_PLAYER_ID).css({ top: blackTop, left: left, position: 'absolute', 'font-size': (0.8 * (clockHeight)), width: itemWidth });
 
         };
 
@@ -114,7 +114,7 @@
             if (distance >= 0) {
                 var minutes = pad(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)));
                 var seconds = pad(Math.floor((distance % (1000 * 60)) / 1000));
-                var html = '⌛&nbsp;' + minutes + ':' + seconds;
+                var html = '⌛&nbsp;' + minutes + ':' + seconds + '&nbsp;';
                 $('#' + divId).html(html);
             }
         }

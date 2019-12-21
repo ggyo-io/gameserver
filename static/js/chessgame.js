@@ -683,7 +683,7 @@
 
             var quarterRowHeight = (rowHeight >> 2);
             toolbar.resize(0, left, itemWidth, quarterRowHeight);
-            players.resize(boardBorderWidth, margin, itemWidth, rowHeight, left, h, orientation);
+            players.resize(boardBorderWidth, itemWidth, rowHeight, left, h, orientation);
 
             var top = boardBorderWidth + rowHeight;
             selectGame.resize(top, left, itemWidth, fontSize);
