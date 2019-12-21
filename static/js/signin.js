@@ -19,7 +19,7 @@
                 '}'),
 
             // div containing error message
-            createCssRule('#' + err_msg_id + '{' +
+            createCssRule('#' + errMsgId + '{' +
                 'display: block;' +
                 'text-align: center;' +
                 '}'),
@@ -63,7 +63,7 @@
 
         widget.html = function() {
             var html = '<div id="' + id + '">' +
-                '<div id="' + err_msg_id + '"></div>' +
+                '<div id="' + errMsgId + '"></div>' +
 
                 '<div id="' + formsId + '">' + /* forms */
                 //Login
@@ -118,7 +118,7 @@
             var url = new URL(window.location.href);
             var errorMessage = url.searchParams.get("err");
             if (errorMessage) {
-                $('#' + err_msg_id).html(
+                $('#' + errMsgId).html(
                     "Error: " + decodeURI(errorMessage)
                 ).show();
             }
