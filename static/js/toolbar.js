@@ -16,17 +16,21 @@
         widget.id = function() { return id; };
 
         var styles = [
-            createCssRule('#' + id + '  {display: flex; align-items: center;}'),
+            createCssRule('#' + id + '  {' +
+                'display: flex;' +
+                'align-items: center;' +
+                'justify-content:space-between;' +
+                '}'),
             createCssRule('.' + buttonClass +
-                ':hover {cursor: pointer; background-color: deepskyblue;}')
+                ':hover {cursor: pointer; opacity: 0.5;}')
         ];
 
         widget.html = function() {
             var html = '<div id="' + id + '">' +
                 '<img id="' + menuId + '" class="' + buttonClass + '" src="img/menu.svg" title="Menu"/>';
             if (UserName !== '') {
-                html += '<span id="' + nameId + '" title="Hello, ' + UserName + '!" >' + UserName + '</span>';
-                html += '<img id="' + logoutId + '" class="' + buttonClass + '" src="img/gear.svg" title="Sign out"/>';
+                html += '<span id="' + nameId + '" title="Hello, ' + UserName + '!" >' + UserName + '&nbsp;';
+                html += '<img id="' + logoutId + '" class="' + buttonClass + '" src="img/gear.svg" title="Sign out"/></span';
                 html += '<form id="' + formId + '" action="/logout" method="GET"/>';
 
             } else {
@@ -42,10 +46,6 @@
             $('#' + id).css({ top: top, left: left, position: 'absolute', width: width, height: height, 'font-size': height });
             $('#' + id + ' img ').attr('width', height);
             $('#' + id + ' img ').attr('height', height);
-            if (UserName !== '') {
-                $('#' + logoutId).css({ left: width - height, position: 'absolute' });
-                $('#' + nameId).css({ left: (width - height - (height >> 2) - $('#' + nameId).outerWidth(true)), position: 'absolute' });
-            }
         };
 
         widget.events = function() {
