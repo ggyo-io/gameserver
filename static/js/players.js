@@ -146,6 +146,7 @@
             console.log('startCountdown  elementId: ' + elementId + ' distance: ' + distance);
 
             clearInterval(runningTimer);
+            printClock(clock, distance);
 
             // Update the count down every 10 times a second
             runningTimer = setInterval(function() {
