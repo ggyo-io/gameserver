@@ -42,7 +42,7 @@
             createCssRule('.' + ulClass + '{' +
                 'display: flex;' +
                 'align-items: center;' +
-                'justify-content:center;' +
+                'justify-content:space-between;' +
                 'list-style-type: none;' +
                 'margin: 0;' +
                 'padding: 0;}')
@@ -64,9 +64,7 @@
                 html += '</select></li>';
             });
             buttons.forEach(function(item, index) {
-                html += '<li>';
-                html += '<input id="' + item.id + '" type="button" value="' + item.name + '">';
-                html += '</li>';
+                html += buttonHtml(item);
             });
             html += '</ul></div>';
             return html;
@@ -80,21 +78,7 @@
             });
 
             buttons.forEach(function(item, index) {
-                $('#' + item.id).on('click', item.onclick);
-                if (item.onkey !== undefined) {
-                    var k = item.onkey;
-                    $(document).keydown(function(e) {
-                        switch (e.which) {
-                            case k:
-                                break;
-
-                            default:
-                                return; // exit this handler for other keys
-                        }
-                        e.preventDefault(); // prevent the default action (scroll / move caret)
-                        item.onclick();
-                    });
-                } // item.onkey
+                buttonEvent(item);
             }); // buttons forEach
 
         };

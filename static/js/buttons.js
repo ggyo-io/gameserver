@@ -6,9 +6,7 @@
         var widget = (cfg || {});
 
         var id = 'buttons-' + createId(),
-            ulClass = 'horiz-ul-' + createId(),
-            liClass = 'horiz-li-' + createId(),
-            btnClass = 'button-' + createId();
+            ulClass = 'horiz-ul-' + createId();
 
         //------------------------------------------------------------------------------
         // Keyboard keys
@@ -66,18 +64,6 @@
                 'grid-template-columns: repeat(' + buttons.length + ',1fr);' +
                 'list-style-type: none;' +
                 'padding: 0;}'),
-
-            createCssRule('.' + btnClass + '{' +
-                'background: var(--primary);' +
-                'color: var(--dark);' +
-                'box-shadow: var(--shadow);' +
-                'display: block;' +
-                'text-align: center;}'),
-
-            createCssRule('.' + btnClass + ':hover{' +
-                'background: var(--dark);' +
-                'color: var(--light);}')
-
         ];
 
         widget.active = states.choose_game | states.playing | states.browsing;
@@ -86,10 +72,7 @@
         widget.html = function() {
             var html = '<div id="' + id + '" ><ul class="' + ulClass + '" >';
             buttons.forEach(function(item, index) {
-                item.id = item.name + '-' + createId();
-                html += '<li  class="' + liClass + '" >';
-                html += '<a id="' + item.id + '" title="' + item.title + '" class="' + btnClass + '">' + item.name + '</a>';
-                html += '</li>';
+                html += buttonHtml(item);
             });
             html += '</ul></div>';
 
@@ -102,21 +85,7 @@
 
         widget.events = function() {
             buttons.forEach(function(item, index) {
-                $('#' + item.id).on('click', item.onclick);
-                if (item.onkey !== undefined) {
-                    var k = item.onkey;
-                    $(document).keydown(function(e) {
-                        switch (e.which) {
-                            case k:
-                                break;
-
-                            default:
-                                return; // exit this handler for other keys
-                        }
-                        e.preventDefault(); // prevent the default action (scroll / move caret)
-                        item.onclick();
-                    });
-                }
+                buttonEvent(item);
             });
         };
 

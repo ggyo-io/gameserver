@@ -12,16 +12,6 @@
         });
     };
 
-    // Addition to jQuery to get the inner text width
-    $.fn.textWidth = function() {
-        var text = $(this).html();
-        $(this).html('<span>' + text + '</span>');
-        var width = $(this).find('span:first').width();
-        $(this).html(text);
-        console.log('textWidth text:' + text);
-        return width;
-    };
-
     window.createCssRule = function(text) {
         var cssStyle = document.createElement('style');
         cssStyle.type = 'text/css';
@@ -50,6 +40,35 @@
         choose_game: 1 << 1,
         playing: 1 << 2,
         browsing: 1 << 3,
+    };
+
+    /* Buttons html + events */
+
+    window.buttonHtml = function(item) {
+        var html = '';
+        item.id = item.name + '-' + createId();
+        html += '<li>';
+        html += '<a id="' + item.id + '" title="' + item.title + '" class="btnClass">' + item.name + '</a>';
+        html += '</li>';
+        return html;
+    };
+
+    window.buttonEvent = function(item) {
+        $('#' + item.id).on('click', item.onclick);
+        if (item.onkey !== undefined) {
+            var k = item.onkey;
+            $(document).keydown(function(e) {
+                switch (e.which) {
+                    case k:
+                        break;
+
+                    default:
+                        return; // exit this handler for other keys
+                }
+                e.preventDefault(); // prevent the default action (scroll / move caret)
+                item.onclick();
+            });
+        } // item.onkey
     };
 
 })(); // end anonymous wrapper
