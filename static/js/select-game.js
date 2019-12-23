@@ -6,8 +6,7 @@
         var widget = cfg;
 
         var id = 'select-game-' + createId(),
-            ulClass = 'horiz-ul-' + createId(),
-            liClass = 'horiz-li-' + createId();
+            ulClass = 'horiz-ul-' + createId();
         var selectOpponent = 'Select_opponent';
         var selectColor = 'Color';
         var selectTimeControl = 'Time_Control';
@@ -41,17 +40,19 @@
 
         var styles = [
             createCssRule('.' + ulClass + '{' +
+                'display: flex;' +
+                'align-items: center;' +
+                'justify-content:center;' +
                 'list-style-type: none;' +
                 'margin: 0;' +
-                'padding: 0;}'),
-            createCssRule('.' + liClass + ' {float: left;}')
+                'padding: 0;}')
         ];
 
         widget.html = function() {
             var html = '<div id="' + id + '" ><ul class="' + ulClass + '">';
             selectNewGame.forEach(function(item, index) {
                 item.id = item.name + '-' + createId();
-                html += '<li class="' + liClass + '" >' +
+                html += '<li>' +
                     '<select id="' + item.id + '" title="' + item.label + '" class="nogame">';
                 item.options.forEach(function(item, index) {
                     html += '<option value="' + item + '"';
@@ -63,7 +64,7 @@
                 html += '</select></li>';
             });
             buttons.forEach(function(item, index) {
-                html += '<li class="' + liClass + '" >';
+                html += '<li>';
                 html += '<input id="' + item.id + '" type="button" value="' + item.name + '">';
                 html += '</li>';
             });
