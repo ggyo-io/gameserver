@@ -1,0 +1,165 @@
+:root {
+    --header-color: #cccccc;
+    --header-shadow-color: #888888;
+    --grid-item-border: #ccc;
+    --footer-background: #f4f4f4;
+    --footer-color: #444;
+}
+
+html,
+body {
+    /* https://css-tricks.com/couple-takes-sticky-footer/ */
+    height: 100%;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* For sticky footer - grow to fill the space */
+
+.content {
+    flex: 1 0 auto;
+}
+
+.container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0.6rem;
+}
+
+.app-header {
+    background: var(--header-color);
+    box-shadow: 0.2rem 0.2rem 0.6rem var(--header-shadow-color);
+}
+
+.app-header .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.app-header .logo {
+    width: 5rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-areas: "top-player" "board" "bottom-player";
+    grid-gap: 0.25rem;
+}
+
+.grid .item {
+    border: 1px var(--grid-item-border) solid;
+    padding: 0.6rem;
+    box-shadow: 1px 1px 2px var(--grid-item-border);
+}
+
+.app-footer {
+    flex-shrink: 0;
+    background: var(--footer-background);
+    color: var(--footer-color);
+    padding: 0.6rem;
+    font-size: 0.85rem;
+    margin-top: 0.6rem;
+}
+
+.app-footer ul {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.app-footer ul li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#top-player {
+    grid-area: top-player;
+}
+
+#board {
+    grid-area: board;
+}
+
+#bottom-player {
+    grid-area: bottom-player;
+}
+
+
+/* Player divs */
+
+.player {
+    display: grid;
+    grid-template-areas: "clock name" "clock elo";
+    grid-auto-columns: min-content;
+    grid-auto-rows: min-content;
+    margin: auto;
+}
+
+.clock {
+    grid-area: clock;
+}
+
+.name {
+    grid-area: name;
+}
+
+.elo {
+    grid-area: elo;
+}
+
+.large-fonts {
+    font-size: 2rem;
+}
+
+.small-fonts {
+    font-size: 0.8rem;
+}
+
+
+/* Change layout on Desktop */
+
+@media (min-width: 600px) {
+    .grid {
+        grid-template-areas: 'board top-player' 'board bottom-player';
+        grid-template-rows: 1fr 1fr;
+        grid-template-columns: 4fr 1fr;
+        margin: auto;
+    }
+}
+
+@media (min-width: 800px) {
+    .grid {
+        grid-template-columns: 3fr 1fr;
+    }
+}
+
+@media (min-width: 1000px) {
+    .grid {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+@media (min-width: 1200px) {
+    .grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1400px) {
+    .grid {
+        grid-template-columns: 1fr 1.5fr;
+    }
+}

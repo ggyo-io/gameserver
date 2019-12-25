@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>Chess</title>
+
+        <link rel="stylesheet" href="/static/css/chessboard.css">
+        <link rel="stylesheet" href="/static/css/mockup.css">
+        
+        <script src="/static/js/jquery-3.4.1.js"></script>
+        <script src="/static/js/chessboard.js"></script>
+    </head>
+    <body>  
+        <div class="content">
+            <header class="app-header">
+                <div class="container">
+                    <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Chess_Pieces_Sprite.svg" alt="" />
+                </div>
+            </header>
+
+            <div class="grid container">
+                <div class="item player" id="top-player">
+                    <div id="top-clock" class="clock large-fonts">⌛&nbsp;14:38&nbsp;</div>
+                    <div id="top-name" class="name small-fonts">👓&nbsp;mrX</div>
+                    <div id="top-elo" class="elo small-fonts">🏆&nbsp;975</div>
+                </div>
+                <div class="item" id="board">
+                </div>
+                <div class="item player" id="bottom-player">
+                    <div id="bottom-clock" class="clock large-fonts">⌛&nbsp;14:38&nbsp;</div>
+                    <div id="bottom-name" class="name small-fonts">👓&nbsp;mrX</div>
+                    <div id="bottom-elo" class="elo small-fonts">🏆&nbsp;975</div>
+                </div>      
+            </div>
+        </div>
+
+        <footer class="app-footer">
+            <ul>
+                <li>Undo</li>
+                <li>Resign</li>
+                <li>Draw</li>
+                <li>←</li>
+                <li>→</li>
+                <li>↔</li>
+            </ul>
+        </footer>
+        <script>
+            var cfg = {
+                draggable: true,
+                position: 'start',
+            };
+            ChessBoard('board', cfg);
+        </script>
+        <div id="chessgame"></div>
+    </body>
+</html>
