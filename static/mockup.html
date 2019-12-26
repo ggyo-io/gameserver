@@ -18,7 +18,7 @@
                 </div>
             </header>
 
-            <div class="grid container">
+            <div class="grid container" id="game">
                 <div class="item player" id="top-player">
                     <div id="top-clock" class="clock large-fonts">⌛&nbsp;14:38&nbsp;</div>
                     <div id="top-name" class="name small-fonts">👓&nbsp;mrX</div>
@@ -30,7 +30,34 @@
                     <div id="bottom-clock" class="clock large-fonts">⌛&nbsp;14:38&nbsp;</div>
                     <div id="bottom-name" class="name small-fonts">👓&nbsp;mrY</div>
                     <div id="bottom-elo" class="elo small-fonts">🏆&nbsp;975</div>
-                </div>      
+                </div>
+                <div class="item grid container small-fonts" id="pgn">
+                <!--
+                    d4 e6
+                    c4 Qf6
+                    Nc3 Ne7
+                    Nf3 h6
+                    e3 Nbc6
+                    d5 Nb4
+                    a3 Na6
+                    b4 Qxc3+
+                -->
+                    <div class="item">1</div>
+                    <div class="item">d4</div>
+                    <div class="item">e6</div>
+
+                    <div class="item">2</div>
+                    <div class="item">c4</div>
+                    <div class="item">Qf6</div>
+
+                    <div class="item">3</div>
+                    <div class="item">Nc3</div>
+                    <div class="item">Ne7</div>
+
+                    <div class="item">4</div>
+                    <div class="item">Nf3</div>
+                    <div class="item">h6</div>
+                </div>
             </div>
         </div>
 
@@ -49,7 +76,7 @@
                 draggable: true,
                 position: 'start',
             };
-            ChessBoard('board', cfg);
+            var b = ChessBoard('board', cfg);
         </script>
     </body>
 </html>

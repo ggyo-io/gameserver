@@ -54,7 +54,6 @@ body {
 
 .grid {
     display: grid;
-    grid-template-areas: "top-player" "board" "bottom-player";
     grid-gap: 0.25rem;
 }
 
@@ -83,6 +82,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+
+/* Game */
+
+#game {
+    grid-template-areas: "top-player" "board" "bottom-player" "pgn";
 }
 
 #top-player {
@@ -132,36 +138,20 @@ body {
 }
 
 
+/* PGN */
+
+#pgn {
+    grid-template-columns: 1fr 2fr 2fr;
+    grid-area: pgn;
+}
+
+
 /* Change layout on Desktop */
 
 @media (min-width: 600px) {
-    .grid {
-        grid-template-areas: 'board top-player' 'board bottom-player';
-        grid-template-rows: 1fr 1fr;
-        grid-template-columns: 4fr 1fr;
-    }
-}
-
-@media (min-width: 800px) {
-    .grid {
-        grid-template-columns: 3fr 1fr;
-    }
-}
-
-@media (min-width: 1000px) {
-    .grid {
-        grid-template-columns: 2fr 1fr;
-    }
-}
-
-@media (min-width: 1200px) {
-    .grid {
+    #game {
+        grid-template-areas: 'board top-player' 'board pgn' 'board bottom-player';
+        grid-template-rows: 1fr 2fr 1fr;
         grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media (min-width: 1400px) {
-    .grid {
-        grid-template-columns: 1fr 1.5fr;
     }
 }
