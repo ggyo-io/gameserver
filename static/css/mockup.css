@@ -87,6 +87,7 @@ body {
 
 #top-player {
     grid-area: top-player;
+    align-self: start;
 }
 
 #board {
@@ -95,6 +96,7 @@ body {
 
 #bottom-player {
     grid-area: bottom-player;
+    align-self: end;
 }
 
 
@@ -105,7 +107,8 @@ body {
     grid-template-areas: "clock name" "clock elo";
     grid-auto-columns: min-content;
     grid-auto-rows: min-content;
-    margin: auto;
+    justify-self: start;
+    /*margin: auto;*/
 }
 
 .clock {
@@ -136,7 +139,6 @@ body {
         grid-template-areas: 'board top-player' 'board bottom-player';
         grid-template-rows: 1fr 1fr;
         grid-template-columns: 4fr 1fr;
-        margin: auto;
     }
 }
 
