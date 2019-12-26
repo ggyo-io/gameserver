@@ -141,7 +141,9 @@ body {
 /* PGN */
 
 #pgn {
-    grid-template-columns: 1fr 2fr 2fr;
+    grid-auto-columns: min-content;
+    grid-auto-rows: min-content;
+    grid-template-areas: 'r1 r1w r1b r2 r2w r2b' 'r3 r3w r3b r4 r4w r4b';
     grid-area: pgn;
 }
 
@@ -153,5 +155,8 @@ body {
         grid-template-areas: 'board top-player' 'board pgn' 'board bottom-player';
         grid-template-rows: 1fr 2fr 1fr;
         grid-template-columns: 1fr 1fr;
+    }
+    #pgn {
+        grid-template-areas: 'r1 r1w r1b' 'r2 r2w r2b' 'r3 r3w r3b' 'r4 r4w r4b';
     }
 }
