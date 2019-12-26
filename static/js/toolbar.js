@@ -30,7 +30,7 @@
                 '<img id="' + menuId + '" class="' + buttonClass + '" src="img/menu.svg" title="Menu"/>';
             if (UserName !== '') {
                 html += '<span id="' + nameId + '" title="Hello, ' + UserName + '!" >' + UserName + '&nbsp;';
-                html += '<img id="' + logoutId + '" class="' + buttonClass + '" src="img/gear.svg" title="Sign out"/></span';
+                html += '<img id="' + logoutId + '" class="' + buttonClass + '" src="img/gear.svg" title="Sign out"/></span>';
                 html += '<form id="' + formId + '" action="/logout" method="GET"/>';
 
             } else {
@@ -56,7 +56,7 @@
 
             // Sign out action
             $('#' + logoutId).click(function(e) {
-                console.log('toolbar logout click: ' + e);
+                console.log('toolbar logout click: ' + e + ". Form id: " + formId);
                 $('#' + formId).submit();
             });
         };
