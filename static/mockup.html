@@ -5,6 +5,7 @@
         <title>Chess</title>
 
         <link rel="stylesheet" href="/static/css/chessboard.css">
+        <link rel="stylesheet" href="/static/css/mobile-select.css">
         <link rel="stylesheet" href="/static/css/mockup.css">
         
         <script src="/static/js/jquery-3.4.1.js"></script>
@@ -57,6 +58,65 @@
                     <div class="item">4</div>
                     <div class="item">Nf3</div>
                     <div class="item">h6</div>
+                </div> <!-- end of pgn -->
+                <div class="item" id="select-game">
+                    <form class="item" id="select-foe"> Select Foe
+                        <div class="radiobtn">
+                            <input type="radio" id="human"
+                                        name="drone" value="human" checked />
+                            <label for="human">Human</label>
+                        </div>
+
+                        <div class="radiobtn">
+                            <input type="radio" id="stockfish"
+                                        name="drone" value="stockfish" />
+                            <label for="stockfish">Stockfish</label>
+                        </div>
+
+                        <div class="radiobtn">
+                            <input type="radio" id="lc0"
+                                        name="drone" value="lc0" />
+                            <label for="lc0">lc0</label>
+                        </div>
+                    </form> <!-- select foe -->
+                    <form class="item" id="select-color"> Select Color
+                        <div class="radiobtn">
+                            <input type="radio" id="any"
+                                        name="drone" value="any" checked />
+                            <label for="any">Any</label>
+                        </div>
+
+                        <div class="radiobtn">
+                            <input type="radio" id="white"
+                                        name="drone" value="white" />
+                            <label for="white">White</label>
+                        </div>
+
+                        <div class="radiobtn">
+                            <input type="radio" id="black"
+                                        name="drone" value="black" />
+                            <label for="black">Black</label>
+                        </div>
+                    </form> <!-- select time control -->
+                     <form class="item" id="select-color"> Select Time Control
+                        <div class="radiobtn">
+                            <input type="radio" id="900+15"
+                                        name="drone" value="900+15" checked />
+                            <label for="900+15">15m+15s</label>
+                        </div>
+
+                        <div class="radiobtn">
+                            <input type="radio" id="300+5"
+                                        name="drone" value="300+5" />
+                            <label for="300+5">5m+5s</label>
+                        </div>
+
+                        <div class="radiobtn">
+                            <input type="radio" id="60+1"
+                                        name="drone" value="60+1" />
+                            <label for="60+1">1m+1s</label>
+                        </div>
+                    </form> <!-- select tc -->
                 </div>
             </div>
         </div>
