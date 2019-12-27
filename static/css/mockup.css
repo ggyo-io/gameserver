@@ -148,6 +148,15 @@ body {
 }
 
 
+/* Select game */
+
+#select-game {
+    /*grid-auto-columns: min-content;*/
+    /* grid-auto-rows: min-content; */
+    grid-template-areas: 'foe color tc';
+}
+
+
 /* Change layout on Desktop */
 
 @media (min-width: 600px) {
