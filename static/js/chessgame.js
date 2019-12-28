@@ -81,7 +81,6 @@
             'accept_undo': accept_undo,
             'outcome': outcome
         });
-        var signin = SignIn();
 
         var widgets = [
             status,
@@ -90,8 +89,7 @@
             pgn,
             players,
             buttons,
-            modal,
-            signin
+            modal
         ];
 
         // constructor return object
@@ -614,7 +612,6 @@
 
         function chessGameDiv() {
             var html = boardDiv();
-            html += signin.html();
             html += selectGame.html();
             html += buttons.html();
             html += players.html();
@@ -697,7 +694,6 @@
 
             status.resize(top, left, itemWidth, (pgntop - top - margin));
             pgn.resize(pgntop, left, itemWidth, (players.bottomClock() - pgntop - margin));
-            signin.resize(0, 0, w, h);
         }
 
         function initDom() {
@@ -742,9 +738,8 @@
             }
         }
 
-        var state = states.signin; // initial
+        var state = states.choose_game; // initial
         function initState() {
-            if (UserName != '') state = states.choose_game;
             if (PGN !== '') {
                 state = states.browsing;
                 showFinishedGame(PGN);

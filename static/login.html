@@ -6,6 +6,9 @@
 
     <link rel="stylesheet" href="/static/css/login.css">
 
+    <script src="/static/js/jquery-3.4.1.js"></script>
+
+
 </head>
 <body>
 <div class="content">
@@ -20,13 +23,14 @@
         <main>
             <form action="/login" method="post">
                 <h1>Sign in</h1>
+                <div id="error-message"></div>
                 <div>
-                    <label class="input-label" for="username-s">User name</label>
-                    <input class="input" type="text" placeholder="Enter Username" name="username-s" required="">
+                    <label class="input-label" for="username">User name</label>
+                    <input class="input" type="text" placeholder="Enter Username" name="username" required="">
                 </div>
                 <div>
-                    <label class="input-label" for="password-s">Password</label>
-                    <input class="input" type="password" placeholder="Enter Password" name="password-s" required="">
+                    <label class="input-label" for="password">Password</label>
+                    <input class="input" type="password" placeholder="Enter Password" name="password" required="">
                 </div>
                 <button type="submit">Sign in</button>
                 <div class="links">
@@ -37,6 +41,11 @@
         </main>
     </div>
 </div>
+<script src="/static/js/utils.js"></script>
+<script>
+    displayErrorMessage();
+</script>
+
 </body>
 </html>
 

@@ -88,3 +88,8 @@ h1 {
     margin-bottom: .5rem;
     font-weight: bold;
 }
+
+#error-message {
+    display: none;
+    color: #c33;
+}

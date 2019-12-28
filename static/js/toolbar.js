@@ -35,7 +35,7 @@
 
             } else {
                 //TODO: implement anon/login
-                html += '<a href="/signin">Sign in</a>';
+                html += '<a href="/static/login.html">Sign in</a>';
 
             }
             html += '</div>';

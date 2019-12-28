@@ -71,4 +71,14 @@
         } // item.onkey
     };
 
+    window.displayErrorMessage = function() {
+        var url = new URL(window.location.href);
+        var errorMessage = url.searchParams.get("err");
+        if (errorMessage) {
+            $('#error-message').html(
+                "Error: " + decodeURI(errorMessage)
+            ).show();
+        }
+    };
+
 })(); // end anonymous wrapper

@@ -5,6 +5,7 @@
     <title>Chess - Sign up</title>
 
     <link rel="stylesheet" href="/static/css/login.css">
+    <script src="/static/js/jquery-3.4.1.js"></script>
 
 </head>
 <body>
@@ -20,17 +21,18 @@
         <main>
             <form action="/register" method="post">
                 <h1>Sign up</h1>
+                <div id="error-message"></div>
                 <div>
-                    <label class="input-label" for="username-s">User name</label>
-                    <input class="input" type="text" placeholder="Enter Username" name="username-s" required="required" autofocus="autofocus">
+                    <label class="input-label" for="username">User name</label>
+                    <input class="input" type="text" placeholder="Enter Username" name="username" required="required" autofocus="autofocus">
                 </div>
                 <div>
-                    <label class="input-label" for="password-s">Password</label>
-                    <input class="input" type="password" placeholder="Enter Password" name="password-s" required="required">
+                    <label class="input-label" for="password">Password</label>
+                    <input class="input" type="password" placeholder="Enter Password" name="password" required="required">
                 </div>
                 <div>
-                    <label class="input-label" for="email-s">Email (for password restore only)</label>
-                    <input class="input" type="email" placeholder="Enter email" name="email-s" required="required">
+                    <label class="input-label" for="email">Email (for password restore only)</label>
+                    <input class="input" type="email" placeholder="Enter email" name="email" required="required">
                 </div>
                 <button type="submit">Sign up</button>
                 <div class="links">
@@ -41,6 +43,10 @@
         </main>
     </div>
 </div>
+<script src="/static/js/utils.js"></script>
+<script>
+    displayErrorMessage();
+</script>
 </body>
 </html>
 
