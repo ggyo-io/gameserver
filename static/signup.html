@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Chess - Sign up</title>
+
+    <link rel="stylesheet" href="/static/css/login.css">
+
+</head>
+<body>
+<div class="content">
+    <header class="app-header">
+        <div class="menu">
+            <a class="logo" href="/">gameserver</a>
+        </div>
+        <div class="usermenu">hello</div>
+    </header>
+
+    <div class="main-wrapper">
+        <main>
+            <form action="/register" method="post">
+                <h1>Sign up</h1>
+                <div>
+                    <label class="input-label" for="username-s">User name</label>
+                    <input class="input" type="text" placeholder="Enter Username" name="username-s" required="required" autofocus="autofocus">
+                </div>
+                <div>
+                    <label class="input-label" for="password-s">Password</label>
+                    <input class="input" type="password" placeholder="Enter Password" name="password-s" required="required">
+                </div>
+                <div>
+                    <label class="input-label" for="email-s">Email (for password restore only)</label>
+                    <input class="input" type="email" placeholder="Enter email" name="email-s" required="required">
+                </div>
+                <button type="submit">Sign up</button>
+                <div class="links">
+                    <a href="/static/login.html">Sign in</a>
+                    <a href="/static/forgotpwd.html">Forgot password</a>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+</body>
+</html>
+
