@@ -11,7 +11,11 @@
         <script src="/static/js/jquery-3.4.1.js"></script>
         <script src="/static/js/chessboard.js"></script>
     </head>
-    <body>  
+    <body>
+        <script>
+            var UserName = "{{.UserName}}";
+            var PGN = "{{.PGN}}";
+        </script>
         <div class="content">
             <header class="app-header">
                 <div class="container">
@@ -118,6 +122,7 @@
                         </div>
                     </form> <!-- select tc -->
                 </div> <!-- end of select game -->
+                <div class="item btn" id="start">play</div>
             </div>
         </div>
         <footer class="app-footer">

@@ -106,6 +106,13 @@ body {
     align-self: end;
 }
 
+#start {
+    align-self: start;
+    justify-self: start;
+    background: var(--footer-background);
+    box-shadow: 0.2rem 0.2rem 0.6rem var(--header-shadow-color);
+}
+
 
 /* Player divs */
 

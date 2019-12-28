@@ -32,7 +32,16 @@ func pathHandler(w http.ResponseWriter, r *http.Request) {
 	http.FileServer(http.Dir("static")).ServeHTTP(w, r)
 }
 
-func index(w http.ResponseWriter, r *http.Request) {
+type indexHandler struct {
+	path string
+}
+
+// IndexHandler  with template path
+func IndexHandler(p string) http.Handler {
+	return &indexHandler{p}
+}
+
+func (i *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	data := indexData{
 		UserName: "",
 		IsAnnon:  true,
@@ -52,7 +61,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	// templates["index"].Execute(w, data)
 	// Parse every time for now, gives refresh w/o restart
-	template := template.Must(template.ParseFiles("tmpl/chess.html"))
+	template := template.Must(template.ParseFiles(i.path))
 	err := template.Execute(w, data)
 	if err != nil {
 		log.Printf("Error parsing the template: %s\n", err)
