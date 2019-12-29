@@ -9,7 +9,9 @@
         <link rel="stylesheet" href="/static/css/mockup.css">
         
         <script src="/static/js/jquery-3.4.1.js"></script>
+        <script src="/static/js/jquery-ui.js"></script>
         <script src="/static/js/chessboard.js"></script>
+        <script src="/static/js/chess.min.js"></script>
     </head>
     <body>
         <script>
@@ -102,7 +104,7 @@
                             <label for="black">Black</label>
                         </div>
                     </form> <!-- select time control -->
-                     <form class="item" id="select-color"> Select Time Control
+                     <form class="item" id="select-tc"> Select Time Control
                         <div class="radiobtn">
                             <input type="radio" id="900+15"
                                         name="drone" value="900+15" checked />
@@ -135,12 +137,16 @@
                 <li class="btn">↔</li>
             </ul>
         </footer>
-        <script>
-            var cfg = {
-                draggable: true,
-                position: 'start',
-            };
-            var b = ChessBoard('board', cfg);
-        </script>
+        <script src="/static/js/utils.js"></script>
+        <script src="/static/js/ws.js"></script>
+        <script src="/static/js/status.js"></script>
+        <script src="/static/js/signin.js"></script>
+        <script src="/static/js/w2/select-game.js"></script>
+        <script src="/static/js/toolbar.js"></script>
+        <script src="/static/js/w2/players.js"></script>
+        <script src="/static/js/buttons.js"></script>
+        <script src="/static/js/w2/pgn.js"></script>
+        <script src="/static/js/modal.js"></script>
+        <script src="/static/js/mockup.js"></script>
     </body>
 </html>
