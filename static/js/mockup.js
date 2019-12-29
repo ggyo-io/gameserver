@@ -84,7 +84,7 @@
             'accept_undo': accept_undo,
             'outcome': outcome
         });
-        var signin = SignIn();
+        // var signin = SignIn();
 
         var widgets = [
             status,
@@ -94,7 +94,7 @@
             players,
             buttons,
             modal,
-            signin
+            // signin
         ];
 
         // constructor return object
@@ -617,7 +617,7 @@
 
         function chessGameDiv() {
             var html = boardDiv();
-            html += signin.html();
+            //html += signin.html();
             html += selectGame.html();
             html += buttons.html();
             html += players.html();
