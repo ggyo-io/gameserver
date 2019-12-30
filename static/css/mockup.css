@@ -10,18 +10,20 @@ html,
 body {
     /* https://css-tricks.com/couple-takes-sticky-footer/ */
     height: 100%;
+    background: #ede8db linear-gradient(to bottom, #cdd0db, rgba(118, 112, 128, 0.28) 110px) no-repeat;
+
 }
 
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+    /*margin: 0;*/
+    /*padding: 0;*/
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
     display: flex;
     flex-direction: column;
+    font-family: 'Roboto', sans-serif;
 }
 
 
@@ -37,20 +39,46 @@ body {
     padding: 0.6rem;
 }
 
+/*.app-header {*/
+    /*background: var(--header-color);*/
+    /*box-shadow: 0.2rem 0.2rem 0.6rem var(--header-shadow-color);*/
+/*}*/
+
 .app-header {
-    background: var(--header-color);
-    box-shadow: 0.2rem 0.2rem 0.6rem var(--header-shadow-color);
+    display: flex;
+    justify-content: space-between;
+    color: #4d4d4d;
+    font-size: 25px;
+    margin: 0 .5rem;
+    font-family: 'Times', serif;
 }
 
-.app-header .container {
+.app-header a {
+    text-decoration: none;
+    color: #4d4d4d;
+}
+
+.app-header a:hover {
+    color: #007fff;
+}
+
+.logo {
+    font-size: 30px;
+    width: 5rem;
+}
+
+.usermenu {
     display: flex;
-    flex-direction: column;
     align-items: center;
 }
 
-.app-header .logo {
-    width: 5rem;
+.usermenu img {
+    flex-grow:0;
+    flex-shrink:0;
+    padding: 10px;
 }
+
+
 
 .grid {
     display: grid;
@@ -58,13 +86,15 @@ body {
 }
 
 .grid .item {
-    border: 1px var(--grid-item-border) solid;
+    /*border: 1px var(--grid-item-border) solid;*/
     padding: 0.6rem;
-    box-shadow: 1px 1px 2px var(--grid-item-border);
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);
+    background: #fff;
+    border-radius: 3px;
 }
 
 .app-footer {
-    background: var(--footer-background);
+    /*background: var(--footer-background);*/
     box-shadow: 0.2rem 0.2rem 0.6rem var(--header-shadow-color);
     flex-shrink: 0;
     color: var(--footer-color);
