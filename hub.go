@@ -72,6 +72,7 @@ func (h *Hub) run() {
 					h.disconnected[rq.player.User()] = b
 				}
 				delete(h.boards, rq.player)
+				delete(h.clients, rq.player)
 			case "match":
 				if rq.foe == "human" {
 					h.matchWs(rq)
