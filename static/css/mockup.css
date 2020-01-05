@@ -42,7 +42,7 @@ body {
     box-shadow: 0.2rem 0.2rem 0.6rem var(--header-shadow-color);
     display: flex;
     justify-content: space-between;
-    color: var(--header-color);
+    color: var(--footer-color);
     font-size: 1.5rem;
     margin: 0 .5rem;
 }
