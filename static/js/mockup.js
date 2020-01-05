@@ -49,36 +49,37 @@
         });
         var players = Players();
         var buttons = Buttons({
-            'game_started': function() { return (state == states.playing); },
-            'game': function() { return game; },
-            'board': function() { return board; },
-            'printStatus': status.printStatus,
-            'outcome': outcome,
-            'browsing': function(val) {
+            id: 'buttons',
+            game_started: function() { return (state == states.playing); },
+            game: function() { return game; },
+            board: function() { return board; },
+            printStatus: status.printStatus,
+            outcome: outcome,
+            browsing: function(val) {
                 if (arguments.length === 0) {
                     return state == states.browsing;
                 } else {
                     if (val) { startBrowsing(); } else { stopBrowsing(); }
                 }
             },
-            'browsingGame': function(val) {
+            browsingGame: function(val) {
                 if (arguments.length === 0) {
                     return browsingGame;
                 } else {
                     browsingGame = val;
                 }
             },
-            'printPgn': pgn.printPgn,
-            'printFen': status.printFen,
-            'updateStatus': updateStatus,
-            'orientation': function(val) {
+            printPgn: pgn.printPgn,
+            printFen: status.printFen,
+            updateStatus: updateStatus,
+            orientation: function(val) {
                 if (arguments.length === 0) {
                     return orientation;
                 } else {
                     orientation = val;
                 }
             },
-            'onResize': resize,
+            onResize: resize,
         });
         var modal = Modal({
             'accept_undo': accept_undo,
@@ -666,6 +667,8 @@
             var fontSize = Math.floor(w / 64);
             console.log('resize() margin: ' + margin + ' window: ' + window.innerWidth + 'X' + window.innerHeight +
                 ' chessgame: ' + w + 'X' + h + ' φ: ' + φ + ' w/h: ' + w / h);
+
+            players.resize(board.orientation());
 
             /*
             // https://stackoverflow.com/questions/12744928/in-jquery-how-can-i-set-top-left-properties-of-an-element-with-position-values

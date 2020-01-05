@@ -14,102 +14,92 @@
     <script src="/static/js/chess.min.js"></script>
 </head>
 <body>
-<script>
-    var UserName = "{{.UserName}}";
-    var PGN = "{{.PGN}}";
-</script>
-<div class="content">
-    <header class="app-header">
-        <div class="menu">
-            <a class="logo" href="/">gameserver</a>
-        </div>
-        {{if not .IsAnnon}}
-            <div class="usermenu">
-                <div class="greet">Hello, {{.UserName}}</div>
-                <img id="menu-img" class="btn" src="img/menu.svg" onclick="$('#logout-form').submit();">
-                <form id="logout-form" action="/logout" method="GET"></form>
+    <script>
+        var UserName = "{{.UserName}}";
+        var PGN = "{{.PGN}}";
+    </script>
+    <div class="content">
+        <header class="app-header">
+            <div class="btn container">
+                <a class="logo" href="/">gameserver</a>
             </div>
-        {{end}}
-        {{if .IsAnnon}}
-            <div class="btn">
-                <a href="/static/login.html">sign in</a>
+            {{if not .IsAnnon}}
+                <div class="usermenu">
+                    <div class="container">{{.UserName}}</div>
+                    <img id="menu-img" class="btn" src="img/menu.svg" onclick="$('#logout-form').submit();">
+                    <form id="logout-form" action="/logout" method="GET"></form>
+                </div>
+            {{end}}
+            {{if .IsAnnon}}
+                <div class="btn">
+                    <a href="/static/login.html">sign in</a>
+                </div>
+            {{end}}
+        </header>
+    
+        <div class="grid container" id="game">
+            <div class="item" id="board"></div>
+            
+            <div class="item player" id="black-player">
+                <div id="black-clock" class="clock large-fonts">⌛&nbsp;00:00&nbsp;</div>
+                <div id="black-name" class="name small-fonts">🕶&nbsp;</div>
+                <div id="black-elo" class="elo small-fonts">🏆&nbsp;</div>
             </div>
-        {{end}}
-
-    </header>
-
-    <div class="grid container" id="game">
-        <div class="item player" id="top-player">
-            <div id="top-clock" class="clock large-fonts">⌛&nbsp;14:38&nbsp;</div>
-            <div id="top-name" class="name small-fonts">👓&nbsp;mrX</div>
-            <div id="top-elo" class="elo small-fonts">🏆&nbsp;975</div>
-        </div>
-        <div class="item" id="board">
-        </div>
-        <div class="item player" id="bottom-player">
-            <div id="bottom-clock" class="clock large-fonts">⌛&nbsp;14:38&nbsp;</div>
-            <div id="bottom-name" class="name small-fonts">👓&nbsp;mrY</div>
-            <div id="bottom-elo" class="elo small-fonts">🏆&nbsp;975</div>
-        </div>
-        <div class="grid container small-fonts" id="pgn">
-            <!--
-                d4 e6
-                c4 Qf6
-                Nc3 Ne7
-                Nf3 h6
-                e3 Nbc6
-                d5 Nb4
-                a3 Na6
-                b4 Qxc3+
-            -->
-            <div class="item">1</div>
-            <div class="item">d4</div>
-            <div class="item">e6</div>
-
-            <div class="item">2</div>
-            <div class="item">c4</div>
-            <div class="item">Qf6</div>
-
-            <div class="item">3</div>
-            <div class="item">Nc3</div>
-            <div class="item">Ne7</div>
-
-            <div class="item">4</div>
-            <div class="item">Nf3</div>
-            <div class="item">h6</div>
-        </div> <!-- end of pgn -->
-        <div class="grid small-fonts" id="select-game">
-            <form class="item" id="select-foe"> Select Foe
-                <div class="radiobtn">
-                    <input type="radio" id="human"
-                           name="drone" value="human" checked/>
-                    <label for="human">Human</label>
-                </div>
-
-                <div class="radiobtn">
-                    <input type="radio" id="stockfish"
-                           name="drone" value="stockfish"/>
-                    <label for="stockfish">Stockfish</label>
-                </div>
-
-                <div class="radiobtn">
-                    <input type="radio" id="lc0"
-                           name="drone" value="lc0"/>
-                    <label for="lc0">lc0</label>
-                </div>
-            </form> <!-- select foe -->
-            <form class="item" id="select-color"> Select Color
-                <div class="radiobtn">
-                    <input type="radio" id="any"
-                           name="drone" value="any" checked/>
-                    <label for="any">Any</label>
-                </div>
-
-                <div class="radiobtn">
-                    <input type="radio" id="white"
-                           name="drone" value="white"/>
-                    <label for="white">White</label>
-                </div>
+            <div class="item player" id="white-player" >
+                <div id="white-clock" class="clock large-fonts">⌛&nbsp;00:00&nbsp;</div>
+                <div id="white-name" class="name small-fonts">👓&nbsp;</div>
+                <div id="white-elo" class="elo small-fonts">🏆&nbsp;</div>
+            </div>
+            
+            <div class="grid container small-fonts" id="pgn">
+                <div class="item"></div>
+                <div class="item"></div>
+                <div class="item"></div>
+    
+                <div class="item"></div>
+                <div class="item"></div>
+                <div class="item"></div>
+    
+                <div class="item"></div>
+                <div class="item"></div>
+                <div class="item"></div>
+    
+                <div class="item"></div>
+                <div class="item"></div>
+                <div class="item"></div>
+            </div> <!-- end of pgn -->
+            <div class="grid small-fonts" id="select-game">
+                <form class="item" id="select-foe"> Select Foe
+                    <div class="radiobtn">
+                        <input type="radio" id="human"
+                               name="drone" value="human" checked/>
+                        <label for="human">Human</label>
+                    </div>
+    
+                    <div class="radiobtn">
+                        <input type="radio" id="stockfish"
+                               name="drone" value="stockfish"/>
+                        <label for="stockfish">Stockfish</label>
+                    </div>
+    
+                    <div class="radiobtn">
+                        <input type="radio" id="lc0"
+                               name="drone" value="lc0"/>
+                        <label for="lc0">lc0</label>
+                    </div>
+                </form> <!-- select foe -->
+                <form class="item" id="select-color"> Select Color
+                    <div class="radiobtn">
+                        <input type="radio" id="any"
+                               name="drone" value="any" checked/>
+                        <label for="any">Any</label>
+                    </div>
+    
+                    <div class="radiobtn">
+                        <input type="radio" id="white"
+                               name="drone" value="white"/>
+                        <label for="white">White</label>
+                    </div>
 
                 <div class="radiobtn">
                     <input type="radio" id="black"
@@ -130,38 +120,38 @@
                     <label for="300+5">5m+5s</label>
                 </div>
 
-                <div class="radiobtn">
-                    <input type="radio" id="60+1"
-                           name="drone" value="60+1"/>
-                    <label for="60+1">1m+1s</label>
-                </div>
-            </form> <!-- select tc -->
-        </div> <!-- end of select game -->
-        <div class="item btn" id="start">play</div>
-    </div>
-</div>
-<footer class="app-footer">
-    <ul>
-        <li class="btn">Undo</li>
-        <li class="btn">Resign</li>
-        <li class="btn">Draw</li>
-        <li class="btn">←</li>
-        <li class="btn">→</li>
-        <li class="btn">↔</li>
-    </ul>
-</footer>
-<script src="/static/js/utils.js"></script>
-<script src="/static/js/ws.js"></script>
-<script src="/static/js/status.js"></script>
-<!--
-<script src="/static/js/signin.js"></script>
--->
-<script src="/static/js/w2/select-game.js"></script>
-<script src="/static/js/toolbar.js"></script>
-<script src="/static/js/w2/players.js"></script>
-<script src="/static/js/buttons.js"></script>
-<script src="/static/js/w2/pgn.js"></script>
-<script src="/static/js/modal.js"></script>
-<script src="/static/js/mockup.js"></script>
+                              <div class="radiobtn">
+                        <input type="radio" id="60+1"
+                               name="drone" value="60+1"/>
+                        <label for="60+1">1m+1s</label>
+                    </div>
+                </form> <!-- select tc -->
+            </div> <!-- end of select game -->
+            <div class="item btn" id="start">play</div>
+        </div> <!-- end of game -->
+    </div> <!-- end of div class="content" -->
+    <footer class="app-footer" id="buttons">
+        <ul>
+            <li class="btn" id="undo">Undo</li>
+            <li class="btn" id="resign">Resign</li>
+            <li class="btn" id="draw">Draw</li>
+            <li class="btn" id="←">←</li>
+            <li class="btn" id="→">→</li>
+            <li class="btn" id="↔">↔</li>
+        </ul>
+    </footer>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/ws.js"></script>
+    <script src="/static/js/status.js"></script>
+    <!--
+    <script src="/static/js/signin.js"></script>
+    -->
+    <script src="/static/js/w2/select-game.js"></script>
+    <script src="/static/js/toolbar.js"></script>
+    <script src="/static/js/w2/players.js"></script>
+    <script src="/static/js/w2/buttons.js"></script>
+    <script src="/static/js/w2/pgn.js"></script>
+    <script src="/static/js/modal.js"></script>
+    <script src="/static/js/mockup.js"></script>
 </body>
 </html>

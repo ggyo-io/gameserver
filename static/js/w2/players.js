@@ -5,14 +5,16 @@
 
         var widget = {};
 
-        var id = 'players', // FIXME: no common div for players now
-            WHITE_NAME_ID = 'bottom-name',
-            WHITE_CLOCK_ID = 'bottom-clock',
-            WHITE_ELO_ID = 'bottom-elo',
+        var id = widget.id,
+            WHITE_PLAYER_ID = "white-player",
+            WHITE_NAME_ID = 'white-name',
+            WHITE_CLOCK_ID = 'white-clock',
+            WHITE_ELO_ID = 'white-elo',
 
-            BLACK_NAME_ID = 'top-name',
-            BLACK_CLOCK_ID = 'top-clock',
-            BLACK_ELO_ID = 'top-elo';
+            BLACK_PLAYER_ID = "black-player",
+            BLACK_NAME_ID = 'black-name',
+            BLACK_CLOCK_ID = 'black-clock',
+            BLACK_ELO_ID = 'black-elo';
 
         var runningTimer = null,
             nextDistance = null;
@@ -22,23 +24,17 @@
 
         widget.events = function() {};
 
-        widget.resize = function(boardBorderWidth, itemWidth, rowHeight, left, h, orientation) {
-            if (orientation === 'white') {
-                WHITE_NAME_ID = 'bottom-name';
-                WHITE_CLOCK_ID = 'bottom-clock';
-                WHITE_ELO_ID = 'bottom-elo';
-
-                BLACK_NAME_ID = 'top-name';
-                BLACK_CLOCK_ID = 'top-clock';
-                BLACK_ELO_ID = 'top-elo';
+        widget.resize = function(o) {
+            if (o === 'white') {
+                $('#' + WHITE_PLAYER_ID).addClass('bottom-player');
+                $('#' + WHITE_PLAYER_ID).removeClass('top-player');
+                $('#' + BLACK_PLAYER_ID).addClass('top-player');
+                $('#' + BLACK_PLAYER_ID).removeClass('bottop-player');
             } else {
-                WHITE_NAME_ID = 'top-name';
-                WHITE_CLOCK_ID = 'top-clock';
-                WHITE_ELO_ID = 'top-elo';
-
-                BLACK_NAME_ID = 'bottom-name';
-                BLACK_CLOCK_ID = 'bottom-clock';
-                BLACK_ELO_ID = 'bottom-elo';
+                $('#' + WHITE_PLAYER_ID).addClass('top-player');
+                $('#' + WHITE_PLAYER_ID).removeClass('bottom-player');
+                $('#' + BLACK_PLAYER_ID).addClass('bottom-player');
+                $('#' + BLACK_PLAYER_ID).removeClass('top-player');
             }
         };
 
