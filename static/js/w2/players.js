@@ -26,15 +26,16 @@
 
         widget.resize = function(o) {
             if (o === 'white') {
-                $('#' + WHITE_PLAYER_ID).addClass('bottom-player');
+
                 $('#' + WHITE_PLAYER_ID).removeClass('top-player');
+                $('#' + WHITE_PLAYER_ID).addClass('bottom-player');
+                $('#' + BLACK_PLAYER_ID).removeClass('bottom-player');
                 $('#' + BLACK_PLAYER_ID).addClass('top-player');
-                $('#' + BLACK_PLAYER_ID).removeClass('bottop-player');
             } else {
-                $('#' + WHITE_PLAYER_ID).addClass('top-player');
                 $('#' + WHITE_PLAYER_ID).removeClass('bottom-player');
-                $('#' + BLACK_PLAYER_ID).addClass('bottom-player');
+                $('#' + WHITE_PLAYER_ID).addClass('top-player');
                 $('#' + BLACK_PLAYER_ID).removeClass('top-player');
+                $('#' + BLACK_PLAYER_ID).addClass('bottom-player');
             }
         };
 
