@@ -22,6 +22,9 @@ func updateScores(whiteID string, blackID string, outcome chess.Outcome, mode st
 }
 
 func saveScore(playerID string, mode string, outcome elogo.Outcome) {
+	if playerID == "" {
+		return
+	}
 	if err := db.Save(&Rating{UserID: playerID,
 		Mode: mode, Score: outcome.Rating}).Error; err != nil {
 		panic(err)
@@ -29,6 +32,9 @@ func saveScore(playerID string, mode string, outcome elogo.Outcome) {
 }
 
 func getRank(playerID string, mode string) int {
+	if playerID == "" {
+		return 1000
+	}
 	var r Rating
 	dbout := db.Order("created_at DESC").First(&r, "user_id=? AND mode=?", playerID, mode)
 	if dbout.RecordNotFound() || dbout.Error != nil {

@@ -482,11 +482,11 @@
             orientation = myColor;
             var whiteName, blackName;
             if (orientation === 'white') {
-                whiteName = UserName;
-                blackName = msg.User;
+                whiteName = UserName || 'Anonymous';
+                blackName = msg.User || 'Anonymous';
             } else {
-                whiteName = msg.User;
-                blackName = UserName;
+                whiteName = msg.User || 'Anonymous';
+                blackName = UserName || 'Anonymous';
             }
             status.printGameId(msg.GameID);
 

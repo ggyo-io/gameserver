@@ -31,15 +31,15 @@
                 </div>
             {{end}}
             {{if .IsAnnon}}
-                <div class="btn">
+            <div>
                     <a href="/static/login.html">sign in</a>
                 </div>
             {{end}}
         </header>
-    
+
         <div class="grid container" id="game">
             <div class="item" id="board"></div>
-            
+
             <div class="item player" id="black-player">
                 <div id="black-clock" class="clock large-fonts">⌛&nbsp;00:00&nbsp;</div>
                 <div id="black-name" class="name small-fonts">🕶&nbsp;</div>
@@ -50,20 +50,20 @@
                 <div id="white-name" class="name small-fonts">👓&nbsp;</div>
                 <div id="white-elo" class="elo small-fonts">🏆&nbsp;</div>
             </div>
-            
+
             <div class="grid container small-fonts" id="pgn">
                 <div class="item"></div>
                 <div class="item"></div>
                 <div class="item"></div>
-    
+
                 <div class="item"></div>
                 <div class="item"></div>
                 <div class="item"></div>
-    
+
                 <div class="item"></div>
                 <div class="item"></div>
                 <div class="item"></div>
-    
+
                 <div class="item"></div>
                 <div class="item"></div>
                 <div class="item"></div>
@@ -75,13 +75,13 @@
                                name="drone" value="human" checked/>
                         <label for="human">Human</label>
                     </div>
-    
+
                     <div class="radiobtn">
                         <input type="radio" id="stockfish"
                                name="drone" value="stockfish"/>
                         <label for="stockfish">Stockfish</label>
                     </div>
-    
+
                     <div class="radiobtn">
                         <input type="radio" id="lc0"
                                name="drone" value="lc0"/>
@@ -94,7 +94,7 @@
                                name="drone" value="any" checked/>
                         <label for="any">Any</label>
                     </div>
-    
+
                     <div class="radiobtn">
                         <input type="radio" id="white"
                                name="drone" value="white"/>

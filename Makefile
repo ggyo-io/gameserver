@@ -9,7 +9,7 @@ ifdef DB_PASS
 dbpass=-p$(DB_PASS)
 endif
 
-.PHONY: all clean run deps db
+.PHONY: all clean run db
 all: build
 
 build:
@@ -20,16 +20,6 @@ clean:
 
 run: build
 	./gameserver
-
-deps:
-	go get github.com/gorilla/handlers
-	go get github.com/gorilla/mux
-	go get github.com/gorilla/sessions
-	go get github.com/jinzhu/gorm/dialects/mysql
-	go get github.com/gorilla/websocket
-	go get github.com/jinzhu/inflection
-	go get github.com/satori/go.uuid
-	go get github.com/notnil/chess
 
 db:
 	mysqladmin -u root $(dbpass) -f drop chess

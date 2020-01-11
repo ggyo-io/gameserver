@@ -50,11 +50,8 @@ func (c *WSPlayer) readPump() {
 			log.Printf("wsplayer '%s' readPump breaks the loop, makeMove error: '%v'\n", c.user, err)
 			break
 		}
-		if c.user == "" {
-			c.send <- &Message{Cmd: "must_login"}
-		} else {
-			c.dispatch(message)
-		}
+		c.dispatch(message)
+
 	}
 	c.closeConnection()
 	c.unregister()
