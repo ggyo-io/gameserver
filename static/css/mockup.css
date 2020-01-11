@@ -43,8 +43,7 @@ body {
     display: flex;
     justify-content: space-between;
     color: var(--footer-color);
-    font-size: 1.5rem;
-    margin: 0 .5rem;
+    white-space: nowrap;
 }
 
 .app-header a {
@@ -188,6 +187,7 @@ body {
 .btn {
     cursor: pointer;
     transition: opacity 0.2s ease-in-out;
+    text-transform: uppercase;
 }
 
 .btn:hover {

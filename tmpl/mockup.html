@@ -19,22 +19,22 @@
         var PGN = "{{.PGN}}";
     </script>
     <div class="content">
-        <header class="app-header">
-            <div class="btn container">
+        <header class="app-header container">
+            <div class="log-div">
                 <a class="logo" href="/">gameserver</a>
             </div>
+            <div class="usermenu">
             {{if not .IsAnnon}}
-                <div class="usermenu">
-                    <div class="container">{{.UserName}}</div>
-                    <img id="menu-img" class="btn" src="img/menu.svg" onclick="$('#logout-form').submit();">
-                    <form id="logout-form" action="/logout" method="GET"></form>
-                </div>
+                <div class="container">{{.UserName}}</div>
+                <img id="menu-img" class="btn" src="img/menu.svg" onclick="$('#logout-form').submit();">
+                <form id="logout-form" action="/logout" method="GET"></form>
             {{end}}
             {{if .IsAnnon}}
-            <div>
+                <div class="btn">
                     <a href="/static/login.html">sign in</a>
                 </div>
             {{end}}
+            </div>
         </header>
 
         <div class="grid container" id="game">
