@@ -22,21 +22,15 @@
         };
 
         widget.printPgn = function(pgn) {
-            var html = '<ol>';
             var moves = pgn.split(' ');
             var index = 12; // there are 12 divs in the mark up
-            while (index > moves.length) {
+            while (index > moves.length || index % 3 != moves.length % 3) {
                 document.querySelector('#pgn div:nth-of-type(' + index + ')').innerHTML = '   ';
                 index--;
             }
 
             moves.slice().reverse().forEach(function(e, i) {
                 if (index === 0) return;
-                if (i % 3 !== 0 && index % 3 === 0) {
-                    document.querySelector('#pgn div:nth-of-type(' + index + ')').innerHTML = '   ';
-                    index--;
-                }
-
                 document.querySelector('#pgn div:nth-of-type(' + index + ')').innerHTML = e;
                 index--;
             });
