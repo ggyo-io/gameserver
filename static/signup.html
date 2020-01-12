@@ -11,15 +11,19 @@
 </head>
 <body>
 <div class="content">
-    <header class="app-header">
+    <header class="app-header container">
         <div class="menu">
             <a class="logo" href="/">gameserver</a>
         </div>
-        <div class="usermenu">hello</div>
+        <div class="usermenu">
+            <div class="btn">
+                <a href="/static/login.html">sign in</a>
+            </div>
+        </div>
     </header>
 
-    <div class="main-wrapper">
-        <main>
+    <div id="wrapper" class="grid">
+        <div id="main">
             <form action="/register" method="post">
                 <h1>Sign up</h1>
                 <div id="error-message"></div>
@@ -41,7 +45,7 @@
                     <a href="/static/forgotpwd.html">Forgot password</a>
                 </div>
             </form>
-        </main>
+        </div>
     </div>
 </div>
 <script src="/static/js/utils.js"></script>

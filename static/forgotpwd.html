@@ -11,20 +11,24 @@
 </head>
 <body>
 <div class="content">
-    <header class="app-header">
+    <header class="app-header container">
         <div class="menu">
             <a class="logo" href="/">gameserver</a>
         </div>
-        <div class="usermenu">hello</div>
+        <div class="usermenu">
+            <div class="btn">
+                <a href="/static/login.html">sign in</a>
+            </div>
+        </div>
     </header>
 
-    <div class="main-wrapper">
-        <main>
+    <div id="wrapper" class="grid">
+        <div id="main">
             <form action="/passwordreset" method="post">
                 <h1>Password reset</h1>
                 <div id="error-message"></div>
                 <div>
-                    <label class="input-label" for="email">Email (for password restore only)</label>
+                    <label class="input-label" for="email">Email</label>
                     <input class="input" type="email" placeholder="Enter email" name="email" required="required" autofocus="autofocus">
                 </div>
                 <button type="submit">Email a link</button>
@@ -33,7 +37,7 @@
                     <a href="/static/signup.html">Sign up</a>
                 </div>
             </form>
-        </main>
+        </div>
     </div>
 </div>
 <script src="/static/js/utils.js"></script>

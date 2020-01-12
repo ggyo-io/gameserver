@@ -1,19 +1,21 @@
-
-.main-wrapper {
-    margin:auto;
-    display: grid;
-    grid-template-areas: '. main . ';
-    grid-template-columns: 3fr 2fr 3fr;
+#wrapper {
+    grid-template-areas: "main";
+    justify-content: center;
+    align-content: center;
+    width: 100%;
+    height: 80%;
 }
 
-main {
+#main {
     grid-area: main;
-    /*width: 30em;*/
+    /*margin: auto;*/
+    min-width: 25em;
     background: #fff;
     --box-padding:60px;
     padding: 5vh var(--box-padding);
     border-radius: 3px;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.2),0 1px 5px 0 rgba(0,0,0,0.12);
+    margin-top: 40px;
 }
 
 form {
@@ -26,6 +28,7 @@ button {
     text-transform: uppercase;
     border: none;
     text-align: center;
+    white-space: nowrap;
     color: #fff;
     border-radius: 3px;
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.225);
@@ -49,7 +52,7 @@ h1 {
 
 .input {
     display: block;
-    width: 92%;
+    width: 100%;
     border-radius: 3px;
     border: 1px solid #d9d9d9;
     height: 2.7em;
