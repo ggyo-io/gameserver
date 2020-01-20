@@ -637,60 +637,35 @@
         }
 
         function resize() {
-            var φ = 1.618; // ~ golden ratio
+            var w = window.innerWidth;
+            var h = window.innerHeight;
 
-            var margin = parseInt($('#' + chessgameId).parent().css('marginLeft'), 10) +
-                parseInt($('#' + chessgameId).parent().css('marginRight'), 10);
+            // set REM size
+            var fontSize = Math.floor((w * h) / (64 * 64 * 16));
+            document.querySelector('html').style.fontSize = fontSize + 'px';
 
-            var w = window.innerWidth - margin;
-            var h = Math.floor(w / φ);
-
-            if (window.innerHeight - (2 * margin) < h) {
-                h = window.innerHeight - (2 * margin);
-                w = Math.floor(h * φ);
+            // Vertical Layout
+            var gameGrid = '"top-player" "board" "bottom-player" "pgn"';
+            document.querySelector('#board').style.width = w + 'px';
+            if (w > 600) {
+                // Horizontal Layout
+                gameGrid = '"board top-player" "board pgn" "board bottom-player"';
+                document.querySelector('#board').style.width = 0.7 * h + 'px';
             }
-            var fontSize = Math.floor(w / 64);
-            console.log('resize() margin: ' + margin + ' window: ' + window.innerWidth + 'X' + window.innerHeight +
-                ' chessgame: ' + w + 'X' + h + ' φ: ' + φ + ' w/h: ' + w / h);
-
+            document.querySelector('#game').style.gridTemplateAreas = gameGrid;
+            board.resize();
             players.resize(board.orientation());
+            orientation = board.orientation();
 
-            /*
-            // https://stackoverflow.com/questions/12744928/in-jquery-how-can-i-set-top-left-properties-of-an-element-with-position-values
-            $('#' + chessgameId).css({ position: 'relative', 'font-size': fontSize, width: w, height: h });
-            $('#' + BOARD_ID).width(h); // chess board listens here ;)
+            var bel = document.querySelector('#board');
+            var bs = window.getComputedStyle(bel);
 
-            var boardBorderWidth = 0;
-            var rowHeight = 0;
-            if (board !== null) {
-                board.resize();
-                orientation = board.orientation();
-                boardBorderWidth = board.borderSize();
-                rowHeight = board.squareSize();
-            }
+            var bmh = bs.height;
+            var bmw = bs.width;
 
-            // start locating elements right of the board
-            var left = $('#' + BOARD_ID).outerWidth(true) + margin;
-            var itemWidth = w - left - margin;
+            console.log('resize() window: ' + window.innerWidth + 'X' + window.innerHeight +
+                ' board:' + bmw + 'X' + bmh);
 
-            var quarterRowHeight = (rowHeight >> 2);
-            toolbar.resize(0, left, itemWidth, quarterRowHeight);
-            players.resize(boardBorderWidth, itemWidth, rowHeight, left, h, orientation);
-
-            var top = boardBorderWidth + rowHeight;
-            selectGame.resize(top, left, itemWidth, fontSize);
-
-            top += $('#' + selectGame.id()).height() + margin;
-            var halfRowHeight = (rowHeight >> 1);
-            buttons.resize(top, left, itemWidth, halfRowHeight, fontSize);
-
-            top += $('#' + buttons.id()).height() + margin;
-            var pgntop = Math.floor(h / φ);
-
-            status.resize(top, left, itemWidth, (pgntop - top - margin));
-            pgn.resize(pgntop, left, itemWidth, (players.bottomClock() - pgntop - margin));
-            signin.resize(0, 0, w, h);
-            */
         }
 
         function initDom() {

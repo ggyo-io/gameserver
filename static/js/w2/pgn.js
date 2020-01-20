@@ -25,13 +25,15 @@
             var moves = pgn.split(' ');
             var index = 12; // there are 12 divs in the mark up
             while (index > moves.length || index % 3 != moves.length % 3) {
-                document.querySelector('#pgn div:nth-of-type(' + index + ')').innerHTML = '   ';
+                document.querySelector('#pgn div:nth-of-type(' + index + ')').innerHTML = '00000';
+                document.querySelector('#pgn div:nth-of-type(' + index + ')').style.opacity = 0;
                 index--;
             }
 
             moves.slice().reverse().forEach(function(e, i) {
                 if (index === 0) return;
                 document.querySelector('#pgn div:nth-of-type(' + index + ')').innerHTML = e;
+                document.querySelector('#pgn div:nth-of-type(' + index + ')').style.opacity = 1;
                 index--;
             });
         };

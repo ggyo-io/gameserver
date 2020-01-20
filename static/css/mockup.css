@@ -141,7 +141,10 @@ body {
 /* Game */
 
 #game {
+    grid-auto-columns: min-content;
+    /*
     grid-template-areas: "top-player" "board" "bottom-player" "pgn";
+    */
 }
 
 .top-player {
@@ -273,12 +276,12 @@ body {
 /* Change layout on Desktop */
 
 @media (min-width: 600px) {
+    /*
     #game {
         grid-template-areas: 'board top-player' 'board pgn' 'board bottom-player';
         grid-template-rows: 1fr 2fr 1fr;
         grid-template-columns: 1fr 1fr;
-    }
-
+    }*/
     #pgn {
         grid-template-areas: 'r1 r1w r1b' 'r2 r2w r2b' 'r3 r3w r3b' 'r4 r4w r4b';
     }
