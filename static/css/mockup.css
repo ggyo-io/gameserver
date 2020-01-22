@@ -100,6 +100,43 @@ body {
     align-items: center;
 }
 
+/*==  Spinner  ==*/
+.lds-ring {
+    display: inline-block;
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+.lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    margin: 4px;
+    border: 4px solid #000;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #000 transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+@keyframes lds-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+/*==  Spinner END ==*/
 
 /* Game */
 
@@ -194,7 +231,45 @@ body {
     opacity: 0.5;
 }
 
+.modal {
+    display: grid;
+    /* Probably need media queries here */
+    width: 400px;
+    max-width: 100%;
+    height: 200px;
+    max-height: 100%;
+    position: fixed;
+    z-index: 100;
+    left: 50%;
+    top: 50%;
+    /* Use this for centering if unknown width/height */
+    transform: translate(-50%, -50%);
+    /* If known, negative margins are probably better (less chance of blurry text). */
+    /* margin: -200px 0 0 -200px; */
+    background: white;
+    box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.9);
+    justify-content: center;
+    align-content: center;
+}
 
+#matching-dialog .item {
+    text-align: center;
+}
+
+.closed {
+    display: none;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+
+    background: rgba(0, 0, 0, 0.6);
+}
 /* Change layout on Desktop */
 
 @media (min-width: 600px) {
@@ -203,6 +278,7 @@ body {
         grid-template-rows: 1fr 2fr 1fr;
         grid-template-columns: 1fr 1fr;
     }
+
     #pgn {
         grid-template-areas: 'r1 r1w r1b' 'r2 r2w r2b' 'r3 r3w r3b' 'r4 r4w r4b';
     }

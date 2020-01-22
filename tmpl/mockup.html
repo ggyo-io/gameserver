@@ -127,7 +127,7 @@
                     </div>
                 </form> <!-- select tc -->
             </div> <!-- end of select game -->
-            <div class="item btn" id="start">play</div>
+            <div class="item btn btn-gray" id="start">play</div>
         </div> <!-- end of game -->
     </div> <!-- end of div class="content" -->
     <footer class="app-footer" id="buttons">
@@ -140,6 +140,16 @@
             <li class="btn" id="↔">↔</li>
         </ul>
     </footer>
+    <div id="matching-dialog" class="modal closed">
+        <div class="container" id="matching-status">
+            <h2 class="item">Waiting for opponent...</h2>
+            <div class="item "><div class="lds-ring"><div></div><div></div><div></div><div></div></div></div>
+            <div class="item">Players playing:  <span id="players-online"></span></div>
+            <div class="item">Players in queue:  <span id="players-inqueue"></span></div>
+            <div class="item btn" id="match-cancel">✕ Cancel</div>
+        </div>
+    </div>
+    <div id="modal-overlay" class="modal-overlay closed"></div>
     <script src="/static/js/utils.js"></script>
     <script src="/static/js/ws.js"></script>
     <script src="/static/js/status.js"></script>

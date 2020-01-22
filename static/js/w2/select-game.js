@@ -16,6 +16,14 @@
         widget.active = states.choose_game | states.browsing;
         widget.id = function() { return id; };
 
+        var closeButton = document.querySelector("#match-cancel");
+        closeButton.addEventListener("click", function() {
+            toggleModal("matching-dialog");
+            wsConn.send({
+                Cmd: "cancel"
+            });
+        });
+
         // event, say buttons, handler initialization
         widget.events = function() {
             // jquery ui tooltips
@@ -46,6 +54,11 @@
             return [f, c, t];
         };
 
+        widget.updateMatching = function (msg) {
+            document.getElementById("players-online").innerHTML = msg.Map.PlayersPlaying || 0;
+            document.getElementById("players-inqueue").innerHTML = msg.Map.PlayersInQueue || 0;
+        };
+
         function startBtn() {
             if (widget.game_started()) {
                 printStatus("Ignore start, Move! The game is not over yet, resign if you'd like...");
@@ -67,6 +80,7 @@
                 Color: colorParam,
                 TimeControl: tcParam
             });
+            toggleModal("matching-dialog");
         }
 
 

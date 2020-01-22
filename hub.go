@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 )
 
 // Client represents a playing user registered to the hub
@@ -55,8 +56,15 @@ func newHub(rs ...uciLauncher) *Hub {
 }
 
 func (h *Hub) run() {
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
 	for {
 		select {
+		case <-ticker.C:
+			for k, _ := range h.clients {
+				h.sendQueuesStatus(k)
+			}
 		case rq := <-h.register:
 			switch rq.request {
 			case "connected":
@@ -86,6 +94,8 @@ func (h *Hub) run() {
 			case "reconnected":
 				log.Printf("board reconnected %#v", rq)
 				rq.player.Match() <- rq.match
+			case "cancel":
+				delete(h.clients, rq.player)
 			}
 		}
 	}
@@ -180,5 +190,13 @@ func (h *Hub) matchWs(rq *registerRequest) {
 		}
 	} else {
 		h.clients[rq.player] = rq
+		h.sendQueuesStatus(rq.player)
 	}
+}
+
+func (h *Hub) sendQueuesStatus(client Client) {
+	client.Send() <- &Message{Cmd: "queues_status", Map: map[string]interface{}{
+		"PlayersPlaying": len(h.boards),
+		"PlayersInQueue": len(h.clients),
+	}}
 }

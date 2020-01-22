@@ -133,6 +133,8 @@ func (c *WSPlayer) dispatch(message *Message) {
 		log.Printf("wsplayer '%s' got start command, params '%s' request to register at hub\n", c.user, message.Params)
 		rr := &registerRequest{player: c, foe: message.Params, color: message.Color, tc: message.TimeControl, request: "match"}
 		c.hub.register <- rr
+	} else if message.Cmd == "cancel" {
+		c.hub.register <- &registerRequest{player:c, request:"cancel"}
 	} else {
 		c.sendBoard(message)
 	}

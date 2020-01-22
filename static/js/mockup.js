@@ -407,6 +407,8 @@
                 accept_undo(msg);
             } else if (msg.Cmd == "undo") {
                 modal.offer(msg.Cmd);
+            } else if (msg.Cmd == "queues_status") {
+                selectGame.updateMatching(msg);
             } else {
                 console.log("Unknown command: '" + msg.Cmd + "'");
             }
@@ -474,6 +476,7 @@
         }
 
         function start(msg) {
+            toggleModal("matching-dialog");
             myColor = msg.Color;
             if (myColor != orientation) {
                 board.orientation(myColor);
@@ -610,24 +613,6 @@
             return true;
         }
 
-
-        function boardDiv() {
-            return '<div id="' + BOARD_ID + '" ></div>';
-        }
-
-
-        function chessGameDiv() {
-            var html = boardDiv();
-            //html += signin.html();
-            html += selectGame.html();
-            html += buttons.html();
-            html += players.html();
-            html += pgn.html();
-            html += modal.html();
-            html += status.html();
-            html += toolbar.html();
-            return html;
-        }
 
         var makeBoard = function(id, position, color) {
             var cfg = {

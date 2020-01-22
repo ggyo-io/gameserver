@@ -81,4 +81,11 @@
         }
     };
 
+    window.toggleModal = function (modalId) {
+        var modal = document.querySelector('#' + modalId);
+        var modalOverlay = document.querySelector("#modal-overlay");
+        modal.classList.toggle("closed");
+        modalOverlay.classList.toggle("closed");
+    };
+
 })(); // end anonymous wrapper
