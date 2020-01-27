@@ -51,7 +51,7 @@ func (i *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if game := findGame(gameID); game != nil {
 		data.PGN = game.State
 	}
-	user := getUserName(r)
+	user := getUserName(r, true)
 	if user != "" {
 		data.UserName = user
 		data.IsAnnon = false
@@ -138,7 +138,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 302)
 }
 
-func getUserName(r *http.Request) (userName string) {
+func getUserName(r *http.Request, verify bool) (userName string) {
 	session, _ := store.Get(r, "cookie-name")
 
 	// Check if user is authenticated
@@ -146,7 +146,11 @@ func getUserName(r *http.Request) (userName string) {
 	switch userRef.(type) {
 	case string:
 		name := userRef.(string)
-		if findUserByName(name) != nil {
+		if verify {
+			if findUserByName(name) != nil {
+				return name
+			}
+		} else {
 			return name
 		}
 	}

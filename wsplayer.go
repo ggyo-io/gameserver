@@ -134,7 +134,7 @@ func (c *WSPlayer) dispatch(message *Message) {
 		rr := &registerRequest{player: c, foe: message.Params, color: message.Color, tc: message.TimeControl, request: "match"}
 		c.hub.register <- rr
 	} else if message.Cmd == "cancel" {
-		c.hub.register <- &registerRequest{player:c, request:"cancel"}
+		c.hub.register <- &registerRequest{player: c, request: "cancel"}
 	} else {
 		c.sendBoard(message)
 	}
@@ -181,22 +181,15 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	user := getUserName(r)
+	user := getUserName(r, false)
 	wcconnect(hub, user, conn)
 }
 
 func wcconnect(hub *Hub, user string, conn *websocket.Conn) {
 	log.Printf("wsconnect %s\n", user)
 	player := newWSPlayer(hub, user, conn)
-	//if oldPlayer, ok := h.users[user]; ok {
-	//	log.Printf("found existing player for user: %s", user)
-	//	player = oldPlayer
-	//	player.conn = conn
-	//	player.sendState()
-	//} else {
-	//h.users[user] = player
+
 	go player.writePump()
-	//}
 	go player.readPump()
 
 	// Register with the hub
