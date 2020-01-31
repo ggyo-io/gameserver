@@ -38,7 +38,8 @@ type WSPlayer struct {
 	*Player
 
 	// The websocket connection.
-	conn *websocket.Conn
+	conn     *websocket.Conn
+	ranksMap map[string]int
 }
 
 // readPump reads moves from this player and dispatches those to the foe
@@ -115,8 +116,8 @@ func (c *WSPlayer) writePump() {
 			}
 			c.onMatch(match)
 
-			whiteElo := getRank(c.User(), match.tc.String())
-			blackElo := getRank(c.foe, match.tc.String())
+			whiteElo := c.Elo(match.tc.String())
+			blackElo := match.foeElo
 			if c.color != "white" {
 				whiteElo, blackElo = blackElo, whiteElo
 			}
@@ -168,9 +169,31 @@ func (c *WSPlayer) makeMove() (*Message, error) {
 	return &message, nil
 }
 
+func (c *WSPlayer) setRanks(ranks []Rating) {
+	for _, r := range ranks {
+		if _, ok := c.ranksMap[r.Mode]; !ok {
+			c.ranksMap[r.Mode] = r.Score
+		}
+	}
+}
+
+func (c *WSPlayer) Elo(mode string) int {
+	r, ok := c.ranksMap[mode]
+	if !ok {
+		return InitialScore
+	}
+	return r
+}
+
+func (c *WSPlayer) SetElo(elo int, mode string) {
+	c.ranksMap[mode] = elo
+}
+
 func newWSPlayer(hub *Hub, user string, conn *websocket.Conn) *WSPlayer {
 	player := &Player{hub: hub, user: user, send: make(chan *Message, 256), match: make(chan *Match)}
-	client := &WSPlayer{Player: player, conn: conn}
+	client := &WSPlayer{Player: player, conn: conn, ranksMap: make(map[string]int)}
+	ranks := getRanks(user)
+	client.setRanks(ranks)
 	return client
 }
 

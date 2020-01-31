@@ -209,7 +209,9 @@ func (b *Board) move(bp *boardPlayer, message *Message) error {
 }
 
 func (b *Board) updateScores() {
-	updateScores(b.white.User(), b.black.User(), b.chess.Outcome(), b.game.Mode)
+	whiteElo, blackElo := updateScores(b.white.User(), b.black.User(), b.chess.Outcome(), b.game.Mode)
+	b.white.SetElo(whiteElo.Rating, b.game.Mode)
+	b.black.SetElo(blackElo.Rating, b.game.Mode)
 }
 
 func (b *Board) outcome(bp *boardPlayer, message *Message) error {
@@ -305,6 +307,7 @@ func (b *Board) reconnect(client Client) *Match {
 	// need to remove trailing * cuz it look like diz: \n1.e2e4 d7d5 2.b1c3 c7c6  *
 	position = strings.TrimSuffix(position, " *")
 	position = strings.TrimSpace(position)
-	match := &Match{ch: bp.ch, color: color, foe: foe, position: position, whiteClock: b.clock.getClock(whiteColor), blackClock: b.clock.getClock(blackColor), tc: b.clock.tc}
+	match := &Match{ch: bp.ch, color: color, foe: foe, foeElo: bp.Elo(b.clock.tc.String()), position: position,
+		whiteClock: b.clock.getClock(whiteColor), blackClock: b.clock.getClock(blackColor), tc: b.clock.tc}
 	return match
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"math"
 	"time"
 )
 
@@ -10,6 +11,8 @@ type Client interface {
 	User() string
 	Match() chan *Match
 	Send() chan *Message
+	Elo(string) int
+	SetElo(int, string)
 }
 
 type registerRequest struct {
@@ -83,14 +86,14 @@ func (h *Hub) run() {
 				delete(h.clients, rq.player)
 			case "match":
 				if rq.foe == "human" {
-					h.matchWs(rq)
+					h.matchHuman(rq)
 				} else {
 					h.matchUCI(rq)
 				}
 			case "gameover":
 				rq.board.control <- nil
-				delete(h.disconnected, rq.board.white.User())
-				delete(h.disconnected, rq.board.black.User())
+				h.removeBoardPlayer(rq.board.white)
+				h.removeBoardPlayer(rq.board.black)
 			case "reconnected":
 				log.Printf("board reconnected %#v", rq)
 				rq.player.Match() <- rq.match
@@ -99,6 +102,11 @@ func (h *Hub) run() {
 			}
 		}
 	}
+}
+
+func (h *Hub) removeBoardPlayer(bp *boardPlayer) {
+	delete(h.disconnected, bp.User())
+	delete(h.boards, bp.Client)
 }
 
 func (h *Hub) matchUCI(rq *registerRequest) {
@@ -151,7 +159,7 @@ func matchColor(c1, c2 string) bool {
 
 func choosePlayersColors(rq1, rq2 *registerRequest) (white, black Client) {
 	if !matchColor(rq1.color, rq2.color) {
-		log.Fatalf("can not match color rq1 '%v' rq2 '%v'\n", rq1, rq2)
+		log.Printf("Error: can not match color rq1 '%v' rq2 '%v'\n", rq1, rq2)
 		return nil, nil
 	}
 	if rq1.color == "any" {
@@ -166,32 +174,67 @@ func choosePlayersColors(rq1, rq2 *registerRequest) (white, black Client) {
 	return rq1.player, rq2.player
 }
 
-func (h *Hub) matchWs(rq *registerRequest) {
-	// _very_ naive matching
-	if len(h.clients) > 0 {
-		for k := range h.clients {
-			if k != rq.player && matchColor(rq.color, h.clients[k].color) {
-				log.Printf("Found match creating a game")
-				white, black := choosePlayersColors(rq, h.clients[k])
-				tc := newTimeControl(rq.tc)
-				board := newBoard(h.register, white, black, tc)
-				cms := tc.time * 1000
-				delete(h.clients, white)
-				delete(h.clients, black)
+func (h *Hub) matchHuman(rq *registerRequest) {
 
-				h.boards[white] = board
-				h.boards[black] = board
+	var matches []Client
+	for k := range h.clients {
+		if k != rq.player && matchColor(rq.color, h.clients[k].color) && rq.tc == h.clients[k].tc {
+			matches = append(matches, k)
+		}
+	}
+	// find the best match by elo diff
+	var best Client
+	if len(matches) > 0 {
+		// make match range depend on # of connected players
+		var eloRange float64 = 1000
+		if len(h.boards)+len(h.clients) > 100 {
+			eloRange = 200
+		}
 
-				white.Match() <- &Match{ch: board.white.ch, color: "white", foe: black.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
-				black.Match() <- &Match{ch: board.black.ch, color: "black", foe: white.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
-				go board.run()
-				return
+		for _, k := range matches {
+			if h.betterMatch(rq, k, best, eloRange) {
+				best = k
 			}
 		}
+	}
+	if best != nil {
+		h.createGameHumans(rq, best)
 	} else {
+		// if no match found wait in queue
 		h.clients[rq.player] = rq
 		h.sendQueuesStatus(rq.player)
 	}
+	return
+}
+
+func (h *Hub) betterMatch(rq *registerRequest, contender Client, best Client, eloRange float64) bool {
+	contenderRange := math.Abs(float64(rq.player.Elo(rq.tc) - contender.Elo(rq.tc)))
+	bestRange := math.MaxFloat64
+	if best != nil {
+		bestRange = math.Abs(float64(rq.player.Elo(rq.tc) - best.Elo(rq.tc)))
+	}
+	if contenderRange <= eloRange && contenderRange < bestRange {
+		return true
+	}
+	return false
+}
+
+func (h *Hub) createGameHumans(rq *registerRequest, k Client) {
+	white, black := choosePlayersColors(rq, h.clients[k])
+	tc := newTimeControl(rq.tc)
+	board := newBoard(h.register, white, black, tc)
+	cms := tc.time * 1000
+	delete(h.clients, white)
+	delete(h.clients, black)
+
+	h.boards[white] = board
+	h.boards[black] = board
+
+	white.Match() <- &Match{ch: board.white.ch, color: "white", foe: black.User(), foeElo: black.Elo(tc.String()),
+		gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
+	black.Match() <- &Match{ch: board.black.ch, color: "black", foe: white.User(), foeElo: white.Elo(tc.String()),
+		gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
+	go board.run()
 }
 
 func (h *Hub) sendQueuesStatus(client Client) {

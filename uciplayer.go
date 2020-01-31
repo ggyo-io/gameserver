@@ -80,6 +80,13 @@ func (c *UCIPlayer) writePump() {
 	}
 }
 
+func (c *UCIPlayer) Elo(mode string) int {
+	return InitialScore
+}
+
+func (c *UCIPlayer) SetElo(int, string) {
+}
+
 func newUCIPlayer(hub *Hub, user string) *UCIPlayer {
 	player := &Player{hub: hub, user: user, send: make(chan *Message, 256), match: make(chan *Match)}
 	client := &UCIPlayer{Player: player, bestMove: make(chan string)}

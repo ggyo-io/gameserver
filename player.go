@@ -21,6 +21,7 @@ type Match struct {
 	ch         chan *Message
 	color      string
 	foe        string
+	foeElo     int
 	gameID     string
 	position   string
 	whiteClock int64
