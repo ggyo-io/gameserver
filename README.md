@@ -1,7 +1,11 @@
 # Game Server
 
-Generic game server for turn based games such as chess
 
+Generic game server for turn based games such as chess
+Local build and run:
+make run
+
+Docker build: 
 docker image build and push:
   eval $(minikube docker-env)
   docker build . -t yuval-go:v1
