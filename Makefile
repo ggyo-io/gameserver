@@ -21,8 +21,10 @@ clean:
 run: build
 	./gameserver
 
-db:
+db-drop:
 	mysqladmin -u root $(dbpass) -f drop chess
+
+db-new:
 	mysqladmin -u root $(dbpass) -f create chess
 
 container:
