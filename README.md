@@ -2,6 +2,7 @@
 
 
 Generic game server for turn based games such as chess
+
 Local build and run:
 make run
 
