@@ -4,6 +4,7 @@
     window.Players = function(cfg) {
 
         var widget = {};
+        widget.name = 'Players';
 
         var id = widget.id,
             WHITE_PLAYER_ID = "white-player",

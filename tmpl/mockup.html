@@ -18,28 +18,28 @@
         var UserName = "{{.UserName}}";
         var PGN = "{{.PGN}}";
     </script>
-    <div class="content">
-        <header class="app-header container">
-            <div class="log-div">
-                <a class="logo" href="/">gameserver</a>
-            </div>
-            <div class="usermenu">
+    <header class="app-header container">
+        <div class="log-div">
+            <a class="logo" href="/">gameserver</a>
+        </div>
+        <div class="usermenu">
             {{if not .IsAnnon}}
-                <div class="container">{{.UserName}}</div>
-                <img id="menu-img" class="btn" src="img/menu.svg" onclick="$('#logout-form').submit();">
-                <form id="logout-form" action="/logout" method="GET"></form>
+            <div class="container">{{.UserName}}</div>
+            <img id="menu-img" class="btn" src="img/menu.svg" onclick="$('#logout-form').submit();">
+            <form id="logout-form" action="/logout" method="GET"></form>
             {{end}}
             {{if .IsAnnon}}
-                <div class="btn">
-                    <a href="/static/login.html">sign in</a>
-                </div>
-            {{end}}
+            <div class="btn">
+                <a href="/static/login.html">sign in</a>
             </div>
-        </header>
+            {{end}}
+        </div>
+    </header>
+    <div class="content">
+
 
         <div class="grid container" id="game">
             <div class="item" id="board"></div>
-
             <div class="item player" id="black-player">
                 <div id="black-clock" class="clock large-fonts">⌛&nbsp;00:00&nbsp;</div>
                 <div id="black-name" class="name small-fonts">🕶&nbsp;</div>
@@ -50,7 +50,6 @@
                 <div id="white-name" class="name small-fonts">👓&nbsp;</div>
                 <div id="white-elo" class="elo small-fonts">🏆&nbsp;</div>
             </div>
-
             <div class="grid container small-fonts" id="pgn">
                 <div class="item"></div>
                 <div class="item"></div>
@@ -129,6 +128,12 @@
             </div> <!-- end of select game -->
             <div class="item btn btn-gray" id="start">play</div>
         </div> <!-- end of game -->
+        <div class="grid container" id="history">
+            <div class="item" id="hgame1">
+                <span class="item" id="result1">Won 1-0</span>
+                <span class="item" id="players1">Pi(1500) - Dor(1500)</span>
+            </div>
+        </div>
     </div> <!-- end of div class="content" -->
     <footer class="app-footer" id="buttons">
         <ul>
@@ -160,8 +165,11 @@
     <script src="/static/js/toolbar.js"></script>
     <script src="/static/js/w2/players.js"></script>
     <script src="/static/js/w2/buttons.js"></script>
+    <script src="/static/js/w2/game.js"></script>
+    <script src="/static/js/w2/history.js"></script>
     <script src="/static/js/w2/pgn.js"></script>
     <script src="/static/js/modal.js"></script>
     <script src="/static/js/mockup.js"></script>
+
 </body>
 </html>

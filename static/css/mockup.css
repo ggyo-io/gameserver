@@ -10,6 +10,7 @@ html,
 body {
     /* https://css-tricks.com/couple-takes-sticky-footer/ */
     height: 100%;
+    font-size: 1.5rem;
 }
 
 * {
@@ -44,6 +45,7 @@ body {
     justify-content: space-between;
     color: var(--footer-color);
     white-space: nowrap;
+    width: 100%;
 }
 
 .app-header a {
@@ -142,9 +144,17 @@ body {
 
 #game {
     grid-auto-columns: min-content;
-    /*
-    grid-template-areas: "top-player" "board" "bottom-player" "pgn";
-    */
+    /*justify-content: center;*/
+    /*grid-template-columns: 1fr;*/
+    /*grid-template-rows: 1fr 2fr 1fr;*/
+    /*grid-template-columns: 1fr 1fr;*/
+
+    grid-template-areas:
+            "top-player"
+            "board"
+            "bottom-player"
+            "pgn";
+
 }
 
 .top-player {

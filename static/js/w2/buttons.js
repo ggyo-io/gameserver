@@ -46,7 +46,7 @@
             }
         ];
 
-        widget.active = states.choose_game | states.playing | states.browsing;
+        widget.active = states.playing | states.browsing;
         widget.id = function() { return id; };
 
         widget.events = function() {

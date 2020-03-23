@@ -4,11 +4,9 @@
     window.Pgn = function(cfg) {
 
         var widget = {};
-
-        var id = cfg.id;
-
+        widget.name = 'Pgn';
         widget.active = states.playing | states.browsing;
-        widget.id = function() { return id; };
+        widget.id = function() { return cfg.id; };
 
 
         // event, say buttons, handler initialization

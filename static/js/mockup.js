@@ -47,6 +47,13 @@
         var pgn = Pgn({
             id: 'pgn'
         });
+        var board = Game({
+           id: 'game'
+        });
+        var history = TheHistory({
+            id: 'history'
+        });
+
         var players = Players();
         var buttons = Buttons({
             id: 'buttons',
@@ -95,6 +102,8 @@
             players,
             buttons,
             modal,
+            game,
+            history,
             // signin
         ];
 
@@ -626,45 +635,48 @@
                 onMoveEnd: onMoveEnd,
                 onSnapEnd: onSnapEnd
             };
-            return ChessBoard(id, cfg);
+            return {};
+            // return ChessBoard(id, cfg);
         };
 
         function initEvents() {
             window.addEventListener("resize", resize);
             widgets.forEach(function(item, index) {
-                item.events();
+                console.log(index + '. init events widget: ' + widget.name);
+                if (item.events !== undefined)
+                    item.events();
             });
         }
 
         function resize() {
-            var w = window.innerWidth;
-            var h = window.innerHeight;
-
-            // set REM size
-            var fontSize = Math.floor((w * h) / (64 * 64 * 16));
-            document.querySelector('html').style.fontSize = fontSize + 'px';
-
-            // Vertical Layout
-            var gameGrid = '"top-player" "board" "bottom-player" "pgn"';
-            document.querySelector('#board').style.width = w + 'px';
-            if (w > 600) {
-                // Horizontal Layout
-                gameGrid = '"board top-player" "board pgn" "board bottom-player"';
-                document.querySelector('#board').style.width = 0.7 * h + 'px';
-            }
-            document.querySelector('#game').style.gridTemplateAreas = gameGrid;
-            board.resize();
-            players.resize(board.orientation());
-            orientation = board.orientation();
-
-            var bel = document.querySelector('#board');
-            var bs = window.getComputedStyle(bel);
-
-            var bmh = bs.height;
-            var bmw = bs.width;
-
-            console.log('resize() window: ' + window.innerWidth + 'X' + window.innerHeight +
-                ' board:' + bmw + 'X' + bmh);
+            // var w = window.innerWidth;
+            // var h = window.innerHeight;
+            //
+            // // set REM size
+            // var fontSize = Math.floor((w * h) / (64 * 64 * 16));
+            // document.querySelector('html').style.fontSize = fontSize + 'px';
+            //
+            // // Vertical Layout
+            // var gameGrid = '"top-player" "board" "bottom-player" "pgn"';
+            // document.querySelector('#board').style.width = w + 'px';
+            // if (w > 600) {
+            //     // Horizontal Layout
+            //     gameGrid = '"board top-player" "board pgn" "board bottom-player"';
+            //     document.querySelector('#board').style.width = 0.7 * h + 'px';
+            // }
+            // document.querySelector('#game').style.gridTemplateAreas = gameGrid;
+            // board.resize();
+            // players.resize(board.orientation());
+            // orientation = board.orientation();
+            //
+            // var bel = document.querySelector('#board');
+            // var bs = window.getComputedStyle(bel);
+            //
+            // var bmh = bs.height;
+            // var bmw = bs.width;
+            //
+            // console.log('resize() window: ' + window.innerWidth + 'X' + window.innerHeight +
+            //     ' board:' + bmw + 'X' + bmh);
 
         }
 
@@ -680,26 +692,17 @@
             $('#' + BOARD_ID).mouseup(mouseUpBoard);
 
             status.printStatus('Choose opponent and click the Start button for a new game');
-            status.printFen(board.fen());
+            //status.printFen(board.fen());
 
             resize();
         }
+
         var updateView = function() {
             widgets.forEach(function(item, index) {
                 if (item.active === undefined) return;
                 if (item.active & state) $('#' + item.id()).show();
                 else $('#' + item.id()).hide();
             });
-            /*
-            if (state == states.playing) {
-                $('.nogame').css('display', 'none');
-                $('.game').css('display', 'inline');
-            } else {
-                players.stopRunningCountdown();
-                $('.nogame').css('display', 'inline');
-                $('.game').css('display', 'none');
-            }
-            */
         };
 
         function connectToServer() {
@@ -712,7 +715,7 @@
 
         var state = states.signin; // initial
         function initState() {
-            if (UserName != '') state = states.choose_game;
+            state = states.choose_game;
             if (PGN !== '') {
                 state = states.browsing;
                 showFinishedGame(PGN);

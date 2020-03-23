@@ -4,6 +4,7 @@
     window.Status = function(cfg) {
 
         var widget = cfg || {};
+        widget.name = 'Status';
 
         var statusName = '📢';
         var gameIDName = '🆔';
