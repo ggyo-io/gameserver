@@ -26,6 +26,7 @@ type Game struct {
 	Mode       string
 	WhiteClock int64
 	BlackClock int64
+	Outcome    string
 }
 
 // User represents authenticated web ui users

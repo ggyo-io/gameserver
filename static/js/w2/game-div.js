@@ -1,8 +1,8 @@
 (function() {
     'use strict';
-    window.Game = function (cfg) {
+    window.GameDiv = function (cfg) {
         var widget = {};
-        widget.name = 'Game';
+        widget.name = 'GameDiv';
         widget.active = states.playing | states.browsing;
         widget.id = function() { return cfg.id; };
         widget.events = function () {};

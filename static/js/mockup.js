@@ -36,7 +36,6 @@
 
         // widgets
         var status = Status();
-        var toolbar = ToolBar();
         var selectGame = SelectGame({
             id: 'select-game',
             game_started: function() { return (state == states.playing); },
@@ -47,10 +46,8 @@
         var pgn = Pgn({
             id: 'pgn'
         });
-        var board = Game({
-           id: 'game'
-        });
-        var history = TheHistory({
+
+        var history = GameHistory({
             id: 'history'
         });
 
@@ -88,22 +85,17 @@
             },
             onResize: resize,
         });
-        var modal = Modal({
-            'accept_undo': accept_undo,
-            'outcome': outcome
-        });
         // var signin = SignIn();
 
+        var gameDiv = GameDiv({ id: 'game'});
         var widgets = [
             status,
-            toolbar,
             selectGame,
             pgn,
             players,
             buttons,
-            modal,
-            game,
             history,
+            gameDiv,
             // signin
         ];
 
@@ -642,7 +634,8 @@
         function initEvents() {
             window.addEventListener("resize", resize);
             widgets.forEach(function(item, index) {
-                console.log(index + '. init events widget: ' + widget.name);
+                console.log(index + '. init events widget name: ' + item.name);
+                console.log(index + '. init events widget id: ' + item.id());
                 if (item.events !== undefined)
                     item.events();
             });

@@ -10,7 +10,9 @@ html,
 body {
     /* https://css-tricks.com/couple-takes-sticky-footer/ */
     height: 100%;
-    font-size: 1.5rem;
+    /*font-size: 1.5rem;*/
+    font-size: 1.3rem;
+    /*font-size: calc(16px + 13 * ((100vw - 320px) / 880));*/
 }
 
 * {
@@ -21,6 +23,7 @@ body {
 
 body {
     display: flex;
+    flex-wrap: nowrap;
     flex-direction: column;
     font-family: 'Times', serif;
 }
@@ -29,7 +32,7 @@ body {
 /* For sticky footer - grow to fill the space */
 
 .content {
-    flex: 1 0 auto;
+    /*flex: 1 0 auto;*/
 }
 
 .container {
@@ -202,6 +205,10 @@ body {
     grid-area: elo;
 }
 
+.hist-item {
+    white-space: nowrap;
+}
+
 .large-fonts {
     font-size: 2rem;
 }
@@ -229,6 +236,7 @@ body {
 
 #select-game {
     grid-template-areas: 'foe color tc';
+    margin: 0.6rem;
 }
 
 
@@ -238,10 +246,18 @@ body {
     cursor: pointer;
     transition: opacity 0.2s ease-in-out;
     text-transform: uppercase;
+    text-align: center;
+    padding: 10px;
+    white-space: nowrap;
+    margin: 0.6rem;
 }
 
 .btn:hover {
     opacity: 0.5;
+}
+
+.hist-item {
+    /*font-size: 0.7rem;*/
 }
 
 .modal {

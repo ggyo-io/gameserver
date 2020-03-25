@@ -73,9 +73,9 @@ func loadLoginData(user string, data *indexData) {
 	db.Where("white = ? OR black = ?", user, user).Order("created_at DESC").Limit(20).Find(&games)
 	data.History = make([]historyGame, len(games))
 	for i, game := range games {
-		name := game.White + " vs. " + game.Black + " on " + game.CreatedAt.String()
 		url := "?game=" + game.ID
-		hg := historyGame{Name: name, URL: url}
+		hg := historyGame{White: game.White, Black: game.Black, Time: game.CreatedAt.String(), URL: url,
+			Outcome: game.Outcome}
 		data.History[i] = hg
 	}
 }

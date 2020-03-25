@@ -20,6 +20,10 @@ type indexData struct {
 }
 
 type historyGame struct {
-	URL  string
-	Name string
+	URL     string
+	Time    string
+	Name    string
+	White   string
+	Black   string
+	Outcome string
 }

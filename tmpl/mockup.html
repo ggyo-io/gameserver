@@ -67,38 +67,40 @@
                 <div class="item"></div>
                 <div class="item"></div>
             </div> <!-- end of pgn -->
-            <div class="grid small-fonts" id="select-game">
-                <form class="item" id="select-foe"> Select Foe
-                    <div class="radiobtn">
-                        <input type="radio" id="human"
-                               name="drone" value="human" checked/>
-                        <label for="human">Human</label>
-                    </div>
+        </div> <!-- end of game -->
 
-                    <div class="radiobtn">
-                        <input type="radio" id="stockfish"
-                               name="drone" value="stockfish"/>
-                        <label for="stockfish">Stockfish</label>
-                    </div>
+        <div class="grid" id="select-game">
+            <form class="item" id="select-foe"> Select Foe
+                <div class="radiobtn">
+                    <input type="radio" id="human"
+                           name="drone" value="human" checked/>
+                    <label for="human">Human</label>
+                </div>
 
-                    <div class="radiobtn">
-                        <input type="radio" id="lc0"
-                               name="drone" value="lc0"/>
-                        <label for="lc0">lc0</label>
-                    </div>
-                </form> <!-- select foe -->
-                <form class="item" id="select-color"> Select Color
-                    <div class="radiobtn">
-                        <input type="radio" id="any"
-                               name="drone" value="any" checked/>
-                        <label for="any">Any</label>
-                    </div>
+                <div class="radiobtn">
+                    <input type="radio" id="stockfish"
+                           name="drone" value="stockfish"/>
+                    <label for="stockfish">Stockfish</label>
+                </div>
 
-                    <div class="radiobtn">
-                        <input type="radio" id="white"
-                               name="drone" value="white"/>
-                        <label for="white">White</label>
-                    </div>
+                <div class="radiobtn">
+                    <input type="radio" id="lc0"
+                           name="drone" value="lc0"/>
+                    <label for="lc0">lc0</label>
+                </div>
+            </form> <!-- select foe -->
+            <form class="item" id="select-color"> Select Color
+                <div class="radiobtn">
+                    <input type="radio" id="any"
+                           name="drone" value="any" checked/>
+                    <label for="any">Any</label>
+                </div>
+
+                <div class="radiobtn">
+                    <input type="radio" id="white"
+                           name="drone" value="white"/>
+                    <label for="white">White</label>
+                </div>
 
                 <div class="radiobtn">
                     <input type="radio" id="black"
@@ -119,21 +121,25 @@
                     <label for="300+5">5m+5s</label>
                 </div>
 
-                              <div class="radiobtn">
-                        <input type="radio" id="60+1"
-                               name="drone" value="60+1"/>
-                        <label for="60+1">1m+1s</label>
-                    </div>
-                </form> <!-- select tc -->
-            </div> <!-- end of select game -->
-            <div class="item btn btn-gray" id="start">play</div>
-        </div> <!-- end of game -->
+                <div class="radiobtn">
+                    <input type="radio" id="60+1"
+                           name="drone" value="60+1"/>
+                    <label for="60+1">1m+1s</label>
+                </div>
+            </form> <!-- select tc -->
+        </div> <!-- end of select game -->
+
+        <div class="item btn" id="start">play</div>
+
         <div class="grid container" id="history">
-            <div class="item" id="hgame1">
-                <span class="item" id="result1">Won 1-0</span>
-                <span class="item" id="players1">Pi(1500) - Dor(1500)</span>
+            {{range .History}}
+            <div class="item hist-item">
+                <span class="item hist-time">{{.Time}}</span>
+                <span class="item hist-result" id="1">{{.Outcome}}</span>
+                <span class="item hist-players">{{.White}}(1500) - {{.Black}}(1500)</span>
             </div>
-        </div>
+            {{end}}
+        </div> <!-- end of game history -->
     </div> <!-- end of div class="content" -->
     <footer class="app-footer" id="buttons">
         <ul>
@@ -158,17 +164,12 @@
     <script src="/static/js/utils.js"></script>
     <script src="/static/js/ws.js"></script>
     <script src="/static/js/status.js"></script>
-    <!--
-    <script src="/static/js/signin.js"></script>
-    -->
     <script src="/static/js/w2/select-game.js"></script>
-    <script src="/static/js/toolbar.js"></script>
     <script src="/static/js/w2/players.js"></script>
     <script src="/static/js/w2/buttons.js"></script>
-    <script src="/static/js/w2/game.js"></script>
-    <script src="/static/js/w2/history.js"></script>
+    <script src="/static/js/w2/game-history.js"></script>
+    <script src="/static/js/w2/game-div.js"></script>
     <script src="/static/js/w2/pgn.js"></script>
-    <script src="/static/js/modal.js"></script>
     <script src="/static/js/mockup.js"></script>
 
 </body>
