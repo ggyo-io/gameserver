@@ -88,6 +88,7 @@
         // var signin = SignIn();
 
         var gameDiv = GameDiv({ id: 'game'});
+        var startBtn = StartBtn({id: 'start'});
         var widgets = [
             status,
             selectGame,
@@ -96,6 +97,7 @@
             buttons,
             history,
             gameDiv,
+            startBtn,
             // signin
         ];
 
@@ -627,8 +629,8 @@
                 onMoveEnd: onMoveEnd,
                 onSnapEnd: onSnapEnd
             };
-            return {};
-            // return ChessBoard(id, cfg);
+            // return {};
+            return ChessBoard(id, cfg);
         };
 
         function initEvents() {
@@ -636,40 +638,41 @@
             widgets.forEach(function(item, index) {
                 console.log(index + '. init events widget name: ' + item.name);
                 console.log(index + '. init events widget id: ' + item.id());
-                if (item.events !== undefined)
+                if (typeof item.events === "function") {
                     item.events();
+                }
             });
         }
 
         function resize() {
-            // var w = window.innerWidth;
-            // var h = window.innerHeight;
+            var w = window.innerWidth;
+            var h = window.innerHeight;
             //
             // // set REM size
             // var fontSize = Math.floor((w * h) / (64 * 64 * 16));
             // document.querySelector('html').style.fontSize = fontSize + 'px';
             //
-            // // Vertical Layout
-            // var gameGrid = '"top-player" "board" "bottom-player" "pgn"';
-            // document.querySelector('#board').style.width = w + 'px';
-            // if (w > 600) {
-            //     // Horizontal Layout
-            //     gameGrid = '"board top-player" "board pgn" "board bottom-player"';
-            //     document.querySelector('#board').style.width = 0.7 * h + 'px';
-            // }
-            // document.querySelector('#game').style.gridTemplateAreas = gameGrid;
-            // board.resize();
-            // players.resize(board.orientation());
-            // orientation = board.orientation();
-            //
-            // var bel = document.querySelector('#board');
-            // var bs = window.getComputedStyle(bel);
-            //
-            // var bmh = bs.height;
-            // var bmw = bs.width;
-            //
-            // console.log('resize() window: ' + window.innerWidth + 'X' + window.innerHeight +
-            //     ' board:' + bmw + 'X' + bmh);
+            // Vertical Layout
+            var gameGrid = '"top-player" "board" "bottom-player" "pgn"';
+            document.querySelector('#board').style.width = w + 'px';
+            if (w > 600) {
+                // Horizontal Layout
+                gameGrid = '"board top-player" "board pgn" "board bottom-player"';
+                document.querySelector('#board').style.width = 0.7 * h + 'px';
+            }
+            document.querySelector('#game').style.gridTemplateAreas = gameGrid;
+            board.resize();
+            players.resize(board.orientation());
+            orientation = board.orientation();
+
+            var bel = document.querySelector('#board');
+            var bs = window.getComputedStyle(bel);
+
+            var bmh = bs.height;
+            var bmw = bs.width;
+
+            console.log('resize() window: ' + window.innerWidth + 'X' + window.innerHeight +
+                ' board:' + bmw + 'X' + bmh);
 
         }
 
