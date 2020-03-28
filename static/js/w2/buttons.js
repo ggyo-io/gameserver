@@ -103,6 +103,10 @@
                 return;
             }
 
+            if (!widget.game_started() && !widget.browsing()) {
+                return;
+            }
+
             if (widget.browsing() === false) {
                 widget.browsing(true);
                 widget.printStatus("Browsing");
@@ -126,15 +130,16 @@
             if (widget.browsing() === false) {
                 return;
             }
-            widget.browsingGame().move(widget.game().history()[widget.browsingGame().history().length]);
-            widget.board().position(widget.browsingGame().fen());
-            widget.printFen(widget.browsingGame().fen());
-            widget.printPgn(widget.browsingGame().pgn());
             if (widget.browsingGame().history().length === widget.game().history().length) {
                 widget.browsing(false);
                 widget.browsingGame(null);
                 widget.updateStatus();
+                return;
             }
+            widget.browsingGame().move(widget.game().history()[widget.browsingGame().history().length]);
+            widget.board().position(widget.browsingGame().fen());
+            widget.printFen(widget.browsingGame().fen());
+            widget.printPgn(widget.browsingGame().pgn());
         }
 
         function flipBtn() {

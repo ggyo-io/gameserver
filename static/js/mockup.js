@@ -524,9 +524,13 @@
 
         function showFinishedGame(pgn) {
             game = new Chess();
+            browsingGame = new Chess();
             console.log("load history game load_pgn: " + game.load_pgn(pgn, {
                 sloppy: true
             }));
+            browsingGame.load_pgn(pgn, {
+                sloppy: true
+            });
             var fen = game.fen();
             console.log("fen is: " + fen);
             board = makeBoard(BOARD_ID, fen, orientation);
@@ -683,7 +687,9 @@
             initEvents();
 
             // make board + events
-            board = makeBoard(BOARD_ID, 'start', 'white');
+            if (board === null) {
+                board = makeBoard(BOARD_ID, 'start', 'white');
+            }
             $('#' + BOARD_ID).mousedown(mouseDownBoard);
             $('#' + BOARD_ID).mouseup(mouseUpBoard);
 
@@ -713,8 +719,8 @@
         function initState() {
             state = states.choose_game;
             if (PGN !== '') {
-                state = states.browsing;
                 showFinishedGame(PGN);
+                startBrowsing();
             }
         }
 
