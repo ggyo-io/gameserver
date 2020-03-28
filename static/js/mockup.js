@@ -87,8 +87,8 @@
         });
         // var signin = SignIn();
 
-        var gameDiv = GameDiv({ id: 'game'});
-        var startBtn = StartBtn({id: 'start'});
+        var gameDiv = GameDiv({ id: 'game' });
+        var startBtn = StartBtn({ id: 'start' });
         var widgets = [
             status,
             selectGame,
@@ -442,7 +442,7 @@
         function outcome(msg) {
             status.printStatus("The outcome is: '" + msg + "', click the Start button for a new game");
             console.log("opponent outcome '" + msg + "'");
-            state = states.browsing;
+            state = states.choose_game;
             players.stopRunningCountdown();
             updateView();
         }
