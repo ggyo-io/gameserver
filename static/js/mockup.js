@@ -285,13 +285,13 @@
             // checkmate?
             if (game.in_checkmate() === true) {
                 s = 'Game over, ' + moveColor + ' is in checkmate.';
-                state = states.browsing;
+                outcome(s);
             }
 
             // draw?
             else if (game.in_draw() === true) {
                 s = 'Game over, drawn position';
-                state = states.browsing;
+                outcome(s);
             }
 
             // game still on

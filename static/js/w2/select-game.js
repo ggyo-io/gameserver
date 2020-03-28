@@ -13,7 +13,7 @@
             onkey: enter
         }];
 
-        widget.active = states.choose_game | states.browsing;
+        widget.active = states.choose_game;
         widget.id = function() { return id; };
 
         var closeButton = document.querySelector("#match-cancel");
@@ -54,7 +54,7 @@
             return [f, c, t];
         };
 
-        widget.updateMatching = function (msg) {
+        widget.updateMatching = function(msg) {
             document.getElementById("players-online").innerHTML = msg.Map.PlayersPlaying || 0;
             document.getElementById("players-inqueue").innerHTML = msg.Map.PlayersInQueue || 0;
         };

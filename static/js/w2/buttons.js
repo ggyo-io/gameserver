@@ -132,7 +132,6 @@
             }
             if (widget.browsingGame().history().length === widget.game().history().length) {
                 widget.browsing(false);
-                widget.browsingGame(null);
                 widget.updateStatus();
                 return;
             }
