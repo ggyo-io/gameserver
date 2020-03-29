@@ -1,5 +1,6 @@
 package main
 
+
 func loadLoginData(user string, data *indexData) {
 	var games []Game
 	db.Where("white = ? OR black = ?", user, user).Order("created_at DESC").Limit(20).Find(&games)
@@ -23,4 +24,17 @@ func findGame(id string) *Game {
 	return &game
 }
 
+// Record the game in DB
+func (b *Board) recordGame() {
+	game := b.game
+	game.State = b.chess.String()
+	game.WhiteClock = b.clock.timeLeft[whiteColor].Milliseconds()
+	game.BlackClock = b.clock.timeLeft[blackColor].Milliseconds()
+	game.WhiteElo = b.white.Elo(b.game.Mode)
+	game.BlackElo = b.black.Elo(b.game.Mode)
+	game.Outcome = string(b.chess.Outcome())
+	if err := db.Save(game).Error; err != nil {
+		panic(err)
+	}
+}
 

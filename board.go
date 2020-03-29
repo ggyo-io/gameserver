@@ -261,20 +261,6 @@ func (b *Board) onClose(bp *boardPlayer) error {
 	return nil
 }
 
-// Record the game in DB
-func (b *Board) recordGame() {
-	game := b.game
-	game.State = b.chess.String()
-	game.WhiteClock = b.clock.timeLeft[whiteColor].Milliseconds()
-	game.BlackClock = b.clock.timeLeft[blackColor].Milliseconds()
-	game.WhiteElo = b.white.Elo(b.game.Mode)
-	game.BlackElo = b.black.Elo(b.game.Mode)
-	game.Outcome = string(b.chess.Outcome())
-	if err := db.Save(game).Error; err != nil {
-		panic(err)
-	}
-}
-
 func (b *Board) sendToFoe(bp *boardPlayer, message *Message) error {
 	foe := b.foe(bp)
 	if foe == nil {
