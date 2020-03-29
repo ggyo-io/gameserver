@@ -130,18 +130,8 @@
         </div> <!-- end of select game -->
 
         <div class="item btn" id="start">play</div>
+        <div class="grid container" id="history"></div>
 
-        <div class="grid container" id="history">
-            {{range .History}}
-            <div class="item hist-item">
-                <a href="{{.URL}}">
-                    <span class="item hist-time">{{.Time}}</span>
-                    <span class="item hist-result" id="1">{{.Outcome}}</span>
-                    <span class="item hist-players">{{.White}}(1500) - {{.Black}}(1500)</span>
-                </a>
-            </div>
-            {{end}}
-        </div> <!-- end of game history -->
     </div> <!-- end of div class="content" -->
     <footer class="app-footer" id="buttons">
         <ul>

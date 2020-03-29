@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -55,7 +56,6 @@ func (i *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if user != "" {
 		data.UserName = user
 		data.IsAnnon = false
-		loadLoginData(user, &data)
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
@@ -66,29 +66,6 @@ func (i *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Error parsing the template: %s\n", err)
 	}
-}
-
-func loadLoginData(user string, data *indexData) {
-	var games []Game
-	db.Where("white = ? OR black = ?", user, user).Order("created_at DESC").Limit(20).Find(&games)
-	data.History = make([]historyGame, len(games))
-	for i, game := range games {
-		url := "?game=" + game.ID
-		hg := historyGame{White: game.White, Black: game.Black, Time: game.CreatedAt.String(), URL: url,
-			Outcome: game.Outcome}
-		data.History[i] = hg
-	}
-}
-
-func findGame(id string) *Game {
-	if id == "" {
-		return nil
-	}
-	var game Game
-	if db.Where("id = ?", id).First(&game).RecordNotFound() {
-		return nil
-	}
-	return &game
 }
 
 func register(w http.ResponseWriter, r *http.Request) {
@@ -167,4 +144,23 @@ func clearSession(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 	delete(session.Values, "user")
 	session.Save(r, w)
+}
+
+func history(w http.ResponseWriter, r *http.Request) {
+	user := getUserName(r, true)
+	if user == "" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+
+	idxData := &indexData{}
+	loadLoginData(user, idxData)
+	if msgb, err := json.Marshal(idxData); err == nil {
+		w.Write(msgb)
+	} else {
+		log.Print("ERROR marshaling game history json", err)
+	}
+
 }

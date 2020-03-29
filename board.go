@@ -267,6 +267,8 @@ func (b *Board) recordGame() {
 	game.State = b.chess.String()
 	game.WhiteClock = b.clock.timeLeft[whiteColor].Milliseconds()
 	game.BlackClock = b.clock.timeLeft[blackColor].Milliseconds()
+	game.WhiteElo = b.white.Elo(b.game.Mode)
+	game.BlackElo = b.black.Elo(b.game.Mode)
 	game.Outcome = string(b.chess.Outcome())
 	if err := db.Save(game).Error; err != nil {
 		panic(err)

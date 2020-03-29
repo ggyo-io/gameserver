@@ -702,8 +702,14 @@
         var updateView = function() {
             widgets.forEach(function(item, index) {
                 if (item.active === undefined) return;
-                if (item.active & state) $('#' + item.id()).show();
-                else $('#' + item.id()).hide();
+                var show = false;
+                if (item.active & state) {
+                    $('#' + item.id()).show();
+                    show = true;
+                } else $('#' + item.id()).hide();
+                if (typeof item.show === "function") {
+                    item.show(show);
+                }
             });
         };
 

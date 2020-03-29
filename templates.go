@@ -21,9 +21,11 @@ type indexData struct {
 
 type historyGame struct {
 	URL     string
-	Time    string
+	Time    int64
 	Name    string
 	White   string
 	Black   string
 	Outcome string
+	WhiteElo int
+	BlackElo int
 }
