@@ -91,6 +91,7 @@ body {
     padding: 0.6rem;
     font-size: 0.85rem;
     margin-top: 0.6rem;
+    display: none;
 }
 
 .app-footer ul {
@@ -146,6 +147,7 @@ body {
 /* Game */
 
 #game {
+    display: none;
     grid-auto-columns: min-content;
     /*justify-content: center;*/
     /*grid-template-columns: 1fr;*/
