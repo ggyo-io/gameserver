@@ -27,11 +27,12 @@
             if (result.History.constructor === Array) {
                 for (var i = 0; i < result.History.length; i++) {
                     var hi = result.History[i];
-                    div.innerHTML += "<div class='item hist-item'>\n" +
-                        "  <span class='item hist-time'><a href='" + hi.URL+"'>" + formatDate(hi.Time) + "</a></span>\n" +
-                        "  <span class='item hist-result'>" + hi.Outcome + "</span>\n" +
-                        "  <span class='item hist-players'>" + hi.White + "(1500) - " + hi.Black + "(1500)</span>\n" +
-                        "</div>";
+                    div.innerHTML += `
+<div class='item hist-item'>
+    <span class='item hist-time'><a href='${hi.URL}'>${formatDate(hi.Time)}</a></span>
+    <span class='item hist-result'>${hi.Outcome}</span>
+    <span class='item hist-players'>${hi.White} (${hi.WhiteElo}) - ${hi.Black} + (${hi.BlackElo})</span>
+</div>`;
                 }
             }
         };
