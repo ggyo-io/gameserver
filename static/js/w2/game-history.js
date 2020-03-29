@@ -16,8 +16,8 @@
                 $.get("/history").done(widget.render).fail(function (err) {
                         console.log("error loading history: " + err);
                     });
-                widget.visible = yesno;
             }
+            widget.visible = yesno;
         };
 
         widget.render = function (result) {
