@@ -483,7 +483,6 @@
             myColor = msg.Color;
             if (myColor != orientation) {
                 board.orientation(myColor);
-                resize();
             }
             orientation = myColor;
             var whiteName, blackName;
@@ -518,6 +517,7 @@
             board = makeBoard(BOARD_ID, fen, orientation);
 
             updateStatus();
+            resize();
             pushGameClock(msg);
         }
 
@@ -657,14 +657,14 @@
             // document.querySelector('html').style.fontSize = fontSize + 'px';
             //
             // Vertical Layout
-            var gameGrid = '"top-player" "board" "bottom-player" "pgn"';
-            document.querySelector('#board').style.width = w + 'px';
-            if (w > 600) {
+            // var gameGrid = '"top-player" "board" "bottom-player" "pgn"';
+            // document.querySelector('#board').style.width = w + 'px';
+            // if (w > 600) {
                 // Horizontal Layout
-                gameGrid = '"board top-player" "board pgn" "board bottom-player"';
-                document.querySelector('#board').style.width = 0.7 * h + 'px';
-            }
-            document.querySelector('#game').style.gridTemplateAreas = gameGrid;
+                // gameGrid = '"board top-player" "board pgn" "board bottom-player"';
+                // document.querySelector('#board').style.width = 0.7 * h + 'px';
+            // }
+            // document.querySelector('#game').style.gridTemplateAreas = gameGrid;
             board.resize();
             players.resize(board.orientation());
             orientation = board.orientation();
@@ -706,7 +706,9 @@
                 if (item.active & state) {
                     $('#' + item.id()).show();
                     show = true;
-                } else $('#' + item.id()).hide();
+                } else {
+                    $('#' + item.id()).hide();
+                }
                 if (typeof item.show === "function") {
                     item.show(show);
                 }
@@ -734,8 +736,8 @@
             if (initContainerEl() !== true) return;
 
             initState();
-            initDom();
             updateView();
+            initDom();
             connectToServer();
         }
 

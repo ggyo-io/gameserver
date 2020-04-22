@@ -6,7 +6,6 @@
         widget.active = states.playing | states.browsing;
         widget.id = function() { return cfg.id; };
         widget.events = function () {};
-
         return widget;
     };
 }());

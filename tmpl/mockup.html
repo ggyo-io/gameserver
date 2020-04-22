@@ -18,8 +18,8 @@
         var UserName = "{{.UserName}}";
         var PGN = "{{.PGN}}";
     </script>
-    <header class="app-header container">
-        <div class="log-div">
+    <header class="app-header">
+        <div class="log-div container">
             <a class="logo" href="/">gameserver</a>
         </div>
         <div class="usermenu">
@@ -39,16 +39,18 @@
 
 
         <div class="grid container" id="game">
-            <div class="item" id="board"></div>
-            <div class="item player" id="black-player">
-                <div id="black-clock" class="clock large-fonts">⌛&nbsp;00:00&nbsp;</div>
-                <div id="black-name" class="name small-fonts">🕶&nbsp;</div>
-                <div id="black-elo" class="elo small-fonts">🏆&nbsp;</div>
+            <div class="item player" id="top-player">
+                <div id="top-clock" class="clock large-fonts">⌛&nbsp;00:00&nbsp;</div>
+                <div id="top-name" class="name small-fonts">🕶&nbsp;</div>
+                <div id="top-elo" class="elo small-fonts">🏆&nbsp;</div>
             </div>
-            <div class="item player" id="white-player" >
-                <div id="white-clock" class="clock large-fonts">⌛&nbsp;00:00&nbsp;</div>
-                <div id="white-name" class="name small-fonts">👓&nbsp;</div>
-                <div id="white-elo" class="elo small-fonts">🏆&nbsp;</div>
+
+            <div class="item" id="board"></div>
+
+            <div class="item player" id="bottom-player" >
+                <div id="bottom-clock" class="clock large-fonts">⌛&nbsp;00:00&nbsp;</div>
+                <div id="bottom-name" class="name small-fonts">👓&nbsp;</div>
+                <div id="bottom-elo" class="elo small-fonts">🏆&nbsp;</div>
             </div>
             <div class="grid container small-fonts" id="pgn">
                 <div class="item"></div>
@@ -141,6 +143,7 @@
             <li class="btn" id="←">←</li>
             <li class="btn" id="→">→</li>
             <li class="btn" id="↔">↔</li>
+            <li class="btn" id="home">Home</li>
         </ul>
     </footer>
     <div id="matching-dialog" class="modal closed">

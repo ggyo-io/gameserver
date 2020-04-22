@@ -7,15 +7,15 @@
         widget.name = 'Players';
 
         var id = widget.id,
-            WHITE_PLAYER_ID = "white-player",
-            WHITE_NAME_ID = 'white-name',
-            WHITE_CLOCK_ID = 'white-clock',
-            WHITE_ELO_ID = 'white-elo',
+            TOP_PLAYER_ID = "top-player",
+            TOP_NAME_ID = 'top-name',
+            TOP_CLOCK_ID = 'top-clock',
+            TOP_ELO_ID = 'top-elo',
 
-            BLACK_PLAYER_ID = "black-player",
-            BLACK_NAME_ID = 'black-name',
-            BLACK_CLOCK_ID = 'black-clock',
-            BLACK_ELO_ID = 'black-elo';
+            BOTTOM_PLAYER_ID = "bottom-player",
+            BOTTOM_NAME_ID = 'bottom-name',
+            BOTTOM_CLOCK_ID = 'bottom-clock',
+            BOTTOM_ELO_ID = 'bottom-elo';
 
         var runningTimer = null,
             nextDistance = null;
@@ -27,35 +27,34 @@
 
         widget.resize = function(o) {
             if (o === 'white') {
-
-                $('#' + WHITE_PLAYER_ID).removeClass('top-player');
-                $('#' + WHITE_PLAYER_ID).addClass('bottom-player');
-                $('#' + BLACK_PLAYER_ID).removeClass('bottom-player');
-                $('#' + BLACK_PLAYER_ID).addClass('top-player');
+                $('#' + TOP_PLAYER_ID).removeClass('top-player');
+                $('#' + TOP_PLAYER_ID).addClass('bottom-player');
+                $('#' + BOTTOM_PLAYER_ID).removeClass('bottom-player');
+                $('#' + BOTTOM_PLAYER_ID).addClass('top-player');
             } else {
-                $('#' + WHITE_PLAYER_ID).removeClass('bottom-player');
-                $('#' + WHITE_PLAYER_ID).addClass('top-player');
-                $('#' + BLACK_PLAYER_ID).removeClass('top-player');
-                $('#' + BLACK_PLAYER_ID).addClass('bottom-player');
+                $('#' + TOP_PLAYER_ID).removeClass('bottom-player');
+                $('#' + TOP_PLAYER_ID).addClass('top-player');
+                $('#' + BOTTOM_PLAYER_ID).removeClass('top-player');
+                $('#' + BOTTOM_PLAYER_ID).addClass('bottom-player');
             }
         };
 
         widget.printWhiteName = function(n) {
-            $('#' + WHITE_NAME_ID).html('👓&nbsp;' + n);
+            $('#' + TOP_NAME_ID).html('👓&nbsp;' + n);
         };
 
         widget.printBlackName = function(n) {
-            $('#' + BLACK_NAME_ID).html('🕶&nbsp;' + n);
+            $('#' + BOTTOM_NAME_ID).html('🕶&nbsp;' + n);
         };
 
         function printElo(id, elo) {
             $('#' + id).html('🏆&nbsp;' + elo);
         }
         widget.printWhiteElo = function(elo) {
-            printElo(WHITE_ELO_ID, elo);
+            printElo(TOP_ELO_ID, elo);
         };
         widget.printBlackElo = function(elo) {
-            printElo(BLACK_ELO_ID, elo);
+            printElo(BOTTOM_ELO_ID, elo);
         };
 
         function printClock(divId, distance) {
@@ -72,11 +71,11 @@
         }
 
         widget.printWhiteClock = function(distance) {
-            printClock(WHITE_CLOCK_ID);
+            printClock(TOP_CLOCK_ID);
         };
 
         widget.printBlackClock = function(distance) {
-            printClock(BLACK_CLOCK_ID);
+            printClock(BOTTOM_CLOCK_ID);
         };
 
         //------------------------------------------------------------------------------
@@ -119,11 +118,11 @@
         }
 
         widget.startWhiteCountdown = function(distance) {
-            startCountdown(WHITE_CLOCK_ID, distance);
+            startCountdown(TOP_CLOCK_ID, distance);
         };
 
         widget.startBlackCountdown = function(distance) {
-            startCountdown(BLACK_CLOCK_ID, distance);
+            startCountdown(BOTTOM_CLOCK_ID, distance);
         };
 
         widget.stopRunningCountdown = function() {

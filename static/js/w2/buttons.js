@@ -43,6 +43,10 @@
             {
                 id: '↔',
                 onclick: flipBtn,
+            },
+            {
+                id: 'home',
+                onclick: homeBtn,
             }
         ];
 
@@ -53,6 +57,24 @@
             buttons.forEach(function(item, index) {
                 buttonEvent(item);
             });
+        };
+
+        widget.show = function(yesno) {
+            if (!yesno)
+                return;
+
+            if (widget.game_started()) {
+                $('#home').hide();
+                $('#undo').show();
+                $('#resign').show();
+                $('#draw').show();
+            }
+            if (widget.browsing()) {
+                $('#home').show();
+                $('#undo').hide();
+                $('#resign').hide();
+                $('#draw').hide();
+            }
         };
 
         //------------------------------------------------------------------------------
@@ -131,8 +153,6 @@
                 return;
             }
             if (widget.browsingGame().history().length === widget.game().history().length) {
-                widget.browsing(false);
-                widget.updateStatus();
                 return;
             }
             widget.browsingGame().move(widget.game().history()[widget.browsingGame().history().length]);
@@ -149,6 +169,10 @@
             }
             widget.board().flip();
             widget.onResize();
+        }
+
+        function homeBtn() {
+            window.location.href = '/';
         }
 
         widget.resize = function(top, left, width, height, fontSize) {
