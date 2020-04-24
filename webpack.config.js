@@ -26,6 +26,7 @@ class CleanUpExtractCssChunks {
 const config = {
     mode: 'development',
     entry: {
+        vendor: ['jquery', 'jquery-ui'],
         application: path.resolve(__dirname, './src/application.js'),
     },
     devtool: 'inline-source-map',
@@ -105,7 +106,7 @@ const config = {
             }
         ),
         new CleanUpExtractCssChunks(),
-        new CleanWebpackPlugin(),
+        // new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: 'Development',
             template: './src/index.html',
@@ -116,7 +117,8 @@ const config = {
         filename: production ? '[name]-[chunkhash].js' : '[name].js',
         chunkFilename: production ? '[name]-[chunkhash].js' : '[name].js',
         path: __dirname + '/dist',
-        publicPath: '/'
+        publicPath: '/html/',
+        path: path.join(__dirname, 'public', 'html'),
     },
     resolve: {
         modules: [

@@ -7,11 +7,12 @@
     <link rel="stylesheet" href="/static/css/chessboard.css">
     <link rel="stylesheet" href="/static/css/mobile-select.css">
     <link rel="stylesheet" href="/static/css/mockup.css">
+    <link rel="stylesheet" href="/static/js/vendor/bootstrap.css">
 
-    <script src="/static/js/jquery-3.4.1.js"></script>
-    <script src="/static/js/jquery-ui.js"></script>
-    <script src="/static/js/chessboard.js"></script>
-    <script src="/static/js/chess.min.js"></script>
+    <script src="/static/js/vendor/jquery-3.4.1.js"></script>
+    <script src="/static/js/vendor/jquery-ui.js"></script>
+    <script src="/static/js/vendor/chessboard.js"></script>
+    <script src="/static/js/vendor/chess.min.js"></script>
 </head>
 <body>
     <script>
@@ -35,9 +36,7 @@
             {{end}}
         </div>
     </header>
-    <div class="content">
-
-
+    <div class="container-fluid">
         <div class="grid container" id="game">
             <div class="item player" id="top-player">
                 <div id="top-clock" class="clock large-fonts">⌛&nbsp;00:00&nbsp;</div>
@@ -71,8 +70,9 @@
             </div> <!-- end of pgn -->
         </div> <!-- end of game -->
 
-        <div class="grid" id="select-game">
-            <form class="item" id="select-foe">Foe
+        <div class="container-md position-relative">
+            <div class="grid select-game-container" id="select-game">
+                <form class="item" id="select-foe">Foe
                 <div class="radiobtn">
                     <input type="radio" id="human"
                            name="drone" value="human" checked/>
@@ -91,7 +91,7 @@
                     <label for="lc0">lc0</label>
                 </div>
             </form> <!-- select foe -->
-            <form class="item" id="select-color">Color
+                <form class="item" id="select-color">Color
                 <div class="radiobtn">
                     <input type="radio" id="any"
                            name="drone" value="any" checked/>
@@ -110,7 +110,7 @@
                     <label for="black">Black</label>
                 </div>
             </form> <!-- select time control -->
-            <form class="item" id="select-tc">Time
+                <form class="item" id="select-tc">Time
                 <div class="radiobtn">
                     <input type="radio" id="900+15"
                            name="drone" value="900+15" checked/>
@@ -129,10 +129,20 @@
                     <label for="60+1">1m+1s</label>
                 </div>
             </form> <!-- select tc -->
-        </div> <!-- end of select game -->
-
-        <div class="item btn" id="start">play</div>
-        <div class="grid container" id="history"></div>
+                <div class="btn btn-secondary btn-sm btn-block start-button mt-3" id="start" data-target="matching-dialog">play</div>
+            </div> <!-- end of select game -->
+            <div class="grid container" id="history" style="">
+                <div class="d-flex bd-highlight">
+                    <div class="item hist-time flex-fill"><a href="?game=c2daa1795e254ac39aa2e4337ac2560f">22:35</a></div>
+                    <div class="item hist-result align-content-center flex-fill"></div>
+                    <div class="item hist-players flex-fill">mzonenac (0) - mz (0)</div>
+                </div>
+                <div class="d-flex bd-highlight">
+                    <div class="item hist-time flex-fill"><a href="?game=23a80ff7f1bf4bcebff8bf3f8f55badb">22:33</a></div>
+                    <div class="item hist-result align-content-center flex-fill"></div>
+                    <div class="item hist-players flex-fill">mzonenac (0) - mz (0)</div>
+                </div></div>
+        </div>
 
     </div> <!-- end of div class="content" -->
     <footer class="app-footer" id="buttons">
@@ -146,16 +156,30 @@
             <li class="btn" id="home">Home</li>
         </ul>
     </footer>
-    <div id="matching-dialog" class="modal closed">
-        <div class="container" id="matching-status">
-            <h2 class="item">Waiting for match...</h2>
-            <div class="item "><div class="lds-ring"><div></div><div></div><div></div><div></div></div></div>
-            <div class="item">Players playing:  <span id="players-online"></span></div>
-            <div class="item">Players in queue:  <span id="players-inqueue"></span></div>
-            <div class="item btn" id="match-cancel">✕ Cancel</div>
+
+    <div id="matching-dialog" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title">Waiting for match...</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="item">Players playing:  <span id="players-online">4</span></div>
+                    <div class="item mb-4">Players in queue:  <span id="players-inqueue">3</span></div>
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="modal-overlay" class="modal-overlay closed"></div>
+    <script src="/static/js/vendor/bootstrap.js"></script>
     <script src="/static/js/utils.js"></script>
     <script src="/static/js/ws.js"></script>
     <script src="/static/js/status.js"></script>

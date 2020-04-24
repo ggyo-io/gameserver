@@ -9,8 +9,6 @@ import "bootstrap/dist/js/bootstrap";
 import "./css/mobile-select.css";
 import "./css/mockup.css";
 
-import "./js/jquery-3.4.1";
-import "./js/jquery-ui";
 import "./js/chessboard";
 import "./js/chess.min";
 import "./js/status";

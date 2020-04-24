@@ -16,12 +16,10 @@
         widget.active = states.choose_game;
         widget.id = function() { return id; };
 
-        var closeButton = document.querySelector("#match-cancel");
-        closeButton.addEventListener("click", function() {
-            toggleModal("matching-dialog");
+        $("#matching-dialog").on('hide.bs.modal', () => {
             wsConn.send({
-                Cmd: "cancel"
-            });
+                        Cmd: "cancel"
+                    });
         });
 
         // event, say buttons, handler initialization
@@ -59,13 +57,11 @@
             document.getElementById("players-inqueue").innerHTML = msg.Map.PlayersInQueue || 0;
         };
 
-        function startBtn() {
+        function startBtn(e) {
             if (widget.game_started()) {
                 printStatus("Ignore start, Move! The game is not over yet, resign if you'd like...");
                 return;
             }
-
-            widget.board().start();
             widget.printStatus("Waiting for a match...");
 
             var vals = widget.selected();
@@ -80,7 +76,8 @@
                 Color: colorParam,
                 TimeControl: tcParam
             });
-            toggleModal("matching-dialog");
+            const {target: {dataset: {target}}} = e;
+            $(`#${target}`).modal('show');
         }
 
 

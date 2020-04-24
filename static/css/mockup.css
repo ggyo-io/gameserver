@@ -176,10 +176,10 @@ body {
 }
 
 #start {
-    align-self: start;
-    justify-self: start;
-    background: var(--footer-background);
-    box-shadow: 0.2rem 0.2rem 0.6rem var(--header-shadow-color);
+    /*align-self: start;*/
+    /*justify-self: start;*/
+    /*background: var(--footer-background);*/
+    /*box-shadow: 0.2rem 0.2rem 0.6rem var(--header-shadow-color);*/
 }
 
 
@@ -204,10 +204,6 @@ body {
 
 .elo {
     grid-area: elo;
-}
-
-.hist-item {
-    white-space: nowrap;
 }
 
 .large-fonts {
@@ -235,11 +231,18 @@ body {
 
 /* Select game */
 
-#select-game {
+.select-game-container {
     grid-template-areas: 'foe color tc';
     margin: 0.6rem;
 }
-
+.action-container {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+}
+#start.start-button {
+  margin: 0;
+    grid-column: 1/4;
+}
 
 /* Buttons */
 
@@ -258,48 +261,28 @@ body {
 }
 
 .hist-item {
-    /*font-size: 0.7rem;*/
-}
-
-.modal {
+    font-size: 0.7rem;
     display: grid;
-    /* Probably need media queries here */
-    width: 400px;
-    max-width: 100%;
-    height: 200px;
-    max-height: 100%;
-    position: fixed;
-    z-index: 100;
-    left: 50%;
-    top: 50%;
-    /* Use this for centering if unknown width/height */
-    transform: translate(-50%, -50%);
-    /* If known, negative margins are probably better (less chance of blurry text). */
-    /* margin: -200px 0 0 -200px; */
-    background: white;
-    box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.9);
-    justify-content: center;
-    align-content: center;
+    grid-template-columns: repeat(3, 1fr);
+    flex-direction: column;
+    flex-direction: row;
 }
-
-#matching-dialog .item {
-    text-align: center;
+.hist-item .item.hist-time {
+    grid-column: 1;
 }
-
-.closed {
-    display: none;
+.hist-item .item.hist-result {
+    grid-column: 2;
 }
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
+.hist-item .item.hist-result span {
     width: 100%;
-    height: 100%;
-    z-index: 50;
-
-    background: rgba(0, 0, 0, 0.6);
 }
+.hist-item .item.hist-players {
+    grid-column: 3;
+}
+.white-space {
+    white-space: nowrap;
+}
+
 /* Change layout on Desktop */
 
 @media only screen and (orientation: landscape) {

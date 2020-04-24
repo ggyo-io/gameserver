@@ -29,9 +29,9 @@
                     var hi = result.History[i];
                     div.innerHTML += `
 <div class='item hist-item'>
-    <span class='item hist-time'><a href='${hi.URL}'>${formatDate(hi.Time)}</a></span>
-    <span class='item hist-result'>${hi.Outcome}</span>
-    <span class='item hist-players'>${hi.White} (${hi.WhiteElo}) - ${hi.Black} (${hi.BlackElo})</span>
+    <div class='item hist-time d-flex align-items-center'><a href='${hi.URL}'><span>${formatDate(hi.Time)}</span></a></div>
+    <div class='item hist-result text-center d-flex align-items-center'><span>${hi.Outcome}</span></div>
+    <div class='item hist-players d-flex align-items-center'><span><span class="white-space">${hi.White} (${hi.WhiteElo})</span> - <span class="white-space">${hi.Black} (${hi.BlackElo})</span></span></div>
 </div>`;
                 }
             }

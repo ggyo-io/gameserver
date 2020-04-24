@@ -479,7 +479,7 @@
         }
 
         function start(msg) {
-            toggleModal("matching-dialog");
+            $("#matching-dialog").modal('hide');
             myColor = msg.Color;
             if (myColor != orientation) {
                 board.orientation(myColor);
