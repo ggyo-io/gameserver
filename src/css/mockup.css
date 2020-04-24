@@ -1,0 +1,316 @@
+:root {
+    --header-color: #cccccc;
+    --header-shadow-color: #888888;
+    --grid-item-border: #ccc;
+    --footer-background: #f4f4f4;
+    --footer-color: #444;
+}
+
+html,
+body {
+    /* https://css-tricks.com/couple-takes-sticky-footer/ */
+    height: 100%;
+
+    /* font-size: calc([minimum size] + ([maximum size] - [minimum size]) * ((100vw - [minimum viewport width]) / ([maximum viewport width] - [minimum viewport width]))); */
+    font-size: calc(18px + (20 - 18) * ((100vw - 300px) / (1600 - 300)));
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    font-family: 'Times', serif;
+}
+
+
+/* For sticky footer - grow to fill the space */
+
+.content {
+    /*flex: 1 0 auto;*/
+}
+
+.container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0.6rem;
+}
+
+.app-header {
+    background: var(--header-color);
+    box-shadow: 0.2rem 0.2rem 0.3rem var(--header-shadow-color);
+    display: flex;
+    justify-content: space-between;
+    color: var(--footer-color);
+    white-space: nowrap;
+    width: 100%;
+}
+
+.app-header a {
+    text-decoration: none;
+    color: var(--footer-color);
+}
+
+.logo {
+    font-size: 1.8rem;
+}
+
+.usermenu {
+    display: flex;
+    align-items: center;
+}
+
+.usermenu img {
+    flex-grow: 0;
+    flex-shrink: 0;
+    padding: 0.8rem;
+}
+
+.grid {
+    display: grid;
+    grid-gap: 0.25rem;
+}
+
+.grid .item {
+    border: 1px var(--grid-item-border) solid;
+    padding: 0.6rem;
+    box-shadow: 1px 1px 2px var(--grid-item-border);
+    border-radius: 3px;
+}
+
+.app-footer {
+    background: var(--footer-background);
+    box-shadow: 0.2rem 0.2rem 0.6rem var(--header-shadow-color);
+    flex-shrink: 0;
+    color: var(--footer-color);
+    padding: 0.6rem;
+    font-size: 0.85rem;
+    margin-top: 0.6rem;
+    display: none;
+}
+
+.app-footer ul {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.app-footer ul li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/*==  Spinner  ==*/
+.lds-ring {
+    display: inline-block;
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+.lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    margin: 4px;
+    border: 4px solid #000;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #000 transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+@keyframes lds-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+/*==  Spinner END ==*/
+
+/* Game */
+
+#game {
+    display: flex;
+    flex-direction: column;
+    /*grid-auto-columns: min-content;*/
+
+    /*grid-template-areas:*/
+    /*        "top-player"*/
+    /*        "board"*/
+    /*        "bottom-player"*/
+    /*        "pgn";*/
+
+}
+
+.top-player {
+    grid-area: top-player;
+    align-self: start;
+}
+
+#board {
+    grid-area: board;
+    width: 100%;
+    /*padding-bottom: 100%;*/
+}
+
+.bottom-player {
+    grid-area: bottom-player;
+    align-self: end;
+}
+
+#start {
+    align-self: start;
+    justify-self: start;
+    background: var(--footer-background);
+    box-shadow: 0.2rem 0.2rem 0.6rem var(--header-shadow-color);
+}
+
+
+/* Player divs */
+
+.player {
+    display: grid;
+    grid-template-areas: "clock name" "clock elo";
+    grid-auto-columns: min-content;
+    grid-auto-rows: min-content;
+    justify-self: start;
+    /*margin: auto;*/
+}
+
+.clock {
+    grid-area: clock;
+}
+
+.name {
+    grid-area: name;
+}
+
+.elo {
+    grid-area: elo;
+}
+
+.hist-item {
+    white-space: nowrap;
+}
+
+.large-fonts {
+    font-size: 2rem;
+}
+
+.small-fonts {
+    font-size: 0.8rem;
+}
+
+
+/* PGN */
+
+#pgn {
+    grid-template-areas: 'r1 r1w r1b r2 r2w r2b' 'r3 r3w r3b r4 r4w r4b';
+    grid-area: pgn;
+}
+
+#pgn div {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+}
+
+
+/* Select game */
+
+#select-game {
+    grid-template-areas: 'foe color tc';
+    margin: 0.6rem;
+}
+
+
+/* Buttons */
+
+.btn {
+    cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 10px;
+    white-space: nowrap;
+    margin: 0.6rem;
+}
+
+.btn:hover {
+    opacity: 0.5;
+}
+
+.hist-item {
+    /*font-size: 0.7rem;*/
+}
+
+.modal {
+    display: grid;
+    /* Probably need media queries here */
+    width: 400px;
+    max-width: 100%;
+    height: 200px;
+    max-height: 100%;
+    position: fixed;
+    z-index: 100;
+    left: 50%;
+    top: 50%;
+    /* Use this for centering if unknown width/height */
+    transform: translate(-50%, -50%);
+    /* If known, negative margins are probably better (less chance of blurry text). */
+    /* margin: -200px 0 0 -200px; */
+    background: white;
+    box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.9);
+    justify-content: center;
+    align-content: center;
+}
+
+#matching-dialog .item {
+    text-align: center;
+}
+
+.closed {
+    display: none;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+
+    background: rgba(0, 0, 0, 0.6);
+}
+/* Change layout on Desktop */
+
+@media only screen and (orientation: landscape) {
+
+    #game {
+        display: grid;
+        grid-template-areas: 'board top-player' 'board pgn' 'board bottom-player';
+        grid-template-rows: 1fr 2fr 1fr;
+        grid-template-columns: 1fr 1fr;
+    }
+    #pgn {
+        grid-template-areas: 'r1 r1w r1b' 'r2 r2w r2b' 'r3 r3w r3b' 'r4 r4w r4b';
+    }
+}
