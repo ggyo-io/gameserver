@@ -259,13 +259,14 @@ body {
 .btn:hover {
     opacity: 0.5;
 }
-
+.game-history-container {
+    grid-column: 1/4;
+}
 .hist-item {
     font-size: 0.7rem;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     flex-direction: column;
-    flex-direction: row;
 }
 .hist-item .item.hist-time {
     grid-column: 1;
