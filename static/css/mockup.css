@@ -44,11 +44,8 @@ body {
 .app-header {
     background: var(--header-color);
     box-shadow: 0.2rem 0.2rem 0.3rem var(--header-shadow-color);
-    display: flex;
     justify-content: space-between;
-    color: var(--footer-color);
     white-space: nowrap;
-    width: 100%;
 }
 
 .app-header a {
@@ -60,9 +57,18 @@ body {
     font-size: 1.8rem;
 }
 
+.logo-div {
+    margin: 0 auto;
+    padding: 0.6rem;
+}
+a.logo:hover {
+    text-decoration: none;
+    color: var(--footer-color);
+}
+
 .usermenu {
-    display: flex;
-    align-items: center;
+    /*display: flex;*/
+    /*align-items: center;*/
 }
 
 .usermenu img {

@@ -8,32 +8,49 @@
     <link rel="stylesheet" href="/static/css/mobile-select.css">
     <link rel="stylesheet" href="/static/css/mockup.css">
     <link rel="stylesheet" href="/static/js/vendor/bootstrap.css">
+    <link rel="stylesheet" href="/static/js/vendor/all.css">
+
+
 
     <script src="/static/js/vendor/jquery-3.4.1.js"></script>
     <script src="/static/js/vendor/jquery-ui.js"></script>
     <script src="/static/js/vendor/chessboard.js"></script>
     <script src="/static/js/vendor/chess.min.js"></script>
+    <script src="/static/js/vendor/popper.min.js"></script>
+
 </head>
 <body>
     <script>
         var UserName = "{{.UserName}}";
         var PGN = "{{.PGN}}";
     </script>
-    <header class="app-header">
-        <div class="log-div container">
+    <header class="d-flex flex-row app-header bd-highlight">
+        <div class="p-2 bd-highlight ml-2">
             <a class="logo" href="/">gameserver</a>
         </div>
-        <div class="usermenu">
-            {{if not .IsAnnon}}
-            <div class="container">{{.UserName}}</div>
-            <img id="menu-img" class="btn" src="img/menu.svg" onclick="$('#logout-form').submit();">
-            <form id="logout-form" action="/logout" method="GET"></form>
-            {{end}}
-            {{if .IsAnnon}}
-            <div class="btn">
-                <a href="/static/login.html">sign in</a>
+        <div class="usermenu p-2 bd-highlight">
+            <div class="dropdown dropleft">
+                <button class="btn btn-secondary btn-sm dropdown-toggle"
+                        type="button" id="userLogin"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false">
+                    {{if not .IsAnnon}}
+                    <i class="fas fa-user-circle"></i>
+                    {{else}}
+                    <i class="far fa-user-circle"></i>
+                    {{end}}
+                   {{.UserName}}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="userLogin">
+                    {{if .IsAnnon}}
+                    <a class="dropdown-item" href="/static/login.html">Sign in</a>
+                    {{else}}
+                    <a class="dropdown-item" href="#" onclick="$('#logout-form').submit();">Logout</a>
+                    {{end}}
+                </div>
             </div>
-            {{end}}
+            <form id="logout-form" action="/logout" method="GET"></form>
         </div>
     </header>
     <div class="container-fluid">
