@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import './style.css';
+import './style.scss';
 import Routing from './Routing'
 
 ReactDOM.render(<Routing />, document.querySelector("#root"));
