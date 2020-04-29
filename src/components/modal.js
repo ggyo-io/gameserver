@@ -1,6 +1,8 @@
 import React from "react";
 import {Button} from "react-bootstrap";
 import {Modal} from "react-bootstrap";
+import {popover} from "./popover";
+import {OverlayTrigger} from "react-bootstrap";
 import { useState } from 'react';
 
 const Example = () => {
@@ -11,9 +13,11 @@ const Example = () => {
 
     return (
         <>
+            <OverlayTrigger tigger={['hover', 'focus']} placement="right" overlay={popover}>
             <Button variant="primary" onClick={handleShow}>
                 Launch demo modal
             </Button>
+            </OverlayTrigger>
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
