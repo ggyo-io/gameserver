@@ -1,28 +1,9 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import {Home} from "./pages/home";
 import {About} from "./pages/about";
 import {Topics} from "./pages/topics";
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link,
-    useLocation,
-    useRouteMatch,
-    useParams
-} from "react-router-dom";
-
-function usePageViews() {
-    let location = useLocation();
-    React.useEffect(() => {
-        ga.send(["/", location.pathname]);
-    }, [location]);
-}
-
-let Routing;
-export default Routing = () => {
-    // usePageViews();
+import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
+export const Routing = () => {
     return (
         <Router>
             <div>

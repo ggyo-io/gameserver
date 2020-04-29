@@ -14,9 +14,9 @@ const Example = () => {
     return (
         <>
             <OverlayTrigger tigger={['hover', 'focus']} placement="right" overlay={popover}>
-            <Button variant="primary" onClick={handleShow}>
-                Launch demo modal
-            </Button>
+                <Button variant="primary" onClick={handleShow}>
+                    Launch demo modal
+                </Button>
             </OverlayTrigger>
 
             <Modal show={show} onHide={handleClose}>
