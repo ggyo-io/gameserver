@@ -1,8 +1,15 @@
 # Game Server
 
 
-Generic game server for turn based games such as chess
+Generic game server template for React with Routing and State managment
 
+install:
+1. npm install or yarn install
+2. npm start or yarn start (automatically open template on port 9100)
+
+
+
+_____________________________________________________________________
 Local build and run:
 make run
 
