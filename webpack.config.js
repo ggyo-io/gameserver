@@ -1,9 +1,11 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const isDevelopment = process.env.NODE_ENV === 'development'
+const isDevelopment = process.env.NODE_ENV === 'development';
+const path = require("path");
 module.exports = {
     module: {
         rules: [
+            { test: /\.jsx$/, use: "babel-loader" },
             {
                 test: /\.module\.s(a|c)ss$/,
                 loader: [
@@ -86,8 +88,13 @@ module.exports = {
         ]
     },
     resolve: {
+        modules: [
+            path.resolve(__dirname, "..", "/dist"),
+            path.resolve(__dirname, "./", "node_modules")
+        ],
         extensions: ['.js', '.jsx', '.scss']
     },
+    devtool: 'inline-source-map',
     plugins: [
         new HtmlWebPackPlugin({
             template: "./src/index.html",
