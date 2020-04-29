@@ -5,6 +5,8 @@ const Home = () => {
         <a href="https://reacttraining.com/react-router/web/guides/quick-start" target="_blank">React Router</a>
         <div>State manager Easy-Peasy</div>
         <a href="https://github.com/ctrlplusb/easy-peasy" target="_blank">Easy-Peasy</a>
+        <div>UI framework</div>
+        <a href="https://react-bootstrap.github.io/getting-started/introduction" target="_blank">React Bootstarp 4</a>
     </h2>;
 }
 export {Home};
