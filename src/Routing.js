@@ -1,7 +1,6 @@
 import React from "react";
 import {Home} from "./pages/home";
 import {About} from "./pages/about";
-import {Topic} from "./pages/topic";
 import {Topics} from "./pages/topics";
 import {
     BrowserRouter as Router,
@@ -12,7 +11,8 @@ import {
     useParams
 } from "react-router-dom";
 
-export default function Routing() {
+let Routing;
+export default Routing = () => {
     return (
         <Router>
             <div>
