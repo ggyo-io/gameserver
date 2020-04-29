@@ -1,3 +1,0 @@
-function loginOnLoad() {
-    displayErrorMessage();
-}
