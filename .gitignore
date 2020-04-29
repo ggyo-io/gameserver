@@ -21,7 +21,6 @@ npm-debug.log
 *.tgz
 coverage
 .tectonic
-.babelrc
 /clover.xml
 /coverage-final.json
 /lcov-report/
