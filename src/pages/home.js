@@ -1,6 +1,6 @@
 import React from "react";
 import {Button} from "react-bootstrap";
-import {Example} from "../components/modal";
+import {ExampleModal} from "../components/modal";
 
 const Home = () => {
     return <h2>
@@ -14,7 +14,7 @@ const Home = () => {
         <a href="https://github.com/mehmetkose/react-websocket" target="_blank">react-websocket</a>
         <div>
             <h2>Modal for exaple</h2>
-            <Example/>
+            <ExampleModal/>
         </div>
     </h2>;
 }

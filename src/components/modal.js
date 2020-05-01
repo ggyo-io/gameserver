@@ -5,7 +5,7 @@ import {popover} from "./popover";
 import {OverlayTrigger} from "react-bootstrap";
 import { useState } from 'react';
 
-const Example = () => {
+const ExampleModal = () => {
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
@@ -37,4 +37,4 @@ const Example = () => {
     );
 }
 
-export {Example};
+export {ExampleModal};
