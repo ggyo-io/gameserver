@@ -7,6 +7,7 @@ import { Nomatch } from './pages/nomatch';
 import { Layout } from './components/layout';
 import { NavigationBar} from './components/navbar';
 import {Contact} from "./pages/contact";
+import {Play} from "./pages/play";
 
 
 
@@ -20,6 +21,7 @@ class App extends Component {
             <Switch>
               <Route exact path="/" component={Home} />
               <Route path="/about" component={About} />
+              <Route path="/play" component={Play} />
               <Route path="/contact" component={Contact} />
               <Route component={Nomatch} />
             </Switch>
