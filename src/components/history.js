@@ -19,8 +19,8 @@ export const History = () => (
     </tr>
     <tr>
         <td>May 1, 17:59</td>
-        <td>Baum</td>
-        <td>Puta</td>
+        <td>Baum(1807)</td>
+        <td>Puta(2345)</td>
         <td>0 - 1</td>
     </tr>
     </tbody>
