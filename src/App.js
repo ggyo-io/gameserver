@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 import { Home } from './pages/home';
 import { About } from './pages/about';
-import { Nomatch } from './pages/nomatch';
 import { Layout } from './components/layout';
 import { NavigationBar} from './components/navbar';
 import {Contact} from "./pages/contact";
@@ -23,7 +22,6 @@ class App extends Component {
               <Route path="/about" component={About} />
               <Route path="/play" component={Play} />
               <Route path="/contact" component={Contact} />
-              <Route component={Nomatch} />
             </Switch>
           </Router>
         </Layout>
