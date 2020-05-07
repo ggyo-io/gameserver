@@ -3,5 +3,20 @@
     grid-auto-columns: min-content;
     grid-auto-rows: min-content;
     grid-gap: 0.25rem;
+    grid-template-areas:
+            "b tp"
+            "b bp";
 
+}
+
+.player.top {
+    grid-area: tp;
+}
+
+.player.bottom {
+    grid-area: bp;
+}
+
+.board {
+    grid-area: b;
 }

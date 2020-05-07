@@ -30,3 +30,13 @@
     grid-area: elo;
     font-size: 1rem;
 }
+
+.top {
+    grid-area: top-player;
+    align-self: start;
+}
+
+.bottom {
+    grid-area: bottom-player;
+    align-self: end;
+}

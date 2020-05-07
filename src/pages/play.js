@@ -1,13 +1,12 @@
 import React from "react";
-import Chessboard from "chessboardjsx";
 import {Player} from "../components/player";
+import {Board} from "../components/board";
 import "./play.css"
 
 export const Play = () => (
     <div className="play">
-        <h2> Шахматишки </h2>
-        <Player/>
-        <Chessboard position="start"/>
-        <Player/>
+        <Player position="top"/>
+        <Board position="start"/>
+        <Player position="bottom" />
     </div>
 )
