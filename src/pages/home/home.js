@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import {ToggleButton, ToggleButtonGroup} from "react-bootstrap";
-import {History} from "../components/history";
+import {History} from "../../components/history/history";
 
 export const Home = () => (
     <div>
@@ -24,7 +24,7 @@ export const Home = () => (
             variant="secondary"
             size="lg" block
             onClick={() => console.log("play clicked")}
-            href="/play"
+            href="/playboard"
         >
             PLAY
         </Button>

@@ -1,8 +1,22 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const isDevelopment = process.env.NODE_ENV === 'development';
 const path = require("path");
+
 module.exports = {
+    mode: 'none',
+    entry: {
+        gameserver: path.resolve(__dirname, './src/index.js')
+    },
+    output: {
+        path: path.resolve(__dirname , "./dist"),
+        filename: "[name].bundle.js",
+        publicPath: '/'
+    },
+    devServer: {
+        historyApiFallback: true
+    },
     module: {
         rules: [
             { test: /\.jsx$/, use: "babel-loader" },
@@ -89,13 +103,14 @@ module.exports = {
     },
     resolve: {
         modules: [
-            path.resolve(__dirname, "..", "/dist"),
-            path.resolve(__dirname, "./", "node_modules")
+            path.resolve(__dirname, "src"),
+            "node_modules"
         ],
         extensions: ['.js', '.jsx', '.scss']
     },
     devtool: 'inline-source-map',
     plugins: [
+        new CleanWebpackPlugin(),
         new HtmlWebPackPlugin({
             template: "./src/index.html",
             filename: "./index.html",

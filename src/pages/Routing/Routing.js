@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import './App.css';
-import { Home } from './pages/home';
-import { About } from './pages/about';
-import { Layout } from './components/layout';
-import { NavigationBar} from './components/navbar';
-import {Contact} from "./pages/contact";
-import {Play} from "./pages/play";
+import { Home } from '../home/home';
+import { About } from '../about/about';
+import { Layout } from '../../components/layout/layout';
+import { NavigationBar } from '../../components/navigation-bar/navigation-bar';
+import { Contact } from "../contacts/contact";
+import { Playboard } from "../playboard/playboard";
 
 
-
-class App extends Component {
+class Routing extends Component {
   render() {
     return (
       <React.Fragment>
@@ -20,7 +18,7 @@ class App extends Component {
             <Switch>
               <Route exact path="/" component={Home} />
               <Route path="/about" component={About} />
-              <Route path="/play" component={Play} />
+              <Route path="/playboard" component={Playboard} />
               <Route path="/contact" component={Contact} />
             </Switch>
           </Router>
@@ -30,4 +28,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default Routing;
