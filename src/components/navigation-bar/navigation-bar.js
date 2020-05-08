@@ -4,7 +4,7 @@ import './navigation-bar.scss'
 
 export const NavigationBar = () => (
     <>
-        <Navbar expand="lg" bg="dark" variant="dark">
+        <Navbar expand="lg" bg="primary" variant="primary">
             <Navbar.Brand href="/"><strong>Gg</strong>ameserver</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar"/>
             <Navbar.Collapse className="justify-content-end">
