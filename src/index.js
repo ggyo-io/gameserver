@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.scss';
 import Routing from './pages/Routing/Routing';
 import * as serviceWorker from './serviceWorker';
-import 'bootstrap/scss/bootstrap.scss';
+import './index.scss';
 
 
 ReactDOM.render(<Routing />, document.getElementById('root'));
