@@ -8,7 +8,7 @@ const ratio = .35;
 const calculate = (value) => {
     return value * ratio;
 }
-const resizeBoard = (props) => {
+const getSizes = (props) => {
     const {width, height} = props;
     const boardSize = height < width ? Math.min(calculate(height), MaxBoardSize): Math.min(calculate(width), MaxBoardSize)
     return {
@@ -21,7 +21,7 @@ const resizeBoard = (props) => {
 
 export const Board = (props) => {
    const {position} = props;
-   const {size, styleWidth, styleHeight} = resizeBoard(props);
+   const {size, styleWidth, styleHeight} = getSizes(props);
    return <div className="d-flex flex-row justify-content-center">
         <div className="d-flex flex-column">
             <div style={styleWidth} className="align-self-center">
