@@ -1,19 +1,9 @@
 import React from "react";
-import {Player} from "../../components/player/player";
+import ReactResizeDetector from 'react-resize-detector';
 import {Board} from "../../components/board/board";
-import {PGN} from "../../components/pgn/pgn";
+const el = document.getElementById('root');
 
-export const Playboard = () => (
-    <div className="d-flex justify-content-center pt-3">
-        <div className="d-flex flex-column justify-content-between">
-            <PGN/>
-            <div className="d-inline-flex p-3">
-                <Board position="start"/>
-                <div className="d-flex flex-column justify-content-between pl-3">
-                    <Player/>
-                    <Player/>
-                </div>
-            </div>
-        </div>
-    </div>
-)
+export const Playboard = () =>
+        <ReactResizeDetector handleWidth handleHeight targetDomEl={el}>
+            {({ width, height }) => <Board height={height} width={width} position="start"/>}
+        </ReactResizeDetector>
