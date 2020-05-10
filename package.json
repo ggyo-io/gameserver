@@ -10,6 +10,7 @@
     "bootswatch": "4.4.1",
     "chessboardjsx": "^2.4.2",
     "font-awesome-sass": "^4.7.0",
+    "font-awesome-webpack-4": "1.0.0",
     "node-sass": "4.14.0",
     "popper.js": "1.16.1",
     "react": "^16.13.1",
