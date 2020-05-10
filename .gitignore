@@ -20,7 +20,7 @@ npm-debug.log
 *.iml
 *.tgz
 coverage
-.tectonic
+package-lock.json
 /clover.xml
 /coverage-final.json
 /lcov-report/
