@@ -4,9 +4,9 @@ import './board.scss';
 import {Player} from "../player/player";
 import {Moves} from "../moves/moves";
 const MaxBoardSize = 470;
-const ratio = .65;
+const ratio = .6;
 const calculate = (value) => {
-    return value * ratio;
+    return Math.ceil(value * ratio);
 }
 const getSizes = (props) => {
     const {width, height} = props;
