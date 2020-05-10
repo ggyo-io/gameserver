@@ -1,5 +1,4 @@
 import React from "react";
-import FontAwesome from 'react-fontawesome'
 import "./pgn.scss"
 
 export function PGN(props) {
@@ -22,9 +21,7 @@ export function PGN(props) {
         <ul className="pagination" name="PGN">
             <li className="page-item">
                 <a className="page-link move-item" role="button" href="#">
-                    <span aria-hidden="true">
-                        <FontAwesome name="chevron-left"/>
-                    </span>
+                    <span aria-hidden="true">«</span>
                     <span className="sr-only">First</span>
                 </a>
             </li>
