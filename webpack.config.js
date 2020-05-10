@@ -21,6 +21,13 @@ module.exports = {
         rules: [
             { test: /\.jsx$/, use: "babel-loader" },
             {
+                test: /\.svg/,
+                use: {
+                    loader: 'svg-url-loader',
+                    options: {}
+                }
+            },
+            {
                 test: /\.module\.s(a|c)ss$/,
                 loader: [
                     isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
