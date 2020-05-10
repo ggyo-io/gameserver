@@ -8,7 +8,7 @@ const moves = ['1. e2e4', '1. rf1', '2. d2d4',
 export const Moves = () => {
     return <ButtonGroup vertical>
             {
-                moves.map((value, key) => <Button bsPrefix="btn btn-sm mb-2 text-left" key={key} size="sm">{`${value}`}</Button>)
+                moves.map((value, key) => <Button variant="outline-warning" size="sm" key={key}>{`${value}`}</Button>)
             }
         </ButtonGroup>
 }
