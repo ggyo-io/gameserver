@@ -37,7 +37,7 @@ export const Board = (props) => {
                 </div>
             </div>
         </div>
-        <div className="ml-2 align-self-center overflow-auto pr-3" style={styleHeight}>
+        <div className="ml-2 align-self-center overflow-auto pr-3 mt-4" style={styleHeight}>
             <Moves/>
         </div>
    </div>
