@@ -12,7 +12,7 @@ export const Chat = (props) => (
 
             </Card.Body>
         </Card>
-        <InputGroup className="mb-3">
+        <InputGroup>
             <FormControl
                 placeholder="message"
                 aria-label="message"
