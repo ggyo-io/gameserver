@@ -14,7 +14,7 @@ export function PGN(props) {
             active = ' active';
 
         return (
-            <li className={"pgn-item page-item" + active}><a style={style}  className="page-link" role="button" href="#">{move}</a></li>
+            <li key={index} className={"pgn-item page-item" + active}><a style={style}  className="page-link" role="button" href="#">{move}</a></li>
         )
     })
 
