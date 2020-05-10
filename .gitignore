@@ -21,6 +21,7 @@ npm-debug.log
 *.tgz
 coverage
 package-lock.json
+yarn.lock
 /clover.xml
 /coverage-final.json
 /lcov-report/
