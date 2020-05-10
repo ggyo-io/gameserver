@@ -4,7 +4,7 @@ import './board.scss';
 import {Player} from "../player/player";
 import {Moves} from "../moves/moves";
 const MaxBoardSize = 470;
-const ratio = .45;
+const ratio = .65;
 const calculate = (value) => {
     return value * ratio;
 }
@@ -24,6 +24,7 @@ export const Board = (props) => {
    const {size, styleWidth, styleHeight} = getSizes(props);
    return <div className="board-content d-flex flex-row justify-content-center">
         <div className="d-flex flex-column">
+            <div className="mb-2 text-danger align-self-center">Board Width: {size} x {size}</div>
             <div style={styleWidth} className="align-self-center">
                 <div className="mb-2">
                     <Player/>
