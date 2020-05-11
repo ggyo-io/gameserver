@@ -49,24 +49,24 @@ export function PGN(props) {
             <ul className="pagination" name="PGN">
                 <li className="page-item">
                     <a className="page-link move-item" role="button" href="#">
-                        <span aria-hidden="true">«</span>
+                        <span aria-hidden="true"><i className='fa fa-angle-double-left'></i></span>
                         <span className="sr-only">First</span>
                     </a>
                 </li>
                 <li className="page-item">
                     <a className="page-link move-item" role="button" href="#">
-                        <span aria-hidden="true">‹</span>
+                        <span aria-hidden="true"><i className='fa fa-angle-left'></i></span>
                         <span className="sr-only">Previous</span>
                     </a>
                 </li>
                 <li className="page-item">
                     <a className="page-link move-item" role="button" href="#">
-                        <span aria-hidden="true">›</span><span className="sr-only">Next</span>
+                        <span aria-hidden="true"><i className='fa fa-angle-right'></i></span><span className="sr-only">Next</span>
                     </a>
                 </li>
                 <li className="page-item">
                     <a className="page-link move-item" role="button" href="#">
-                        <span aria-hidden="true">»</span>
+                        <span aria-hidden="true"><i className='fa fa-angle-double-right'></i></span>
                         <span className="sr-only">Last</span>
                     </a>
                 </li>
