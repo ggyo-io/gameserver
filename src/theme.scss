@@ -1,3 +1,8 @@
+/* Inject FontAwesome 4 */
+$fa-font-path: '/fonts';
+@import '~font-awesome/scss/font-awesome';
+
+
 @import "~bootswatch/dist/slate/variables";
 @import "~bootstrap/scss/bootstrap";
 @import "~bootswatch/dist/slate/bootswatch";

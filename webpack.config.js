@@ -24,11 +24,8 @@ module.exports = {
                 test: /\.svg/,
                 use: {
                     loader: 'svg-url-loader',
-                    options: {}
                 }
             },
-            { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
-            { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" },
             {
                 test: /\.module\.s(a|c)ss$/,
                 loader: [
@@ -49,6 +46,17 @@ module.exports = {
                 ]
             },
             {
+                test: /\.(eot|woff|woff2|ttf|svg)(\?\S*)?$/,
+                use: [{
+                    loader: 'file-loader',
+                    options: {
+                        name: '[name].[ext]',
+                        outputPath: 'fonts/',
+                        publicPath: '../fonts/'
+                    }
+                }]
+            },
+            {
                 test: /\.s(a|c)ss$/,
                 exclude: /\.module.(s(a|c)ss)$/,
                 loader: [
@@ -59,7 +67,7 @@ module.exports = {
                         options: {
                             sourceMap: isDevelopment
                         }
-                    }
+                    },
                 ]
             },
             {
@@ -108,6 +116,15 @@ module.exports = {
                     },
                 ],
             },
+            {
+                test: /\.svg$/i,
+                use: {
+                    loader: 'react-svg-loader',
+                    options: {
+                        encoding: false
+                    }
+                }
+            }
         ]
     },
     resolve: {
@@ -115,6 +132,9 @@ module.exports = {
             path.resolve(__dirname, "src"),
             "node_modules"
         ],
+        alias: {
+            images: path.resolve(__dirname, '/src/assets')
+        },
         extensions: ['.js', '.jsx', '.scss']
     },
     devtool: 'inline-source-map',
