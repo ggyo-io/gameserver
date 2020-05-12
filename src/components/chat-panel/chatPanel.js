@@ -4,7 +4,7 @@ import "./chat.scss"
 
 export const ChatPanel = (props) => (
         <Card>
-            <Card.Header>Chat</Card.Header>
+            <Card.Header>Chat with Puta</Card.Header>
             <Card.Body>
 
             </Card.Body>

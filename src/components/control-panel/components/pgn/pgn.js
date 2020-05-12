@@ -27,7 +27,7 @@ const _renderMoves = mvpairs.map((pair, index) => (
 );
 
 export const PGN = (props) => {
-    const style = {"max-height": Math.ceil(props.size / 2) + 'px'};
+    const style = {"maxHeight": Math.ceil(props.size / 2) + 'px'};
   return  <Card>
         <Card.Body>
             <div className="d-flex flex-column flex-fill justify-content-between">
