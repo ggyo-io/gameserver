@@ -4,11 +4,11 @@ import {Dialog} from "./components/dialog/dialog";
 import {PGN} from "./components/pgn/pgn";
 
 export const ControlPanel = (props) => (
-        <Card>
+        <Card style={{minWidth:230}}>
             <Card.Body>
                 <div className="d-flex flex-column flex-fill justify-content-around">
                     <div className="box-item mb-2">
-                        <PGN size={props.size}/>
+                        <PGN gameState={props.gameState} setGameState={props.setGameState} size={props.size}/>
                     </div>
                     <div className="box-item">
                         <Dialog/>
