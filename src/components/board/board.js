@@ -1,9 +1,9 @@
 import Chessboard from "chessboardjsx";
 import React from "react";
-import './board.scss';
+import './styles/board.scss';
 import {Player} from "../player/player";
 import {ControlPanel} from "../control-panel/controlPanel";
-import {Chat} from "../chat/chat";
+import {ChatPanel} from "../chat-panel/chatPanel";
 
 const MaxBoardSize = 600;
 const ratio = .6;
@@ -35,7 +35,7 @@ export const Board = (props) => {
                 </div>
                 <Player/>
             </div>
-                <Chat/>
+                <ChatPanel/>
             </div>
         </React.Fragment>
     )
