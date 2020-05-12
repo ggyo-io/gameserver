@@ -1,7 +1,5 @@
 import React from "react";
-import Card from "react-bootstrap/Card";
-import InputGroup from "react-bootstrap/InputGroup";
-import FormControl from "react-bootstrap/FormControl";
+import {Button, InputGroup, Card, FormControl} from "react-bootstrap";
 import "./chat.scss"
 
 export const Chat = (props) => (
@@ -19,7 +17,7 @@ export const Chat = (props) => (
                 aria-describedby="basic-addon"
             />
             <InputGroup.Append>
-                <InputGroup.Text id="basic-addon">Send</InputGroup.Text>
+                <Button variant="secondary">Send</Button>
             </InputGroup.Append>
         </InputGroup>
     </div>
