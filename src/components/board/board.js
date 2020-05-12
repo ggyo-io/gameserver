@@ -29,12 +29,12 @@ export const Board = (props) => {
             <div className='d-flex flex-fill justify-content-between'>
                 <ControlPanel size={size}/>
                 <div style={styleWidth} className="board-content d-flex flex-column">
-                <Player/>
-                <div className="position-relative border-warning p-1">
-                    <Chessboard id="board" position={position} calcWidth={() => size}/>
+                    <Player/>
+                    <div className="position-relative border-warning p-1">
+                        <Chessboard id="board" position={position} calcWidth={() => size}/>
+                    </div>
+                    <Player/>
                 </div>
-                <Player/>
-            </div>
                 <ChatPanel/>
             </div>
         </React.Fragment>
