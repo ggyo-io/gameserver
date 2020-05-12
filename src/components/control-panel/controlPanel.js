@@ -1,7 +1,7 @@
 import React from "react";
-import {ButtonGroup, Card, Button} from "react-bootstrap";
-import {Dialog} from "../dialog/dialog";
-import {PGN} from "../pgn/pgn";
+import {Card} from "react-bootstrap";
+import {Dialog} from "./components/dialog/dialog";
+import {PGN} from "./components/pgn/pgn";
 
 export const ControlPanel = (props) => (
         <Card>
@@ -10,7 +10,7 @@ export const ControlPanel = (props) => (
                     <div className="box-item mb-2">
                         <PGN size={props.size}/>
                     </div>
-                    <div className="box-item align-self-end">
+                    <div className="box-item">
                         <Dialog/>
                     </div>
                 </div>
