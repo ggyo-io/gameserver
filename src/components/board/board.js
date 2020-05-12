@@ -30,7 +30,7 @@ const initGameState = ()=> {
     const browsing = false;
     let position = "start";
     if (gameState.browseIndex > 0) {
-        if (gameState.browseIndex === history.length - 1) {
+        if (gameState.browseIndex === history.length) {
             position = chess.fen()
         } else {
             const tmpChess = new Chess();
