@@ -35,7 +35,7 @@ export const PGN = (props) => {
   return  <Card>
         <Card.Body>
             <div className="d-flex flex-column flex-fill justify-content-between">
-                <div className="pgn-table-div box-item mb-2" style={style}>
+                <div className="overflow-auto box-item mb-2" style={style}>
                     <Table striped bordered hover responsive="sm">
                         <tbody>
                         {moves}
