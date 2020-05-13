@@ -26,6 +26,36 @@ const renderMoves = (props) => {
     return _renderMoves;
 }
 
+const reactToKeys = (props, e) => {
+    const left = 37;
+    const up = 38;
+    const right = 39;
+    const down = 40;
+    const leftClick = () => setBrowseIndex(props, props.gameState.browseIndex - 1);
+    const rightClick = () => setBrowseIndex(props, props.gameState.browseIndex + 1);
+    const upClick = () => setBrowseIndex(props, 0);
+    const downClick = () => setBrowseIndex(props, props.gameState.chess.history().length);
+
+    let doClick = () => {};
+    switch (e.which) {
+        case left:
+            doClick = leftClick;
+            break;
+        case right:
+            doClick = rightClick;
+            break;
+        case up:
+            doClick = upClick;
+            break;
+        case down:
+            doClick = downClick;
+            break;
+        default:
+            return; // not our key
+    }
+    e.preventDefault(); // prevent the default action (scroll / move caret)
+    doClick();
+}
 
 const setBrowseIndex = (props, number) => {
     props.setGameState({
@@ -35,9 +65,14 @@ const setBrowseIndex = (props, number) => {
 }
 
 
+let handler = (e) => {};
 export const PGN = (props) => {
     const style = {"maxHeight": Math.ceil(props.size / 2) + 'px'};
     const _renderMoves = renderMoves(props);
+
+    window.removeEventListener('keydown', handler)
+    handler = (e) => reactToKeys(props, e);
+    window.addEventListener('keydown', handler)
 
     return  <Card>
         <Card.Body>
