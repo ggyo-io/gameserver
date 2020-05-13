@@ -56,7 +56,7 @@ export const Board = (props) => {
                 <div style={styleWidth} className="board-content d-flex flex-column">
                     <Player/>
                     <div className="position-relative border-warning p-1">
-                        <Chessboard id="board" position={position} calcWidth={() => size}/>
+                        <Chessboard id="board" transitionDuration={0} position={position} calcWidth={() => size}/>
                     </div>
                     <Player/>
                 </div>
