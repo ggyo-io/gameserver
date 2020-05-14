@@ -67,25 +67,30 @@ const reactToKeys = (props, e) => {
 }
 
 const setBrowseIndex = (props, number) => {
+    const chess = props.gameState.chess
+    if (number < 0 || number > chess.history().length)
+        return
+
     props.setGameState({
-        chess: props.gameState.chess,
+        chess: chess,
         browseIndex: number
     })
 }
 
 
-let handler = (e) => {};
 export const PGN = (props) => {
     const style = {"maxHeight": Math.ceil(props.size / 2) + 'px'};
     const _renderMoves = renderMoves(props);
+    const handler = (e) => reactToKeys(props, e);
 
-    window.removeEventListener('keydown', handler)
-    handler = (e) => reactToKeys(props, e);
-    window.addEventListener('keydown', handler)
     useEffect(()=> {
         const el = document.querySelector(".pgn-scroll-to")
         if (el)
             el.scrollIntoView({block: "center"})
+        window.addEventListener('keydown', handler)
+        return ()=> {
+            window.removeEventListener('keydown', handler)
+        }
     })
 
     return  <Card>
