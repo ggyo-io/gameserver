@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Table, Pagination, Card} from "react-bootstrap";
 import "./pgn.scss";
 
@@ -10,8 +10,11 @@ const renderMoves = (props) => {
         return result;
     }, []);
     const currentMove = (idx) => {
+        if (idx === 1 && props.gameState.browseIndex === 0) {
+            return "pgn-scroll-to"
+        }
         if (idx === props.gameState.browseIndex) {
-            return "table-secondary"
+            return "table-secondary pgn-scroll-to"
         }
         return ""
     }
@@ -79,6 +82,11 @@ export const PGN = (props) => {
     window.removeEventListener('keydown', handler)
     handler = (e) => reactToKeys(props, e);
     window.addEventListener('keydown', handler)
+    useEffect(()=> {
+        const el = document.querySelector(".pgn-scroll-to")
+        if (el)
+            el.scrollIntoView({block: "center"})
+    })
 
     return  <Card>
         <Card.Body>
