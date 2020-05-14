@@ -9,15 +9,21 @@ const renderMoves = (props) => {
         (index % 2 === 0) ? result.push(array.slice(index, index + 2)) : '';
         return result;
     }, []);
+    const currentMove = (idx) => {
+        if (idx === props.gameState.browseIndex) {
+            return "table-secondary"
+        }
+        return ""
+    }
     const _renderMoves = mvpairs.map((pair, index) => (
             <tr key={index}>
                 <td>
                     <strong>{index + 1}.</strong>
                 </td>
-                <td>
+                <td className={currentMove(index*2+1)}>
                     <a href="#" onClick={() => setBrowseIndex(props,index*2+1)}>{pair[0]}</a>
                 </td>
-                <td>
+                <td className={currentMove((index+1)*2)}>
                     {pair.length === 2 ? <a href="#" onClick={() => setBrowseIndex(props,(index+1)*2)}>{pair[1]}</a>: '-'}
                 </td>
             </tr>
