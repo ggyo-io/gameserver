@@ -1,5 +1,16 @@
+// no header? :(
+`[Event "Paul Morphy - Duke Karl Count Isouard (1858.??.??)"]
+[Site "Paris (France)"]
+[Date "1858.??.??"]
+[Round "?"]
+[White "Paul Morphy"]
+[Black "Duke of Brunswick and Count Isouard"]
+[Result "1-0"]
+`
+
 const pgn = `
-1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 e5 6. Ndb5 d6 7. Nd5 Nxd5 8. exd5 Ne7 9. c4 Ng6 10. Qa4 Bd7 11. Qb4 Bf5 12. Qa4 Bd7 13. Qb4 Bf5 14. h4 h5 15. Bg5 Qb8 16. Be2 a6 17. Nc3 Qc7 18. g3 Be7 19. Be3 e4 20. O-O O-O 21. Bxh5 Ne5 22. Be2 Qd7 23. Qa4 Qc8 24. c5 dxc5 25. Nxe4 c4 26. Nc3 b5 27. Qd1 b4 28. Na4 Be4 29. Qd4 Qf5 30. f4 Qg6 31. Bf2 Nd3 32. h5 Qf5 33. Bg4 Qxg4 34. Qxe4 Bd6 35. Qg2 Rae8 36. Bd4 Qxh5 37. Qf3 Qg6 38. Kh1 Re4 39. Bf2 Rfe8
-`;
+1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8.
+Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14.
+Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0`;
 
 export {pgn};

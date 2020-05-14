@@ -25,8 +25,8 @@ const getSizes = (props) => {
 const initGameState = ()=> {
     const chess = new Chess()
     chess.load_pgn(pgn, {sloppy: true})
-    const [gameState, setGameState] = useState({browseIndex: 5, chess: chess})
     const history = chess.history()
+    const [gameState, setGameState] = useState({browseIndex: history.length, chess: chess})
     const browsing = false;
     let position = "start";
     if (gameState.browseIndex > 0) {
