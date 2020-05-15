@@ -5,5 +5,5 @@ import 'font-awesome/scss/font-awesome.scss';
 import './theme.scss';
 
 
-ReactDOM.render(<Routing />, document.getElementById('root'));
+ReactDOM.render(<Routing/>, document.getElementById('root'));
 

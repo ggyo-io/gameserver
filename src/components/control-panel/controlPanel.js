@@ -3,6 +3,7 @@ import {Card} from "react-bootstrap";
 import {Dialog} from "./components/dialog/dialog";
 import {PGN} from "./components/pgn/pgn";
 
+
 export const ControlPanel = (props) => (
         <Card>
             <Card.Body>

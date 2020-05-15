@@ -5,7 +5,6 @@ import {actionHandlers} from "./actionHandlers";
 
 
 const view = (props) => {
-console.info(props)
 const {currentLabel, click} = props;
     return <Card>
         <Card.Body>
