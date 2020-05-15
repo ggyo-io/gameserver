@@ -2,9 +2,6 @@ import React from "react";
 import Button from "react-bootstrap/Button";
 import {ToggleButton, ToggleButtonGroup} from "react-bootstrap";
 import {History} from "../../components/history/history";
-import {Login} from "../../components/auth/components/login/login";
-import {Register} from "../../components/auth/components/register/register";
-import {Reset} from "../../components/auth/components/reset/reset";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -45,10 +42,6 @@ export const Home = () => (
         <p/><br/>
         <Row><h5>History</h5></Row>
         <Row><History/></Row>
-        <Row><h5>Authentication</h5></Row>
-        <Row><Login/></Row>
-       <Row><Register/></Row>
-       <Row><Reset/></Row>
     </Container>
 )
 

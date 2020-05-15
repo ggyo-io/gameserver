@@ -77,21 +77,22 @@ const setBrowseIndex = (props, number) => {
     })
 }
 
+const keydownEffects = (props) => {
+    const keyHandler = (e) => reactToKeys(props, e);
+    const el = document.querySelector(".pgn-scroll-to");
+    if (el)
+        el.scrollIntoView({ block: "center" });
+    window.addEventListener('keydown', keyHandler);
+    return () => {
+        window.removeEventListener('keydown', keyHandler);
+    };
+}
 
 export const PGN = (props) => {
     const style = {"maxHeight": Math.ceil(props.size / 2) + 'px'};
     const _renderMoves = renderMoves(props);
-    const handler = (e) => reactToKeys(props, e);
 
-    useEffect(()=> {
-        const el = document.querySelector(".pgn-scroll-to")
-        if (el)
-            el.scrollIntoView({block: "center"})
-        window.addEventListener('keydown', handler)
-        return ()=> {
-            window.removeEventListener('keydown', handler)
-        }
-    })
+    useEffect( () =>  keydownEffects(props) )
 
     return  <Card>
         <Card.Body>
@@ -137,4 +138,3 @@ export const PGN = (props) => {
         </Card.Body>
     </Card>
 };
-
