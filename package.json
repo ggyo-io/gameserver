@@ -2,7 +2,6 @@
   "name": "test",
   "version": "0.2.0",
   "private": true,
-
   "dependencies": {
     "@babel/core": "7.9.0",
     "@babel/preset-env": "7.4.2",
@@ -10,9 +9,9 @@
     "bootstrap": "4.4.1",
     "bootswatch": "4.4.1",
     "chess.js": "^0.10.3",
-    "chessboardjsx": "2.4.2",
     "easy-peasy": "3.3.0",
     "font-awesome": "4.7.0",
+    "ggchessboard": "^1.0.2",
     "jquery": "3.5.1",
     "lodash": "4.17.15",
     "popper.js": "1.16.1",
