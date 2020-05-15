@@ -18,8 +18,5 @@ export const actionHandlers = {
             dispatch('TEST_ACTION', {dialog: name});
             setState({currentLabel: null});
         }
-    },
-    "TEST_ACTION": (coeffects) => {
-        console.info(coeffects)
     }
 }

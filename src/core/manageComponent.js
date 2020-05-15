@@ -4,7 +4,7 @@ import devtools from 'unistore/devtools';
 
 
 export default function menageComponent({...args}) {
-    const {initialState, view, actionHandlers} = args;
+    const {initialState, view, actionHandlers, properties} = args;
     let store = process.env.NODE_ENV === 'production' ?  createStore(initialState) : devtools(createStore(initialState));
     const defaults = {
         mapping: () =>  Object.assign({}, store, store.getState()),
@@ -12,7 +12,7 @@ export default function menageComponent({...args}) {
             dispatch: (type, payload) => {
                 const effect = {type: type, payload: payload};
                 const coeffects = Object.assign({}, {effect: effect}, store, store.getState());
-                return actionHandlers[type](coeffects);
+                return actionHandlers[type]? actionHandlers[type](coeffects): '';
             },
             click: (event) => {
                 event.persist();
@@ -23,7 +23,7 @@ export default function menageComponent({...args}) {
             }
         })
     }
-    store = Object.assign({}, store, defaults.actions());
+    store = Object.assign({}, store, defaults.actions(), properties);
     const {mapping, actions} = defaults;
     const Container = connect(mapping, actions)(view);
     return <Provider store={store}>

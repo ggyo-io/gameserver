@@ -4,8 +4,8 @@ import createComponent from 'core/manageComponent';
 import {actionHandlers} from "./actionHandlers";
 
 
-const view = (props) => {
-const {currentLabel, click} = props;
+const view = (properties) => {
+const {currentLabel, click} = properties;
     return <Card>
         <Card.Body>
             {currentLabel ?
