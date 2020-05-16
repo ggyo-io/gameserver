@@ -31,6 +31,7 @@ const {currentLabel, click} = properties;
 
 export const Dialog = () =>  createComponent({
     view,
+    name: 'dialog', /* required */
     actionHandlers,
     initialState: {
         currentLabel: null,

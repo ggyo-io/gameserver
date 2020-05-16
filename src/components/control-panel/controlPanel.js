@@ -6,13 +6,13 @@ import createComponent from "core/manageComponent";
 import {actionHandlers} from "./actionHandlers";
 
 
-const view = (properties) => {
-   const {size} = properties;
+const view = (props) => {
+   const {properties} = props;
     return <Card>
         <Card.Body>
             <div className="d-flex flex-column flex-fill justify-content-around">
                 <div className="box-item mb-2">
-                    <PGN size={size}/>
+                    <PGN size={properties.size}/>
                 </div>
                 <div className="box-item">
                     <Dialog/>
@@ -24,9 +24,10 @@ const view = (properties) => {
 
 export const ControlPanel = (properties) =>  createComponent({
     view,
+    name: 'controlPanel',
     actionHandlers,
     properties,
     initialState: {
-
+      testState: null
     }
 });
