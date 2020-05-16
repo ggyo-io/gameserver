@@ -4,9 +4,8 @@ import './styles/board.scss';
 import {Player} from "../player/player";
 import {ControlPanel} from "../control-panel/controlPanel";
 
-import {pgn} from "./constants"
 import Chess from "chess.js"
-import { ChatPanel } from "../chat-panel/chatPanel";
+import ReactResizeDetector from "react-resize-detector";
 
 const MaxBoardSize = 600;
 const ratio = .6;
@@ -23,12 +22,13 @@ const getSizes = (props) => {
     };
 };
 
-const initGameState = ()=> {
+const getState = (props) => {
     const chess = new Chess()
-    chess.load_pgn(pgn, {sloppy: true})
+    if (props.pgn)
+        chess.load_pgn(props.pgn, {sloppy: true})
+
     const history = chess.history()
     const [gameState, setGameState] = useState({browseIndex: history.length, chess: chess})
-    const browsing = false;
     let position = "start";
     if (gameState.browseIndex > 0) {
         if (gameState.browseIndex === history.length) {
@@ -44,26 +44,33 @@ const initGameState = ()=> {
 }
 
 
-
 export const Board = (props) => {
+    return (
+        <ReactResizeDetector handleWidth handleHeight querySelector="#root">
+            {({width, height}) =>
+                <ResizableBoard {...props} width={width} height={height}/>
+            }
+        </ReactResizeDetector>
+    )
+}
 
+const ResizableBoard = (props) => {
     const {boardId, RightPanel} = props;
     const {size, styleWidth} = getSizes(props)
-    const {gameState, setGameState, position} = initGameState()
+    const {gameState, setGameState, position} = getState(props)
 
-    return (
-        <React.Fragment>
-            <div className='d-flex flex-fill justify-content-between'>
-                <ControlPanel gameState={gameState} setGameState={setGameState} size={size}/>
-                <div style={styleWidth} className="board-content d-flex flex-column">
-                    <Player/>
-                    <div className="position-relative border-warning p-1">
-                        <Chessboard id={boardId} transitionDuration={0} position={position} calcWidth={() => size}/>
-                    </div>
-                    <Player/>
+    return <React.Fragment>
+        <div className='d-flex flex-fill justify-content-between'>
+            <ControlPanel gameState={gameState} setGameState={setGameState} size={size}/>
+            <div style={styleWidth} className="board-content d-flex flex-column">
+                <Player/>
+                <div className="position-relative border-warning p-1">
+                    <Chessboard id={boardId} position={position} calcWidth={() => size}/>
                 </div>
-                {RightPanel(props)}
+                <Player/>
             </div>
-        </React.Fragment>
-    )
+            {RightPanel(props)}
+        </div>
+    </React.Fragment>
+
 }

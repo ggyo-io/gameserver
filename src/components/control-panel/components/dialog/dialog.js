@@ -22,7 +22,7 @@ const {currentLabel, click} = properties;
                 <ButtonGroup size="sm">
                     <Button name="dialog_resign" onClick={click} >Resign</Button>
                     <Button name="dialog_draw" onClick={click}>Draw</Button>
-                    <Button name="dialog_abort" onClick={click}>Abort</Button>
+                    <Button name="dialog_abort" onClick={click}>Fuck You</Button>
                 </ButtonGroup>
             </div>
         </Card.Body>
