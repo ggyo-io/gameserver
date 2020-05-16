@@ -44,6 +44,7 @@ const reactToKeys = (props, e) => {
     const rightClick = () => setBrowseIndex(props, props.gameState.browseIndex + 1);
     const upClick = () => setBrowseIndex(props, 0);
     const downClick = () => setBrowseIndex(props, props.gameState.chess.history().length);
+    console.log(e);
 
     let doClick = () => {};
     switch (e.which) {

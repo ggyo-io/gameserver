@@ -1,28 +1,28 @@
 import React from 'react';
 import Table from "react-bootstrap/Table";
 
-export const History = () => (
+const renderRows = () => {
+    const games = [
+        {time: "18:30", p1: "Baum(1807)", p2: "Durak (1421)", result: "1 - 0"},
+        {time: "May 1, 18:13", p1: "Durak (1419)", p2: "Durak (1421)Baum (1800)", result: "&frac12;-&frac12;"},
+        {time: "May 1, 17:59", p1: "Baum(1807)", p2: "Puta(2345)", result: "0 - 1"}]
 
-<Table striped bordered hover>
-    <tbody>
-    <tr>
-        <td>18:30</td>
-        <td>Baum (1800)</td>
-        <td>Durak (1421)</td>
-        <td>1 - 0</td>
-    </tr>
-    <tr>
-        <td>May 1, 18:13</td>
-        <td>Durak (1419)</td>
-        <td>Baum (1800)</td>
-        <td>&frac12;-&frac12;</td>
-    </tr>
-    <tr>
-        <td>May 1, 17:59</td>
-        <td>Baum(1807)</td>
-        <td>Puta(2345)</td>
-        <td>0 - 1</td>
-    </tr>
-    </tbody>
-</Table>
-)
+    return games.map((game, index) => (
+        <tr onClick={() => window.location = '/analysisboard'}>
+            <td>{game.time}</td>
+            <td>{game.p1}</td>
+            <td>{game.p2}</td>
+            <td>{game.result}</td>
+        </tr>
+
+    ))
+}
+
+export const History = () => {
+    const _renderRows = renderRows()
+    return <Table style={{cursor: 'pointer'}} striped bordered hover>
+        <tbody>
+        {_renderRows}
+        </tbody>
+    </Table>
+}

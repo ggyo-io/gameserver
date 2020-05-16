@@ -16,7 +16,7 @@ export const AnalysisPanel = (props) => {
                     <InputGroup>
                         <Form.Group controlId="analysisForm.ControlPGN">
                             <Form.Label>Paste in PGN</Form.Label>
-                            <Form.Control as="textarea" rows="4" />
+                            <Form.Control as="textarea" rows="4" style={{padding:0, resize: "none"}}/>
                             <Button variant="primary" type="submit" onClick={loadPgn}>Load</Button>
                         </Form.Group>
                     </InputGroup>
