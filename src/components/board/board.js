@@ -3,9 +3,10 @@ import React, {useState} from "react";
 import './styles/board.scss';
 import {Player} from "../player/player";
 import {ControlPanel} from "../control-panel/controlPanel";
-import {ChatPanel} from "../chat-panel/chatPanel";
+
 import {pgn} from "./constants"
 import Chess from "chess.js"
+import { ChatPanel } from "../chat-panel/chatPanel";
 
 const MaxBoardSize = 600;
 const ratio = .6;
@@ -46,7 +47,8 @@ const initGameState = ()=> {
 
 export const Board = (props) => {
 
-    const {size, styleWidth, styleHeight} = getSizes(props)
+    const {boardId, RightPanel} = props;
+    const {size, styleWidth} = getSizes(props)
     const {gameState, setGameState, position} = initGameState()
 
     return (
@@ -56,11 +58,11 @@ export const Board = (props) => {
                 <div style={styleWidth} className="board-content d-flex flex-column">
                     <Player/>
                     <div className="position-relative border-warning p-1">
-                        <Chessboard id="board" transitionDuration={0} position={position} calcWidth={() => size}/>
+                        <Chessboard id={boardId} transitionDuration={0} position={position} calcWidth={() => size}/>
                     </div>
                     <Player/>
                 </div>
-                <ChatPanel/>
+                {RightPanel(props)}
             </div>
         </React.Fragment>
     )
