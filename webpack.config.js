@@ -133,7 +133,7 @@ module.exports = {
             "node_modules"
         ],
         alias: {
-            images: path.resolve(__dirname, '/src/assets')
+            core: path.resolve(__dirname, 'src/core')
         },
         extensions: ['.js', '.jsx', '.scss']
     },
