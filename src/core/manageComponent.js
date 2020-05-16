@@ -42,7 +42,7 @@ export default function menageComponent({...args}) {
             }
         })
     }
-    Object.assign(store, defaults.actions(), {properties: properties});
+    Object.assign(store, defaults.actions(), {properties: properties || {}});
     Object.assign(globalAggregator,  globalStoreAggregator(name, store, actionHandlers));
     const {mapping, actions} = defaults;
     const Container = connect(mapping, actions)(view);
@@ -50,5 +50,3 @@ export default function menageComponent({...args}) {
                  <Container/>
             </Provider>
 }
-
-//mapping:  (store) => Object.assign({}, store, store.getState())

@@ -26,7 +26,5 @@ export const ControlPanel = (properties) =>  createComponent({
     name: 'controlPanel',
     actionHandlers,
     properties,
-    initialState: {
-
-    }
+    initialState: {}
 });
