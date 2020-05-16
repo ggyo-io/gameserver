@@ -1,4 +1,4 @@
-import Chessboard from "ggchessboard";
+import Chessboard from "../ggchessboard";
 import React, {useState} from "react";
 import './styles/board.scss';
 import {Player} from "../player/player";
