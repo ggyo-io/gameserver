@@ -50,6 +50,7 @@ export const Board = (props) => {
     const {boardId, RightPanel} = props;
     const {size, styleWidth} = getSizes(props)
     const {gameState, setGameState, position} = initGameState()
+    console.log(position)
 
     return (
         <React.Fragment>
