@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Home } from '../home/home';
 import { About } from '../about/about';
@@ -10,8 +10,7 @@ import { Playboard } from "../playboard/playboard";
 import { Analysisboard } from "../analysisboard/analysisboard"
 
 
-class Routing extends Component {
-  render() {
+const Routing = () => {
     return (
       <React.Fragment>
         <NavigationBar />
@@ -28,8 +27,8 @@ class Routing extends Component {
           </Router>
         </Layout>
       </React.Fragment>
-    );
-  }
-}
+    )
+  };
+
 
 export default Routing;
