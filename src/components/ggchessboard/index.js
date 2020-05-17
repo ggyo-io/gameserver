@@ -166,10 +166,7 @@ class Chessboard extends Component {
      * Signature: function( { piece: string, sourceSquare: string } ) => bool
      */
     allowDrag: PropTypes.func,
-    /**
-    When set to true it undos previous move
-     */
-    undo: PropTypes.bool
+
   };
 
   static defaultProps = {
@@ -181,7 +178,6 @@ class Chessboard extends Component {
     showNotation: true,
     sparePieces: false,
     draggable: true,
-    undo: false,
     dropOffBoard: 'snapback',
     boardStyle: {},
     lightSquareStyle: { backgroundColor: 'rgb(240, 217, 181)' },
@@ -214,7 +210,6 @@ class Chessboard extends Component {
     squareClicked: false,
     firstMove: false,
     pieces: { ...defaultPieces, ...this.props.pieces },
-    undoMove: this.props.undo
   };
 
   componentDidMount() {
@@ -235,15 +230,13 @@ class Chessboard extends Component {
 
   componentDidUpdate(prevProps) {
     const { position, getPosition } = this.props;
-    const { undoMove } = this.state;
     const positionFromProps = getPositionObject(position);
     const previousPositionFromProps = getPositionObject(prevProps.position);
 
-    // Check if there is a new position coming from props or undo is called
-    if (!isEqual(positionFromProps, previousPositionFromProps) || undoMove) {
+    // Check if there is a new position coming from props
+    if (!isEqual(positionFromProps, previousPositionFromProps)) {
       this.setState({
         previousPositionFromProps: previousPositionFromProps,
-        undoMove: false
       });
 
       // get board position for user
@@ -252,7 +245,7 @@ class Chessboard extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { position, undo } = props;
+    const { position} = props;
     const {
       currentPosition,
       previousPositionFromProps,
@@ -308,19 +301,6 @@ class Chessboard extends Component {
           currentPosition: positionFromProps,
           manualDrop: false,
           squareClicked: false
-        };
-      }
-
-      // allows for taking back a move
-      if (undo) {
-        return {
-          sourceSquare,
-          targetSquare,
-          sourcePiece,
-          currentPosition: positionFromProps,
-          manualDrop: false,
-          squareClicked: false,
-          undoMove: true
         };
       }
 
