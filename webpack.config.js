@@ -101,7 +101,7 @@ module.exports = {
                             return '[path][name].[ext]';
                         }
 
-                        return '[contenthash].[ext]';
+                        return '[path][name].[ext]';
                     },
                 },
             },
@@ -139,7 +139,7 @@ module.exports = {
     },
     devtool: 'inline-source-map',
     plugins: [
-        new CleanWebpackPlugin(),
+        // new CleanWebpackPlugin(),
         new HtmlWebPackPlugin({
             template: "./src/index.html",
             filename: "./index.html",

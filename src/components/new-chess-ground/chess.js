@@ -3,13 +3,17 @@ import React from "react"
 import ReactDOM from "react-dom"
 import Chess from "chess.js"
 import Chessground from "react-chessground"
-// import "react-chessground/dist/styles/chessground.scss"
-import { Icon, List, Col, Row, Modal, Button, Avatar } from "antd"
+import { Col, Row, Modal, Button } from "react-bootstrap"
 import queen from "../../assets/images/wQ.svg";
 import rook from "../../assets/images/wR.svg";
 import bishop from "../../assets/images/wB.svg";
 import knight from "../../assets/images/wN.svg";
-import './styles/styles';
+import "react-chessground/dist/styles/chessground.css"
+// import "react-chessground/dist/assets/chessground.css"
+// import "react-chessground/dist/assets/3d.css"
+// import "react-chessground/dist/assets/examples.css"
+// import "react-chessground/dist/assets/theme.css"
+// import './styles/styles';
 
 const sleep = milliseconds => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -82,8 +86,8 @@ export default class App extends React.Component {
     }, 1000)
 
     componentDidUpdate() {
-        const message = document.getElementById("scroll")
-        message.scrollTop = message.scrollHeight
+        // const message = document.getElementById("scroll")
+        // message.scrollTop = 200 //message.scrollHeight
     }
 
     onMove = (from, to) => {
@@ -263,7 +267,7 @@ export default class App extends React.Component {
                 </Col>
                 <Col span={12} style={{ top: "5%" }}>
                     <Row style={{ marginLeft: "12%", paddingTop: "1%", paddingBottom: "3%", marginRight: "12%" }}>
-                        <Avatar shape="square" style={{ background: "#3c93b0" }} size="large" icon="user" />
+                        {/*<Avatar shape="square" style={{ background: "#3c93b0" }} size="large" icon="user" />*/}
                         <span style={{ marginLeft: 10, color: "white", verticalAlign: "top" }}>test</span>
                         <div style={{ color: "white", float: "right" }}>{opptime}</div>
                     </Row>
@@ -285,33 +289,33 @@ export default class App extends React.Component {
                         }}
                     />
                     <Row style={{ marginLeft: "12%", paddingTop: "3%", paddingBottom: "1%", marginRight: "12%" }}>
-                        <Avatar shape="square" style={{ background: "#3c93b0" }} size="large" icon="user" />
+                        {/*<Avatar shape="square" style={{ background: "#3c93b0" }} size="large" icon="user" />*/}
                         <span style={{ marginLeft: 10, color: "white", verticalAlign: "top" }}>User</span>
                         <div style={{ color: "white", float: "right" }}>{mytime}</div>
                     </Row>
                 </Col>
                 <Col span={3} push={1} style={{ top: "10%" }}>
-                    <List
-                        id="scroll"
-                        header={<h3>History</h3>}
-                        size="small"
-                        style={{ height: "43vw", overflowY: "scroll", background: "white" }}
-                        bordered
-                        dataSource={userHistory}
-                        renderItem={item => (
-                            <List.Item>
-                                <Col span={10} style={{ textAlign: "center" }}>
-                                    {item[0]}
-                                </Col>
-                                <Col span={4} style={{ textAlign: "center" }}>
-                                    <Icon type="right" />
-                                </Col>
-                                <Col span={10} style={{ textAlign: "center" }}>
-                                    {item[1]}
-                                </Col>
-                            </List.Item>
-                        )}
-                    />
+                    {/*<List*/}
+                    {/*    id="scroll"*/}
+                    {/*    header={<h3>History</h3>}*/}
+                    {/*    size="small"*/}
+                    {/*    style={{ height: "43vw", overflowY: "scroll", background: "white" }}*/}
+                    {/*    bordered*/}
+                    {/*    dataSource={userHistory}*/}
+                    {/*    renderItem={item => (*/}
+                    {/*        <List.Item>*/}
+                    {/*            <Col span={10} style={{ textAlign: "center" }}>*/}
+                    {/*                {item[0]}*/}
+                    {/*            </Col>*/}
+                    {/*            <Col span={4} style={{ textAlign: "center" }}>*/}
+                    {/*                <Icon type="right" />*/}
+                    {/*            </Col>*/}
+                    {/*            <Col span={10} style={{ textAlign: "center" }}>*/}
+                    {/*                {item[1]}*/}
+                    {/*            </Col>*/}
+                    {/*        </List.Item>*/}
+                    {/*    )}*/}
+                    {/*/>*/}
                 </Col>
 
                 <Modal visible={visibleUserwin} footer={null}>
