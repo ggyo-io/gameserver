@@ -1,25 +1,35 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
+import fetchHistory from "./loader"
+import {useHistory} from "react-router-dom"
 
-const renderRows = () => {
-    const games = [
-        {time: "18:30", p1: "Baum(1807)", p2: "Durak (1421)", result: "1 - 0"},
-        {time: "May 1, 18:13", p1: "Durak (1419)", p2: "Durak (1421)Baum (1800)", result: "&frac12;-&frac12;"},
-        {time: "May 1, 17:59", p1: "Baum(1807)", p2: "Puta(2345)", result: "0 - 1"}]
+const draw = <span>&frac12;-&frac12;</span>
 
-    return games.map((game, index) => (
-        <tr onClick={() => window.location = '/analysisboard'}>
-            <td>{game.time}</td>
-            <td>{game.p1}</td>
-            <td>{game.p2}</td>
-            <td>{game.result}</td>
-        </tr>
 
-    ))
+const renderRows = (games) => {
+    const history = useHistory();
+    return games.map((game, index) => {
+        const onClick = () => {
+            history.push('/analysisboard', {game: game})
+        };
+        return (
+            <tr key={index} onClick={onClick}>
+                <td>{game.time}</td>
+                <td>{game.p1}</td>
+                <td>{game.p2}</td>
+                <td>{game.result === "1/2-1/2"? draw: game.result}</td>
+            </tr>
+        );
+    })
 }
 
-export const History = () => {
-    const _renderRows = renderRows()
+export const History = (props) => {
+    const [games, setGames] = useState([])
+    useEffect(()=> {
+        fetchHistory("/history", setGames);
+    }, [])
+    const {setState} = props
+    const _renderRows = renderRows(games)
     return <Table style={{cursor: 'pointer'}} striped bordered hover>
         <tbody>
         {_renderRows}
