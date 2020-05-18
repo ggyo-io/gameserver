@@ -1,4 +1,5 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
+const CopyPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -140,6 +141,16 @@ module.exports = {
     devtool: 'inline-source-map',
     plugins: [
         new CleanWebpackPlugin(),
+        
+        new CopyPlugin({
+            patterns: [
+                { from: 'src/assets/img/chesspieces/wikipedia/*.png', 
+                  to: 'img/chesspieces/wikipedia/',
+                  flatten: true
+                 }
+          ],
+        }),
+        
         new HtmlWebPackPlugin({
             template: "./src/index.html",
             filename: "./index.html",
