@@ -3,7 +3,10 @@ import React from "react"
 import ReactDOM from "react-dom"
 import Chess from "chess.js"
 import Chessground from "react-chessground"
-// import "react-chessground/dist/styles/chessground.scss"
+import './styles/theme.css'
+//import './styles/chessground-theme.css'
+import './styles/chessground.css'
+//import './styles/chessground-theme.css'
 import { Icon, List, Col, Row, Modal, Button, Avatar } from "antd"
 import queen from "../../assets/images/wQ.svg";
 import rook from "../../assets/images/wR.svg";
