@@ -1,5 +1,4 @@
 import Chessboard from "../ggchessboard";
-import GGBoard from "../ggboard"
 import React, {useState} from "react";
 import './styles/board.scss';
 import {Player} from "../player/player";
@@ -66,7 +65,7 @@ const ResizableBoard = (props) => {
             <div style={styleWidth} className="board-content d-flex flex-column">
                 <Player/>
                 <div className="position-relative border-warning p-1">
-                    <GGBoard id={boardId} position={position} style={styleWidth}/>
+                    <Chessboard id={boardId} position={position} calcWidth={() => size}/>
                 </div>
                 <Player/>
             </div>
