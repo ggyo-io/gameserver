@@ -10,16 +10,17 @@ export default class GGBoard extends React.Component {
     }
     componentWillUnmount() {
         // destroy?
+        this.board = null;
     }
 
     render() {
         const props = { style: { ...this.props.style } }
-      if (this.props.width) {
-        props.style.width = this.props.width
-      }
-      if (this.props.height) {
-        props.style.height = this.props.height
-      }
-      return <div ref={el => this.el = el} {...props} />
+        if (this.props.width) {
+            props.style.width = this.props.width
+        }
+        if (this.props.height) {
+            props.style.height = this.props.height
+        }
+        return <div ref={el => this.el = el} {...props} />
     }
 }

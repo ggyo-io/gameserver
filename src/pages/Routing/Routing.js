@@ -8,6 +8,8 @@ import { NavigationBar } from '../../components/navigation-bar/navigation-bar';
 import { Contact } from "../contacts/contact";
 import { Playboard } from "../playboard/playboard";
 import { Analysisboard } from "../analysisboard/analysisboard"
+import { GGBoardPage } from "../ggboard"
+import { GGroundPage } from "../gground"
 
 
 const Routing = () => {
@@ -18,9 +20,10 @@ const Routing = () => {
           <Router>
             <Switch>
               <Route exact path="/" component={Home} />
-              <Route path="/about" component={About} />
               <Route path="/playboard" component={Playboard} />
               <Route path="/analysisboard" component={Analysisboard} />
+              <Route path="/ggboard" component={GGBoardPage} />
+              <Route path="/gground" component={GGroundPage} />
               <Route path="/contact" component={Contact} />
               <Route path="/signup" component={Signup} />
             </Switch>

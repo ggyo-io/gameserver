@@ -7,6 +7,7 @@
     "@babel/polyfill": "7.8.7",
     "@babel/preset-env": "7.4.2",
     "@babel/preset-react": "7.0.0",
+    "antd": "3.19.3",
     "bootstrap": "4.4.1",
     "bootswatch": "4.4.1",
     "chess.js": "^0.10.3",
@@ -19,14 +20,18 @@
     "prop-types": "^15.7.2",
     "react": "16.13.1",
     "react-bootstrap": "1.0.1",
+    "react-chessground": "^1.1.0",
     "react-dnd": "2.6.0",
     "react-dnd-html5-backend": "4.0.5",
     "react-dnd-multi-backend": "3.1.2",
     "react-dom": "16.13.1",
+    "react-redux": "7.1.0",
     "react-resize-detector": "4.2.3",
     "react-router-dom": "5.1.2",
+    "react-scripts": "^1.1.4",
     "react-websocket": "2.1.0",
-    "unistore": "^3.5.1"
+    "redux": "4.0.1",
+    "unistore": "3.5.1"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.8.3",
