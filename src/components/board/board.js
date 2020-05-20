@@ -6,9 +6,14 @@ import {ControlPanel} from "../control-panel/controlPanel";
 
 import Chess from "chess.js"
 import ReactResizeDetector from "react-resize-detector";
+import Emitter from "core/emitter";
+import set from "@babel/runtime/helpers/esm/set";
 
 const MaxBoardSize = 600;
 const ratio = .6;
+
+const chess = new Chess()
+
 const calculate = (value) => {
     return Math.ceil(value * ratio);
 }
@@ -23,24 +28,25 @@ const getSizes = (props) => {
 };
 
 const getState = (props) => {
-    const chess = new Chess()
     if (props.pgn)
         chess.load_pgn(props.pgn, {sloppy: true})
 
-    const history = chess.history()
-    const [gameState, setGameState] = useState({browseIndex: history.length, chess: chess})
-    let position = "start";
-    if (gameState.browseIndex > 0) {
-        if (gameState.browseIndex === history.length) {
-            position = chess.fen()
-        } else {
-            const tmpChess = new Chess();
-            for (let i = 0; i < gameState.browseIndex; i++)
-                tmpChess.move(history[i])
-            position = tmpChess.fen()
+    const moves = chess.history()
+    const [state, setState] = useState({browseIndex: moves.length})
+    const {browseIndex} = state
+    const setBrowseIndex = (idx) => {
+        if (idx === browseIndex || idx < 0 || idx > moves.length)
+            return
+        setState({browseIndex: idx})
+    }
+    if (browseIndex !== moves.length) {
+        chess.reset()
+        for (let i = 0; i < browseIndex; i++) {
+            chess.move(moves[i])
         }
     }
-    return {gameState, setGameState, position};
+
+    return {moves, browseIndex, position: chess.fen(), setBrowseIndex}
 }
 
 
@@ -57,11 +63,11 @@ export const Board = (props) => {
 const ResizableBoard = (props) => {
     const {boardId, RightPanel} = props;
     const {size, styleWidth} = getSizes(props)
-    const {gameState, setGameState, position} = getState(props)
+    const {browseIndex, moves, position, setBrowseIndex} = getState(props)
 
     return <React.Fragment>
         <div className='d-flex flex-fill justify-content-between'>
-            <ControlPanel gameState={gameState} setGameState={setGameState} size={size}/>
+            <ControlPanel browseIndex={browseIndex} moves={moves} size={size} setBrowseIndex={setBrowseIndex}/>
             <div style={styleWidth} className="board-content d-flex flex-column">
                 <Player/>
                 <div className="position-relative border-warning p-1">
