@@ -7,6 +7,7 @@ import { NavigationBar } from '../../components/navigation-bar/navigation-bar';
 import { Contact } from "../contacts/contact";
 import { Playboard } from "../playboard/playboard";
 import { Analysisboard } from "../analysisboard/analysisboard"
+import WithMoveValidation from "../../components/board/modes/WithMoveValidation";
 
 
 const Routing = () => {
@@ -21,6 +22,7 @@ const Routing = () => {
               <Route path="/analysisboard" component={Analysisboard} />
               <Route path="/contact" component={Contact} />
               <Route path="/signup" component={Signup} />
+              <Route path="/wmvalid" component={WithMoveValidation} />
             </Switch>
           </Router>
         </Layout>
