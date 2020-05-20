@@ -8,6 +8,7 @@ import { Contact } from "../contacts/contact";
 import { Playboard } from "../playboard/playboard";
 import { Analysisboard } from "../analysisboard/analysisboard"
 import WithMoveValidation from "../../components/board/modes/WithMoveValidation";
+import PlayRandomMoveEngine from "../../components/board/modes/PlayRandomMoveEngine";
 
 
 const Routing = () => {
@@ -23,6 +24,7 @@ const Routing = () => {
               <Route path="/contact" component={Contact} />
               <Route path="/signup" component={Signup} />
               <Route path="/wmvalid" component={WithMoveValidation} />
+              <Route path="/vsrandom" component={PlayRandomMoveEngine} />
             </Switch>
           </Router>
         </Layout>

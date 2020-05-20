@@ -12,7 +12,7 @@ export const NavigationBar = () => (
                     <Nav.Link  href="/">Home</Nav.Link>
                     <Nav.Link  href="/analysisboard">Analize</Nav.Link>
                     <Nav.Link  href="/wmvalid">WithMoveValidation</Nav.Link>
-
+                    <Nav.Link  href="/vsrandom">HumanVsRandom</Nav.Link>
                     <Nav.Link  href="/contact">Contact</Nav.Link>
                     <Nav.Link  href="/signup">Sign Up!</Nav.Link>
                 </Nav>
