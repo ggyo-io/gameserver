@@ -6,8 +6,6 @@ import {ControlPanel} from "../control-panel/controlPanel";
 
 import Chess from "chess.js"
 import ReactResizeDetector from "react-resize-detector";
-import Emitter from "core/emitter";
-import set from "@babel/runtime/helpers/esm/set";
 
 const MaxBoardSize = 600;
 const ratio = .6;
