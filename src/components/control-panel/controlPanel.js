@@ -8,7 +8,7 @@ export const ControlPanel = (props) => (
         <Card.Body>
             <div className="d-flex flex-column flex-fill justify-content-around">
                 <div className="box-item mb-2">
-                    <PGN {...props}/>
+                    <PGN size={props.size}/>
                 </div>
                 <div className="box-item">
                     {/*<Dialog/>*/}

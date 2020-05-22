@@ -2,14 +2,16 @@ import React, {useEffect} from "react";
 import {Card, Table} from "react-bootstrap";
 import "./pgn.scss";
 import {PagingButton} from "./pagingButton";
+import {useStoreActions, useStoreState} from "easy-peasy";
 
-const renderMoves = (props) => {
-    const {setBrowseIndex, moves, browseIndex} = props
+const renderMoves = ({moves, browseIndex, setBrowseIndex} ) => {
+
     // split to pairs
     const mvpairs = moves.reduce((result, value, index, array) => {
         (index % 2 === 0) ? result.push(array.slice(index, index + 2)) : '';
         return result;
     }, []);
+
     const currentMove = (idx) => {
         if (idx === 1 && browseIndex === 0) {
             return "pgn-scroll-to"
@@ -19,12 +21,14 @@ const renderMoves = (props) => {
         }
         return ""
     }
+
     const handleClick = (idx) => {
         return function (e) {
             e.preventDefault()
-            setBrowseIndex(props, idx)
+            setBrowseIndex(idx)
         }
     }
+
     const _renderMoves = mvpairs.map((pair, index) => {
             const [whiteIdx, blackIdx] = [index * 2 + 1, (index + 1) * 2];
 
@@ -75,21 +79,31 @@ const reactToKeys = (props, e) => {
 
 const keydownEffects = (props) => {
     const keyHandler = (e) => reactToKeys(props, e);
-    const el = document.querySelector(".pgn-scroll-to");
-    if (el)
-        el.scrollIntoView({block: "center"});
     window.addEventListener('keydown', keyHandler);
     return () => {
         window.removeEventListener('keydown', keyHandler);
     };
 }
 
+const scrollEffect = () => {
+    const el = document.querySelector(".pgn-scroll-to");
+    if (el)
+        el.scrollIntoView({block: "center"});
+}
+
 export const PGN = (props) => {
     const style = {"maxHeight": Math.ceil(props.size / 2) + 'px'};
-    const _renderMoves = renderMoves(props);
-    const {setBrowseIndex, browseIndex, moves} = props
 
-    useEffect(() => keydownEffects(props))
+    const browseIndex = useStoreState(state => state.game.browseIndex)
+    const history = useStoreState(state => state.game.history)
+    const moves = history ? history.map(x => x.san) : []
+
+    const setBrowseIndex = useStoreActions(actions => actions.game.setBrowseIndex)
+
+    const _renderMoves = renderMoves({moves, browseIndex, setBrowseIndex});
+
+    useEffect(() => keydownEffects({moves, browseIndex, setBrowseIndex}))
+    useEffect(scrollEffect)
 
     return <Card>
         <Card.Body>
