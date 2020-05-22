@@ -1,8 +1,10 @@
 import {action} from "easy-peasy";
+import {actions} from "./actions";
 
 export const gameModel = {
     game: {
         history: [],
+        // browsing where?
         browseIndex: 0,
         // custom square styles
         squareStyles: {},
@@ -13,25 +15,8 @@ export const gameModel = {
         // square styles for active drop squares
         dropSquareStyle: {},
 
-        setBrowseIndex: action((state, payload) => {
-            if (payload < 0 || payload > state.history.length)
-                return
-            state.browseIndex = payload
-        }),
-
-        update: action((state, payload) => {
-            Object.assign(state, payload)
-        }),
-
-        setDropSquareStyle: action((state, payload) => {
-            state.dropSquareStyle = payload
-        }),
-        setSquareStyles: action((state, payload) => {
-            state.squareStyles = payload
-        }),
-        setPieceSquare: action((state, payload) => {
-            state.pieceSquare = payload
-        })
+        // actions
+        ...actions
 
     }
 }
