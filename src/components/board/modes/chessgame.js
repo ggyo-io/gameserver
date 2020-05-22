@@ -1,7 +1,7 @@
-import Chess from "chess.js";
+import Chess from "../../../../node_modules/chess.js/chess";
 import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import Chessboard from "../ggchessboard";
+import Chessboard from "../../ggchessboard";
 
 const game = new Chess()
 

@@ -3,7 +3,7 @@ import './styles/board.scss'
 import {Player} from "../player/player"
 import {ControlPanel} from "../control-panel/controlPanel"
 import {ChatPanel} from "../chat-panel/chatPanel"
-import {ChessGame} from "./chessgame";
+import {ChessGame} from "./modes/chessgame";
 
 
 export const Board = () => {
