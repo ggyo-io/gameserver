@@ -93,13 +93,10 @@ const scrollEffect = () => {
 
 export const PGN = (props) => {
     const style = {"maxHeight": Math.ceil(props.size / 2) + 'px'};
-
     const browseIndex = useStoreState(state => state.game.browseIndex)
     const history = useStoreState(state => state.game.history)
     const moves = history ? history.map(x => x.san) : []
-
     const setBrowseIndex = useStoreActions(actions => actions.game.setBrowseIndex)
-
     const _renderMoves = renderMoves({moves, browseIndex, setBrowseIndex});
 
     useEffect(() => keydownEffects({moves, browseIndex, setBrowseIndex}))

@@ -2,7 +2,6 @@ import {action} from "easy-peasy";
 
 export const gameModel = {
     game: {
-        position: "start",
         history: [],
         browseIndex: 0,
         // custom square styles
@@ -20,7 +19,7 @@ export const gameModel = {
             state.browseIndex = payload
         }),
 
-        onMove: action((state, payload) => {
+        update: action((state, payload) => {
             Object.assign(state, payload)
         }),
 
