@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './theme.scss';
-import Routing from "./pages/Routing/Routing";
+import {App} from "./App";
 
-ReactDOM.render(<Routing/>, document.getElementById('root'));
+ReactDOM.render(<App/>, document.getElementById('root'));
 
