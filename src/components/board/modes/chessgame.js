@@ -197,21 +197,19 @@ export const ChessGame = (props) => {
     const position = calcPosition();
 
     return (
-        <div className="position-relative border-warning p-1">
-            <Chessboard
-                position={position}
-                squareStyles={squareStyles}
-                dropSquareStyle={dropSquareStyle}
-                onDrop={onDrop}
-                onMouseOverSquare={onMouseOverSquare}
-                onMouseOutSquare={onMouseOutSquare}
-                onSquareClick={onSquareClick}
-                onSquareRightClick={onSquareRightClick}
-                onDragOverSquare={onDragOverSquare}
-                calcWidth={() => size}
-                {...props}
-            />
-        </div>
+        <Chessboard
+            position={position}
+            squareStyles={squareStyles}
+            dropSquareStyle={dropSquareStyle}
+            onDrop={onDrop}
+            onMouseOverSquare={onMouseOverSquare}
+            onMouseOutSquare={onMouseOutSquare}
+            onSquareClick={onSquareClick}
+            onSquareRightClick={onSquareRightClick}
+            onDragOverSquare={onDragOverSquare}
+            calcWidth={() => size}
+            {...props}
+        />
     )
 }
 

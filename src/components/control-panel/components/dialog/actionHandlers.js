@@ -12,7 +12,6 @@ export const actionHandlers = (actions) => {
             setDialogLabel("")
         },
         dialogClick: (e) => {
-            //console.log()
             setDialogLabel(dialogs[e.target.name])
         }
     }

@@ -10,6 +10,6 @@ export const Analysisboard = () => {
     if (location.state && location.state.game) {
         pgn = location.state.game.pgn
     }
-    return <Board pgn={pgn} boardId="analysisboard" RightPanel={AnalysisPanel}/>
+    return <Board boardId="analysisboard" RightPanel={AnalysisPanel} Mode={Analysis pgn={pgn}}/>
 }
 
