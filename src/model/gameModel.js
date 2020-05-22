@@ -1,4 +1,3 @@
-import {action} from "easy-peasy";
 import {actions} from "./actions";
 
 export const gameModel = {
@@ -14,6 +13,8 @@ export const gameModel = {
         square: '',
         // square styles for active drop squares
         dropSquareStyle: {},
+
+        dialogLabel: "",
 
         // actions
         ...actions

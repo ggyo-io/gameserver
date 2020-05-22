@@ -1,40 +1,33 @@
 import React from "react";
-import {Button, Card, ButtonGroup} from "react-bootstrap";
-import createComponent from 'core/manageComponent';
+import {Button, ButtonGroup, Card} from "react-bootstrap";
+import {useStore, useStoreActions, useStoreState} from "easy-peasy";
 import {actionHandlers} from "./actionHandlers";
 
 
-const view = (properties) => {
-const {currentLabel, click} = properties;
-    return <Card>
-        <Card.Body>
-            {currentLabel ?
-                <div className="d-flex flex-column alert alert-secondary">
-                    <h6 className="align-self-center mb-3">{currentLabel}</h6>
-                    <div className="d-inline-flex justify-content-around">
-                        <Button size="sm" onClick={click} variant="primary" name="yes">Yes</Button>
-                        <Button size="sm" onClick={click} variant="secondary" name="no">No</Button>
-                    </div>
-                </div>
-                : null
-            }
-            <div className="d-flex flex-column">
-                <ButtonGroup size="sm">
-                    <Button name="dialog_resign" onClick={click} >Resign</Button>
-                    <Button name="dialog_draw" onClick={click}>Draw</Button>
-                    <Button name="dialog_abort" onClick={click}>Fuck You</Button>
-                </ButtonGroup>
-            </div>
-        </Card.Body>
-    </Card>
-}
+export const Dialog = () => {
+    const dialogLabel = useStoreState(state => state.game.dialogLabel)
+    const actions = actionHandlers(useStoreActions(actions => actions.game))
 
-export const Dialog = () =>  createComponent({
-    view,
-    name: 'dialog', /* required */
-    actionHandlers,
-    initialState: {
-        currentLabel: null,
-        currentTime: 'time'
-    }
-});
+    return (
+        <Card>
+            <Card.Body>
+                {dialogLabel ?
+                    <div className="d-flex flex-column alert alert-secondary">
+                        <h6 className="align-self-center mb-3">{dialogLabel}</h6>
+                        <div className="d-inline-flex justify-content-around">
+                            <Button size="sm" onClick={actions.yesClick} variant="primary" name="yes">Yes</Button>
+                            <Button size="sm" onClick={actions.noClick} variant="secondary" name="no">No</Button>
+                        </div>
+                    </div>
+                    : null
+                }
+                <div className="d-flex flex-column">
+                    <ButtonGroup size="sm">
+                        <Button name="dialog_resign" onClick={actions.dialogClick}>Resign</Button>
+                        <Button name="dialog_draw" onClick={actions.dialogClick}>Draw</Button>
+                    </ButtonGroup>
+                </div>
+            </Card.Body>
+        </Card>
+    )
+};

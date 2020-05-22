@@ -2,23 +2,19 @@ import {constants} from "./constants";
 
 const {dialogs} = constants;
 
-export const actionHandlers = {
-    "ttt": ({effect, setState}) => {
-        const {payload} = effect;
-        setState(payload);
-    },
-    "GAME_BUTTON#CLICKED": ({effect, setState, getState, dispatch}) => {
-        const {payload} = effect;
-        const {name} = payload;
-        if (name.startsWith('dialog_'))
-            setState({currentLabel: dialogs[name]});
-        else if (name === 'no')
-            setState({currentLabel: null});
-        else if (name === 'yes') {
-            const {currentLabel} = getState();
-            effect['confirmation'] = currentLabel;
-            dispatch('TEST_ACTION', {dialog: {name, currentLabel}, effect}, {transit: 'controlPanel'});
-            setState({currentLabel: null});
+export const actionHandlers = (actions) => {
+    const {setDialogLabel} = actions
+    return {
+        yesClick: () => {
+            setDialogLabel("")
+        },
+        noClick: () => {
+            setDialogLabel("")
+        },
+        dialogClick: (e) => {
+            //console.log()
+            setDialogLabel(dialogs[e.target.name])
         }
     }
 }
+

@@ -1,6 +1,6 @@
 import React from "react";
 import {Card} from "react-bootstrap";
-// import {Dialog} from "./components/dialog/dialog";
+ import {Dialog} from "./components/dialog/dialog";
 import {PGN} from "./components/pgn/pgn";
 
 export const ControlPanel = (props) => (
@@ -11,7 +11,7 @@ export const ControlPanel = (props) => (
                     <PGN size={props.size}/>
                 </div>
                 <div className="box-item">
-                    {/*<Dialog/>*/}
+                    <Dialog/>
                 </div>
             </div>
         </Card.Body>
