@@ -1,9 +1,12 @@
 import {constants} from "./constants";
+import {useStoreActions} from "easy-peasy";
 
 const {dialogs} = constants;
 
-export const actionHandlers = (actions) => {
-    const {setDialogLabel} = actions
+export const actionHandlers = () => {
+
+    const {setDialogLabel} = useStoreActions(actions => actions.game)
+
     return {
         yesClick: () => {
             setDialogLabel("")

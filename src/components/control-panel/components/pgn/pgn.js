@@ -29,7 +29,7 @@ const renderMoves = ({moves, browseIndex, setBrowseIndex} ) => {
         }
     }
 
-    const _renderMoves = mvpairs.map((pair, index) => {
+    const rendered = mvpairs.map((pair, index) => {
             const [whiteIdx, blackIdx] = [index * 2 + 1, (index + 1) * 2];
 
             return <tr key={index}>
@@ -46,7 +46,7 @@ const renderMoves = ({moves, browseIndex, setBrowseIndex} ) => {
             </tr>
         }
     );
-    return _renderMoves;
+    return rendered;
 }
 
 const reactToKeys = (props, e) => {
@@ -76,7 +76,7 @@ const reactToKeys = (props, e) => {
         default:
             return; // not our key
     }
-    console.log(e)
+    //console.log(e)
     e.preventDefault(); // prevent the default action (scroll / move caret)
     setBrowseIndex(browse_where)
 }

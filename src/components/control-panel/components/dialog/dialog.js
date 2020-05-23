@@ -1,12 +1,12 @@
 import React from "react";
 import {Button, ButtonGroup, Card} from "react-bootstrap";
-import {useStoreActions, useStoreState} from "easy-peasy";
+import {useStoreState} from "easy-peasy";
 import {actionHandlers} from "./actionHandlers";
 
 
 export const Dialog = () => {
     const dialogLabel = useStoreState(state => state.game.dialogLabel)
-    const actions = actionHandlers(useStoreActions(actions => actions.game))
+    const actions = actionHandlers()
 
     return (
         <Card>
@@ -22,7 +22,7 @@ export const Dialog = () => {
                     : null
                 }
                 <div className="d-flex flex-column">
-                    <ButtonGroup size="sm">
+                        <ButtonGroup size="sm">
                         <Button name="dialog_resign" onClick={actions.dialogClick}>Resign</Button>
                         <Button name="dialog_draw" onClick={actions.dialogClick}>Draw</Button>
                     </ButtonGroup>
