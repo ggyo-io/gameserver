@@ -37,7 +37,7 @@ export const view = (width, height) => {
     </div>
 
 }
-q
+
 export const Board = () => {
     return (
         <ReactResizeDetector handleWidth handleHeight querySelector="#root">
