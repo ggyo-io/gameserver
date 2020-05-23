@@ -2,6 +2,7 @@ import Chess from "../../../../node_modules/chess.js/chess";
 import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import Chessboard from "../../ggchessboard";
+import {calcPosition} from "./helpers";
 
 const game = new Chess()
 
@@ -24,6 +25,21 @@ export const ChessGame = (props) => {
     const setDropSquareStyle = useStoreActions(actions => actions.game.setDropSquareStyle)
     const setPieceSquare = useStoreActions(actions => actions.game.setPieceSquare)
 
+    const getSizes = (props) => {
+        const MaxBoardSize = 600
+        const ratio = .6
+        const calculate = (value) => {
+            return Math.ceil(value * ratio)
+        }
+
+        const {width, height} = props
+        const boardSize = height < width ? Math.min(calculate(height), MaxBoardSize) : Math.min(calculate(width), MaxBoardSize)
+        return {
+            size: boardSize - 7,
+            styleWidth: {width: `${boardSize}px`},
+            styleHeight: {height: `${boardSize}px`}
+        }
+    }
 
     //
     // Game logic
@@ -193,7 +209,7 @@ export const ChessGame = (props) => {
         return game.fen()
     }
 
-    const { size } = props
+    const {size, styleWidth} = getSizes(props)
     const position = calcPosition();
 
     return (
@@ -207,8 +223,7 @@ export const ChessGame = (props) => {
             onSquareClick={onSquareClick}
             onSquareRightClick={onSquareRightClick}
             onDragOverSquare={onDragOverSquare}
-            calcWidth={() => size}
-            {...props}
+            calcWidth={props.calcWidth}
         />
     )
 }

@@ -21,6 +21,7 @@ export const actions = {
     setPieceSquare: action((state, payload) => {
         state.pieceSquare = payload
     }),
+
     setDialogLabel: action((state, payload) => {
         state.dialogLabel = payload
     })
