@@ -25,22 +25,6 @@ export const ChessGame = (props) => {
     const setDropSquareStyle = useStoreActions(actions => actions.game.setDropSquareStyle)
     const setPieceSquare = useStoreActions(actions => actions.game.setPieceSquare)
 
-    const getSizes = (props) => {
-        const MaxBoardSize = 600
-        const ratio = .6
-        const calculate = (value) => {
-            return Math.ceil(value * ratio)
-        }
-
-        const {width, height} = props
-        const boardSize = height < width ? Math.min(calculate(height), MaxBoardSize) : Math.min(calculate(width), MaxBoardSize)
-        return {
-            size: boardSize - 7,
-            styleWidth: {width: `${boardSize}px`},
-            styleHeight: {height: `${boardSize}px`}
-        }
-    }
-
     //
     // Game logic
     //
