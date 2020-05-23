@@ -1,8 +1,8 @@
 import React from "react";
-import {Board} from "../../components/board/board";
-import {AnalysisPanel} from "../../components/analysis-panel/analysisPanel"
+import {Board} from "components/board/board";
+import {AnalysisPanel} from "components/analysis-panel/analysisPanel"
 import {useLocation} from "react-router-dom";
-import {Analysis} from "../../components/board/modes/analysis";
+import {Analysis} from "components/board/modes/analysis";
 import {useStoreActions} from 'easy-peasy'
 import Chess from 'chess.js'
 
@@ -16,18 +16,16 @@ export const Analysisboard = () => {
                 pgn = location.state.game.pgn
                 if (game.load_pgn(pgn, { sloppy: true })) {
                         update({
-                                position: 'start',
                                 history: game.history({ verbose: true }),
-                                browseIndex: 0,
+                                browseIndex: game.history().length,
                                 pieceSquare: ''
                         })
                 }
         }
 
-
     return <Board
         boardId="analysisboard"
-        Mode={<Analysis pgn={pgn}/>}
+        Mode={<Analysis/>}
         RightPanel={<AnalysisPanel/>}
     />
 }

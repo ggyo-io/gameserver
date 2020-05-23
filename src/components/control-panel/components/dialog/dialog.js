@@ -1,6 +1,6 @@
 import React from "react";
 import {Button, ButtonGroup, Card} from "react-bootstrap";
-import {useStore, useStoreActions, useStoreState} from "easy-peasy";
+import {useStoreActions, useStoreState} from "easy-peasy";
 import {actionHandlers} from "./actionHandlers";
 
 
