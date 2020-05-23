@@ -1,4 +1,4 @@
-import Chess from "../../../../node_modules/chess.js/chess";
+import Chess from "chess.js";
 import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import Chessboard from "../../ggchessboard";

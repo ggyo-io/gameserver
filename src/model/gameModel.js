@@ -16,8 +16,6 @@ export const gameModel = {
 
         dialogLabel: "",
 
-        firstRender: true,
-
         // actions
         ...actions
 
