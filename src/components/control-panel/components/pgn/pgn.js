@@ -55,8 +55,11 @@ const reactToKeys = (props, e) => {
     const up = 38;
     const right = 39;
     const down = 40;
-
     let browse_where
+
+    if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey)
+        return;
+
     switch (e.which) {
         case left:
             browse_where = browseIndex - 1;
@@ -73,6 +76,7 @@ const reactToKeys = (props, e) => {
         default:
             return; // not our key
     }
+    console.log(e)
     e.preventDefault(); // prevent the default action (scroll / move caret)
     setBrowseIndex(browse_where)
 }
