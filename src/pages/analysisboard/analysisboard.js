@@ -15,10 +15,21 @@ export const Analysisboard = () => {
         if (location.state && location.state.game) {
                 pgn = location.state.game.pgn
                 if (game.load_pgn(pgn, { sloppy: true })) {
+                        console.log("headers", game.header())
+                        const { Black, BlackElo, White, WhiteElo, Result } = game.header()
                         update({
                                 history: game.history({ verbose: true }),
                                 browseIndex: game.history().length,
-                                pieceSquare: ''
+                                pieceSquare: '',
+                                top: {
+                                        name: Black,
+                                        elo: BlackElo
+                                },
+                                bottom: {
+                                        name: White,
+                                        elo: WhiteElo
+                                },
+                                result: Result
                         })
                 }
         }

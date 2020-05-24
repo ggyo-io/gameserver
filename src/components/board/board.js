@@ -42,11 +42,11 @@ const ResizableBoard = (props) => {
         <div className='d-flex flex-fill justify-content-between'>
             <ControlPanel size={size}/>
             <div className="board-content d-flex flex-column">
-                <Player/>
+                <Player posish="top"/>
                 <div className="position-relative border-warning p-1">
                     {ModeWithProps}
                 </div>
-                <Player/>
+                <Player posish="bottom"/>
             </div>
             {RightPanelWithProps}
         </div>

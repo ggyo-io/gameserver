@@ -13,8 +13,16 @@ export const gameModel = {
         square: '',
         // square styles for active drop squares
         dropSquareStyle: {},
-
         dialogLabel: "",
+        top: {
+            name: 'Annonymous',
+            elo: '1000'
+        },
+        bottom: {
+            name: 'Annonymous',
+            elo: '1000'
+        },
+        result: '',
 
         // actions
         ...actions
