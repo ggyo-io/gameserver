@@ -8,31 +8,34 @@ import Chess from 'chess.js'
 
 const game = new Chess()
 
+function updateState(headers) {
+    const {Black, BlackElo, White, WhiteElo, Result} = headers
+    const update = useStoreActions(actions => actions.game.update)
+    update({
+        history: game.history({verbose: true}),
+        browseIndex: game.history().length,
+        pieceSquare: '',
+        top: {
+            name: Black,
+            elo: BlackElo
+        },
+        bottom: {
+            name: White,
+            elo: WhiteElo
+        },
+        result: Result
+    })
+}
+
 export const Analysisboard = () => {
-        const location = useLocation();
-        const update = useStoreActions(actions => actions.game.update)
-        let pgn = ""
-        if (location.state && location.state.game) {
-                pgn = location.state.game.pgn
-                if (game.load_pgn(pgn, { sloppy: true })) {
-                        console.log("headers", game.header())
-                        const { Black, BlackElo, White, WhiteElo, Result } = game.header()
-                        update({
-                                history: game.history({ verbose: true }),
-                                browseIndex: game.history().length,
-                                pieceSquare: '',
-                                top: {
-                                        name: Black,
-                                        elo: BlackElo
-                                },
-                                bottom: {
-                                        name: White,
-                                        elo: WhiteElo
-                                },
-                                result: Result
-                        })
-                }
+    const location = useLocation();
+    let pgn = ""
+    if (location.state && location.state.game) {
+        pgn = location.state.game.pgn
+        if (game.load_pgn(pgn, {sloppy: true})) {
+            updateState(game.header());
         }
+    }
 
     return <Board
         boardId="analysisboard"

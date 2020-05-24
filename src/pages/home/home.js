@@ -38,7 +38,6 @@ export const Home = () => (
             </Button></Col>
 
         </Row>
-        {/*</div>*/}
         <p/><br/>
         <Row><h5>History</h5></Row>
         <Row><History/></Row>
