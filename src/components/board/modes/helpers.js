@@ -1,7 +1,7 @@
 const selectedSquare = 'rgba(255, 255, 0, 0.4)';
 const possibleMove = {
     background:
-        'radial-gradient(circle, #495029 5%, transparent 40%)',
+        'radial-gradient(circle, gray 15%, transparent 25%)',
     borderRadius: '5%'
 }
 
