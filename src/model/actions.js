@@ -12,16 +12,9 @@ export const actions = {
             return
         state.browseIndex = payload
     }),
-    setDropSquareStyle: action((state, payload) => {
-        state.dropSquareStyle = payload
-    }),
-    setSquareStyles: action((state, payload) => {
-        state.squareStyles = payload
-    }),
     setPieceSquare: action((state, payload) => {
         state.pieceSquare = payload
     }),
-
     setDialogLabel: action((state, payload) => {
         state.dialogLabel = payload
     })

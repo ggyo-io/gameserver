@@ -2,7 +2,7 @@ import Chess from "chess.js";
 import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import Chessboard from "../../ggchessboard";
-import {calcPosition} from "./helpers";
+import {calcPosition, lastMoveSquareStyling, possibleMovesSquareStyling, pieceSquareStyling} from "./helpers";
 
 const game = new Chess()
 
@@ -15,14 +15,10 @@ export const ChessGame = (props) => {
     // Store state
     const history = useStoreState(state => state.game.history)
     const pieceSquare = useStoreState(state => state.game.pieceSquare)
-    const squareStyles = useStoreState(state => state.game.squareStyles)
-    const dropSquareStyle = useStoreState(state => state.game.dropSquareStyle)
     const browseIndex = useStoreState(state => state.game.browseIndex)
 
     // Actions
     const onMove = useStoreActions(actions => actions.game.update)
-    const setSquareStyles = useStoreActions(actions => actions.game.setSquareStyles)
-    const setDropSquareStyle = useStoreActions(actions => actions.game.setDropSquareStyle)
     const setPieceSquare = useStoreActions(actions => actions.game.setPieceSquare)
 
     //
@@ -36,11 +32,6 @@ export const ChessGame = (props) => {
             history: game.history({verbose: true}),
             browseIndex: game.history().length,
             pieceSquare: '',
-            squareStyles: {
-                [game.history({verbose: true})[game.history().length - 1].to]: {
-                    backgroundColor: 'DarkTurquoise'
-                }
-            }
         }
         onMove(update)
     }
@@ -61,40 +52,7 @@ export const ChessGame = (props) => {
         timer()
     }
 
-
-    const onMouseOverSquare = (square) => {
-        // get list of possible moves for this square
-        let moves = game.moves({
-            square: square,
-            verbose: true
-        })
-
-        // exit if there are no moves available for this square
-        if (moves.length === 0) return
-
-        let squaresToHighlight = []
-        for (let i = 0; i < moves.length; i++) {
-            squaresToHighlight.push(moves[i].to)
-        }
-
-        highlightSquare(square, squaresToHighlight)
-    }
-
-    const onMouseOutSquare = (square) => {
-        removeHighlightSquare(square)
-    }
-
-    // central squares get diff dropSquareStyles
-    const onDragOverSquare = square => {
-        setDropSquareStyle(
-            square === 'e4' || square === 'd4' || square === 'e5' || square === 'd5'
-                ? {backgroundColor: 'cornFlowerBlue'}
-                : {boxShadow: 'inset 0 0 1px 4px rgb(255, 255, 0)'}
-        )
-    }
-
     const onSquareClick = (square) => {
-        setSquareStyles(squareStyling(square))
         setPieceSquare(square)
 
         let move = game.move({
@@ -108,58 +66,6 @@ export const ChessGame = (props) => {
 
         moveMade()
         timer()
-    }
-
-    const onSquareRightClick = (square) =>
-        setSquareStyles({[square]: {backgroundColor: 'deepPink'}})
-
-    const squareStyling = (ps) => {
-        if (!ps)
-            ps = pieceSquare
-
-        const sourceSquare = history.length && history[history.length - 1].from
-        const targetSquare = history.length && history[history.length - 1].to
-
-        return {
-            [ps]: {backgroundColor: 'rgba(255, 255, 0, 0.4)'},
-            ...(history.length && {
-                [sourceSquare]: {
-                    backgroundColor: 'rgba(255, 255, 0, 0.4)'
-                }
-            }),
-            ...(history.length && {
-                [targetSquare]: {
-                    backgroundColor: 'rgba(255, 255, 0, 0.4)'
-                }
-            })
-        }
-    }
-
-    // keep clicked square style and remove hint squares
-    const removeHighlightSquare = () => {
-        setSquareStyles({pieceSquare, history})
-    }
-
-
-    // show possible moves
-    const highlightSquare = (sourceSquare, squaresToHighlight) => {
-        const highlightStyles = [sourceSquare, ...squaresToHighlight].reduce(
-            (a, c) => {
-                return {
-                    ...a,
-                    ...{
-                        [c]: {
-                            background:
-                                'radial-gradient(circle, #fffc00 36%, transparent 40%)',
-                            borderRadius: '50%'
-                        }
-                    },
-                    ...squareStyling()
-                }
-            },
-            {}
-        )
-        setSquareStyles({...squareStyles, ...highlightStyles})
     }
 
     const makeRandomMove = () => {
@@ -180,18 +86,16 @@ export const ChessGame = (props) => {
     }
 
     const position = calcPosition(history, browseIndex, game);
+    const squareStyles= { ...pieceSquareStyling(pieceSquare),
+                          ...lastMoveSquareStyling(history, browseIndex),
+                          ...possibleMovesSquareStyling(pieceSquare, game) };
 
     return (
         <Chessboard
             position={position}
             squareStyles={squareStyles}
-            dropSquareStyle={dropSquareStyle}
             onDrop={onDrop}
-            onMouseOverSquare={onMouseOverSquare}
-            onMouseOutSquare={onMouseOutSquare}
             onSquareClick={onSquareClick}
-            onSquareRightClick={onSquareRightClick}
-            onDragOverSquare={onDragOverSquare}
             calcWidth={props.calcWidth}
         />
     )

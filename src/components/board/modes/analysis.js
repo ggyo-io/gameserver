@@ -2,7 +2,7 @@ import React from "react";
 import Chessboard from "../../ggchessboard";
 import Chess from "chess.js";
 import { useStoreState } from "easy-peasy";
-import { calcPosition } from "./helpers";
+import { calcPosition, lastMoveSquareStyling } from "./helpers";
 
 const game = new Chess()
 
@@ -12,26 +12,7 @@ export const Analysis = (props) => {
     const browseIndex = useStoreState(state => state.game.browseIndex)
 
     const position = calcPosition(history, browseIndex, game);
-
-    const squareStyling = () => {
-        const sourceSquare = browseIndex && history[browseIndex - 1].from
-        const targetSquare = browseIndex && history[browseIndex - 1].to
-
-        return {
-            ...(browseIndex && {
-                [sourceSquare]: {
-                    backgroundColor: 'rgba(255, 255, 0, 0.4)'
-                }
-            }),
-            ...(browseIndex && {
-                [targetSquare]: {
-                    backgroundColor: 'rgba(255, 255, 0, 0.4)'
-                }
-            })
-        }
-    }
-
-    const squareStyles=squareStyling()
+    const squareStyles=lastMoveSquareStyling(history, browseIndex)
 
     return (
         <Chessboard
