@@ -3,6 +3,7 @@ import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import Chessboard from "../../ggchessboard";
 import {calcPosition, lastMoveSquareStyling, possibleMovesSquareStyling, pieceSquareStyling} from "./helpers";
+import GGBoard from '../../ggboard'
 
 const game = new Chess()
 
@@ -26,6 +27,15 @@ export const ChessGame = (props) => {
     //
     const timer = () => window.setTimeout(makeRandomMove, 200)
 
+    const onDragStart = (source, piece, position, orientation) => {
+        console.log("onDragStart");
+        // do not pick up pieces if the game is over
+        if (game.game_over()) return false
+
+        // only pick up pieces for White
+        if (piece.search(/^b/) !== -1) return false
+    }
+
     const moveMade = () => {
         const update = {
             position: game.fen(),
@@ -37,7 +47,7 @@ export const ChessGame = (props) => {
     }
 
 
-    const onDrop = ({sourceSquare, targetSquare}) => {
+    const onDrop = (sourceSquare, targetSquare) => {
         // see if the move is legal
         const move = game.move({
             from: sourceSquare,
@@ -46,7 +56,7 @@ export const ChessGame = (props) => {
         })
 
         // illegal move
-        if (move === null) return
+        if (move === null) return 'snapback'
 
         moveMade()
         timer()
@@ -91,12 +101,13 @@ export const ChessGame = (props) => {
                           ...possibleMovesSquareStyling(pieceSquare, game) };
 
     return (
-        <Chessboard
+        <GGBoard
             position={position}
             squareStyles={squareStyles}
+            onDragStart={onDragStart}
             onDrop={onDrop}
             onSquareClick={onSquareClick}
-            calcWidth={props.calcWidth}
+            style={props.style}
         />
     )
 }

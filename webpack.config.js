@@ -141,7 +141,14 @@ module.exports = {
     devtool: 'inline-source-map',
     plugins: [
         new CleanWebpackPlugin(),
-
+        new CopyPlugin({
+            patterns: [
+                { from: 'src/assets/img/chesspieces/wikipedia/*.png',
+                  to: 'img/chesspieces/wikipedia/',
+                  flatten: true
+                 }
+          ],
+        }),
         new HtmlWebPackPlugin({
             template: "./src/index.html",
             filename: "./index.html",
