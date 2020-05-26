@@ -3,11 +3,11 @@ import Chessboard from "../../ggchessboard";
 import Chess from "chess.js";
 import { useStoreState } from "easy-peasy";
 import { calcPosition, lastMoveSquareStyling } from "./helpers";
+import GGBoard from "../../ggboard";
 
 const game = new Chess()
 
 export const Analysis = (props) => {
-    const { calcWidth } = props
     const history = useStoreState(state => state.game.history)
     const browseIndex = useStoreState(state => state.game.browseIndex)
 
@@ -15,9 +15,9 @@ export const Analysis = (props) => {
     const squareStyles=lastMoveSquareStyling(history, browseIndex)
 
     return (
-        <Chessboard
+        <GGBoard
             position={position}
-            calcWidth={calcWidth}
+            style={props.style}
             squareStyles={squareStyles}
         />
     )
