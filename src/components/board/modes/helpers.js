@@ -1,4 +1,4 @@
-const selectedSquare = 'rgba(255, 255, 0, 0.4)';
+const selectedSquare = 'rgba(248,220,100,0.9)';
 const possibleMove = {
     background:
         'radial-gradient(circle, gray 15%, transparent 25%)',

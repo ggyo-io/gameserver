@@ -14,6 +14,14 @@ const GGBoard = (props) => {
             onDrop: props.onDrop
         }
         board = Chessboard(element, config);
+
+        const { squareStyles } = props
+        for (let [key, value] of Object.entries(squareStyles)) {
+            console.log(`${key}: ${JSON.stringify(value)}`);
+            const el = document.querySelector(".square-" + key)
+            if (el)
+                Object.assign(el.style, value)
+        }
     });
 
     // Render
