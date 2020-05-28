@@ -61,19 +61,12 @@
     background-color: rgba(201, 167, 60, 0.88);
 }
 
-.possible-move {
-    z-index: -1;
+.possible-move.white-1e1d7 {
+    background: radial-gradient(circle, gray 15%, transparent 25%), #f0d9b5;
 }
 
-.possible-move::before {
-    content: "";
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    position: absolute;
-    z-index: 0;
-    background: radial-gradient(rgba(20, 85, 30, 0.5) 22%, #208530 0, rgba(0, 0, 0, 0.3) 0, rgba(0, 0, 0, 0) 0);
+.possible-move.black-3c85d {
+    background: radial-gradient(circle, gray 15%, transparent 25%), #b58863;
 }
 
 .in-check {
