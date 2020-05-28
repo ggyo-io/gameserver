@@ -147,7 +147,11 @@ module.exports = {
                   to: 'img/chesspieces/wikipedia/',
                   flatten: true
                  },
-                 { from: 'src/assets/img/chesspieces/merida/*.svg',
+                { from: 'src/assets/img/chesspieces/wikisvg/*.svg',
+                  to: 'img/chesspieces/wikisvg/',
+                  flatten: true
+                 },
+                { from: 'src/assets/img/chesspieces/merida/*.svg',
                   to: 'img/chesspieces/merida/',
                   flatten: true
                  }

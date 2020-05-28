@@ -12,7 +12,8 @@ const GGBoard = (props) => {
             position: props.position,
             onDragStart: props.onDragStart,
             onDrop: props.onDrop,
-            pieceTheme: 'img/chesspieces/merida/{piece}.svg'
+            //pieceTheme: 'img/chesspieces/merida/{piece}.svg'
+            pieceTheme: 'img/chesspieces/wikisvg/{piece}.svg'
         }
         board = Chessboard(element, config);
 
