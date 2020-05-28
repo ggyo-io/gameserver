@@ -1,7 +1,13 @@
 import Chess from "chess.js";
 import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {calcPosition, lastMoveSquareStyling, possibleMovesSquareStyling, pieceSquareStyling, checkSquareStyling} from "./helpers";
+import {
+    calcPosition,
+    checkSquareStyling,
+    lastMoveSquareStyling,
+    pieceSquareStyling,
+    possibleMovesSquareStyling
+} from "./helpers";
 import GGBoard from '../../ggboard'
 
 const game = new Chess()
@@ -35,11 +41,19 @@ export const ChessGame = (props) => {
     }
 
     const moveMade = () => {
+        let result = ''
+        if (game.game_over())
+            if (game.in_draw())
+                result = '1/2-1/2'
+            else
+                result = '1-0'
+
         const update = {
             position: game.fen(),
             history: game.history({verbose: true}),
             browseIndex: game.history().length,
             pieceSquare: '',
+            result: result
         }
         onMove(update)
     }
@@ -93,10 +107,12 @@ export const ChessGame = (props) => {
     }
 
     const position = calcPosition(history, browseIndex, game);
-    const squareStyles= { ...checkSquareStyling(game),
-                          ...pieceSquareStyling(pieceSquare),
-                          ...lastMoveSquareStyling(history, browseIndex),
-                          ...possibleMovesSquareStyling(pieceSquare, game) };
+    const squareStyles = {
+        ...checkSquareStyling(game),
+        ...pieceSquareStyling(pieceSquare),
+        ...lastMoveSquareStyling(history, browseIndex),
+        ...possibleMovesSquareStyling(pieceSquare, game)
+    };
 
     return (
         <GGBoard
