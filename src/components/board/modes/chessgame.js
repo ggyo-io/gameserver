@@ -83,10 +83,11 @@ export const ChessGame = (props) => {
         })
 
         // illegal move
-        if (move === null) return
+        if (move === null) return false
 
         moveMade()
         timer()
+        return true
     }
 
     const makeRandomMove = () => {

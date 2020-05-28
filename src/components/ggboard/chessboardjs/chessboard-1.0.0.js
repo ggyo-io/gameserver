@@ -1185,10 +1185,10 @@ window.jQuery = $;
       }
     }
 
-    function removeSquareHighlights () {
+    function removeSquareHighlights (cls) {
       $board
         .find('.' + CSS.square)
-        .removeClass(CSS.highlight1 + ' ' + CSS.highlight2)
+        .removeClass(cls)
     }
 
     function snapbackDraggedPiece () {
@@ -1198,7 +1198,7 @@ window.jQuery = $;
         return
       }
 
-      removeSquareHighlights()
+      removeSquareHighlights(CSS.highlight2)
 
       // animation complete
       function complete () {
@@ -1231,7 +1231,7 @@ window.jQuery = $;
     }
 
     function trashDraggedPiece () {
-      removeSquareHighlights()
+      removeSquareHighlights(CSS.highlight1 + ' ' + CSS.highlight2)
 
       // remove the source piece
       var newPosition = deepCopy(currentPosition)
@@ -1249,7 +1249,7 @@ window.jQuery = $;
     }
 
     function dropDraggedPieceOnSquare (square) {
-      removeSquareHighlights()
+      removeSquareHighlights(CSS.highlight1 + ' ' + CSS.highlight2)
 
       // update position
       var newPosition = deepCopy(currentPosition)
@@ -1605,8 +1605,11 @@ window.jQuery = $;
       // do nothing if there is no piece on this square
       var square = $(this).attr('data-square')
       if (!validSquare(square)) return
+      removeSquareHighlights(CSS.highlight1 + ' ' + CSS.highlight2)
       if (isFunction(config.onSquareClick))
-        config.onSquareClick(square)
+        if (!config.onSquareClick(square)) {
+          $(evt.currentTarget).addClass(CSS.highlight1)
+        }
       if (!currentPosition.hasOwnProperty(square)) return
 
       beginDraggingPiece(square, currentPosition[square], evt.pageX, evt.pageY)
