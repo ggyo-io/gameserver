@@ -1,5 +1,4 @@
 import React from "react";
-import Chessboard from "../../ggchessboard";
 import Chess from "chess.js";
 import { useStoreState } from "easy-peasy";
 import { calcPosition, lastMoveSquareStyling, checkSquareStyling } from "./helpers";
