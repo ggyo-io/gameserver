@@ -1,7 +1,6 @@
 import Chess from "chess.js";
 import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import Chessboard from "../../ggchessboard";
 import {calcPosition, lastMoveSquareStyling, possibleMovesSquareStyling, pieceSquareStyling} from "./helpers";
 import GGBoard from '../../ggboard'
 
@@ -61,17 +60,13 @@ export const ChessGame = (props) => {
         timer()
     }
 
-    let from = ''
     const onSquareClick = (square) => {
         setPieceSquare(square)
-
         let move = game.move({
-            from: from,
+            from: pieceSquare,
             to: square,
             promotion: 'q' // always promote to a queen for example simplicity
         })
-
-        from = square;
 
         // illegal move
         if (move === null) return

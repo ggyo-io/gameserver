@@ -13,7 +13,7 @@ window.jQuery = $;
 
 // start anonymous scope
 ;(function () {
-    
+
   var $ = window['jQuery']
 
   // ---------------------------------------------------------------------------
@@ -1555,6 +1555,10 @@ window.jQuery = $;
         setCurrentPosition(position)
         drawPositionInstant()
       }
+    }
+
+    widget.setConfig = function(cfg) {
+        Object.assign(config, cfg)
     }
 
     widget.resize = function () {

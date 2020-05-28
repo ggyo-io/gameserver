@@ -55,6 +55,10 @@ const GGBoard = (props) => {
             board.resize()
     }, [props.style.width]);
 
+    if (board)
+        board.setConfig({
+            onSquareClick: props.onSquareClick
+        })
 
     // Render
     const _props = { style: { ...props.style } }

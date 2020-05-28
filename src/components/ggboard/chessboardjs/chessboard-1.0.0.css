@@ -63,5 +63,4 @@
 
 .possible-move {
     background: radial-gradient(circle, gray 15%, transparent 25%);
-    border-radius: '5%';
 }
