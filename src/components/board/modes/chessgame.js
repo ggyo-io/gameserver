@@ -1,7 +1,7 @@
 import Chess from "chess.js";
 import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {calcPosition, lastMoveSquareStyling, possibleMovesSquareStyling, pieceSquareStyling} from "./helpers";
+import {calcPosition, lastMoveSquareStyling, possibleMovesSquareStyling, pieceSquareStyling, checkSquareStyling} from "./helpers";
 import GGBoard from '../../ggboard'
 
 const game = new Chess()
@@ -93,7 +93,8 @@ export const ChessGame = (props) => {
     }
 
     const position = calcPosition(history, browseIndex, game);
-    const squareStyles= { ...pieceSquareStyling(pieceSquare),
+    const squareStyles= { ...checkSquareStyling(game),
+                          ...pieceSquareStyling(pieceSquare),
                           ...lastMoveSquareStyling(history, browseIndex),
                           ...possibleMovesSquareStyling(pieceSquare, game) };
 
@@ -108,4 +109,3 @@ export const ChessGame = (props) => {
         />
     )
 }
-

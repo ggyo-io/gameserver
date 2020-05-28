@@ -11,7 +11,7 @@ export const calcPosition = (history, browseIndex, game) => {
 }
 
 function isBlack(square) {
-    if  (!square ||  !square.length || square.length !== 2)
+    if (!square || !square.length || square.length !== 2)
         return false
 
     const x = square.charCodeAt(0)
@@ -24,6 +24,34 @@ export const pieceSquareStyling = (square) => {
         ...(square && {
             [square]: selectedSquareColor(square)
         })
+    }
+}
+
+const checkSquare = (game) => {
+    const board = game.board()
+    const alphaBase = 'a'.charCodeAt(0);
+    const numericBase = '8'.charCodeAt(0);
+
+    for (let i = 0; i < board.length; i++) {
+        const row = board[i]
+        for (let j = 0; j < row.length; j++) {
+            const cell = row[j]
+            if (cell !== null &&
+                cell.type === 'k' &&
+                cell.color === game.turn()) {
+                return String.fromCharCode(alphaBase + j,
+                    numericBase - i)
+            }
+        }
+    }
+    // never reached
+    return ''
+}
+
+export const checkSquareStyling = (game) => {
+    return {
+        ...(game.in_check() &&
+            { [checkSquare(game)]: 'in-check' })
     }
 }
 
@@ -55,7 +83,7 @@ export const possibleMovesSquareStyling = (square, game) => {
     if (moves.length === 0) return {}
 
     return {
-        ...{[square]: selectedSquareColor(square)},
+        ...{ [square]: selectedSquareColor(square) },
         ...moves.map(x => x.to).reduce(
             (a, c) => {
                 return {
