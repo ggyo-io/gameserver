@@ -12,6 +12,7 @@ function updateState(headers) {
     const {Black, BlackElo, White, WhiteElo, Result} = headers
     const update = useStoreActions(actions => actions.game.update)
     update({
+        mode: "analysis",
         history: game.history({verbose: true}),
         browseIndex: game.history().length,
         pieceSquare: '',
