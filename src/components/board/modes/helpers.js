@@ -30,7 +30,7 @@ export const pieceSquareStyling = (square) => {
     return {
         ...(square && {
             [square]: {
-                backgroundColor: color
+                backgroundColor: selectedSquareColor(square)
             }
         })
     }

@@ -1603,6 +1603,8 @@ window.jQuery = $;
       // do nothing if there is no piece on this square
       var square = $(this).attr('data-square')
       if (!validSquare(square)) return
+      if (isFunction(config.onSquareClick))
+        config.onSquareClick(square)
       if (!currentPosition.hasOwnProperty(square)) return
 
       beginDraggingPiece(square, currentPosition[square], evt.pageX, evt.pageY)
@@ -1615,6 +1617,8 @@ window.jQuery = $;
       // do nothing if there is no piece on this square
       var square = $(this).attr('data-square')
       if (!validSquare(square)) return
+      if (isFunction(config.onSquareClick))
+        config.onSquareClick(square)
       if (!currentPosition.hasOwnProperty(square)) return
 
       e = e.originalEvent
