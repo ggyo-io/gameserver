@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import './chessboardjs/chessboard-1.0.0.css'
 import { Chessboard } from './chessboardjs/chessboard-1.0.0'
 
@@ -22,10 +22,10 @@ const hl = (props) => {
     }
 }
 
+let board
+
 const GGBoard = (props) => {
     let element = null;
-
-    const [board, setBoard] = useState(null)
 
     useEffect(() => {
         const config = {
@@ -37,8 +37,7 @@ const GGBoard = (props) => {
             //pieceTheme: 'img/chesspieces/merida/{piece}.svg'
             pieceTheme: 'img/chesspieces/wikisvg/{piece}.svg'
         }
-        setBoard(Chessboard(element, config));
-
+        board = Chessboard(element, config);
     }, []);
 
     useEffect(() => {
