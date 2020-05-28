@@ -52,3 +52,16 @@
   top: 2px;
   left: 2px;
 }
+
+.selected-square-white {
+    background-color: rgba(248, 220, 100, 0.9);
+}
+
+.selected-square-black {
+    background-color: rgba(201, 167, 60, 0.88);
+}
+
+.possible-move {
+    background: radial-gradient(circle, gray 15%, transparent 25%);
+    border-radius: '5%';
+}

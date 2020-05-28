@@ -1,10 +1,3 @@
-const selectedSquareWhite = 'rgba(248,220,100,0.9)';
-const selectedSquareBlack = 'rgba(201,167,60,0.88)';
-const possibleMove = {
-    background:
-        'radial-gradient(circle, gray 15%, transparent 25%)',
-    borderRadius: '5%'
-}
 
 export const calcPosition = (history, browseIndex, game) => {
     if (browseIndex === history.length && game.history().length === history.length)
@@ -29,18 +22,12 @@ function isBlack(square) {
 export const pieceSquareStyling = (square) => {
     return {
         ...(square && {
-            [square]: {
-                backgroundColor: selectedSquareColor(square)
-            }
+            [square]: selectedSquareColor(square)
         })
     }
 }
 
-function selectedSquareColor(square) {
-    console.log("selectedSquareColor: " + square)
-    const color = isBlack(square) ? selectedSquareBlack : selectedSquareWhite
-    return color
-}
+const selectedSquareColor = square => isBlack(square) ? 'selected-square-black' : 'selected-square-white'
 
 export const lastMoveSquareStyling = (history, browseIndex) => {
     const sourceSquare = browseIndex && history[browseIndex - 1].from
@@ -48,14 +35,10 @@ export const lastMoveSquareStyling = (history, browseIndex) => {
 
     return {
         ...(browseIndex && {
-            [sourceSquare]: {
-                backgroundColor: selectedSquareColor(sourceSquare)
-            }
+            [sourceSquare]: selectedSquareColor(sourceSquare)
         }),
         ...(browseIndex && {
-            [targetSquare]: {
-                backgroundColor: selectedSquareColor(targetSquare)
-            }
+            [targetSquare]: selectedSquareColor(targetSquare)
         })
     }
 }
@@ -72,13 +55,13 @@ export const possibleMovesSquareStyling = (square, game) => {
     if (moves.length === 0) return {}
 
     return {
-        ...{[square]: {backgroundColor: selectedSquareColor(square)}},
+        ...{[square]: selectedSquareColor(square)},
         ...moves.map(x => x.to).reduce(
             (a, c) => {
                 return {
                     ...a,
                     ...{
-                        [c]: possibleMove
+                        [c]: 'possible-move'
                     },
                 }
             },

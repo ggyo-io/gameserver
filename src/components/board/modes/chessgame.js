@@ -28,7 +28,6 @@ export const ChessGame = (props) => {
     const timer = () => window.setTimeout(makeRandomMove, 200)
 
     const onDragStart = (source, piece, position, orientation) => {
-        console.log("onDragStart");
         // do not pick up pieces if the game is over
         if (game.game_over()) return false
 
@@ -62,14 +61,17 @@ export const ChessGame = (props) => {
         timer()
     }
 
+    let from = ''
     const onSquareClick = (square) => {
         setPieceSquare(square)
 
         let move = game.move({
-            from: pieceSquare,
+            from: from,
             to: square,
             promotion: 'q' // always promote to a queen for example simplicity
         })
+
+        from = square;
 
         // illegal move
         if (move === null) return

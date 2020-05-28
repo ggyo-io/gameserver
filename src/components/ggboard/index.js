@@ -1,10 +1,31 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import './chessboardjs/chessboard-1.0.0.css'
 import { Chessboard } from './chessboardjs/chessboard-1.0.0'
 
+const unhl = () => {
+    const squareClass = '.square-55d63'
+    const highlights = ['possible-move', 'selected-square-black', 'selected-square-white']
+
+    highlights.forEach(function (cn) {
+        document.querySelectorAll(squareClass).forEach(function (el) {
+            el.classList.remove(cn);
+        })
+    });
+}
+
+const hl = (props) => {
+    const { squareStyles } = props
+    for (let [key, value] of Object.entries(squareStyles)) {
+        const el = document.querySelector(".square-" + key)
+        if (el)
+            el.classList.add(value);
+    }
+}
+
 const GGBoard = (props) => {
-    let board = null;
     let element = null;
+
+    const [board, setBoard] = useState(null)
 
     useEffect(() => {
         const config = {
@@ -16,16 +37,25 @@ const GGBoard = (props) => {
             //pieceTheme: 'img/chesspieces/merida/{piece}.svg'
             pieceTheme: 'img/chesspieces/wikisvg/{piece}.svg'
         }
-        board = Chessboard(element, config);
+        setBoard(Chessboard(element, config));
 
-        const { squareStyles } = props
-        for (let [key, value] of Object.entries(squareStyles)) {
-            console.log(`${key}: ${JSON.stringify(value)}`);
-            const el = document.querySelector(".square-" + key)
-            if (el)
-                Object.assign(el.style, value)
-        }
-    });
+    }, []);
+
+    useEffect(() => {
+        unhl()
+        hl(props)
+    }, [props.squareStyles]);
+
+    useEffect(() => {
+        if (board)
+            board.position(props.position, false)
+    }, [props.position]);
+
+    useEffect(() => {
+        if (board)
+            board.resize()
+    }, [props.style.width]);
+
 
     // Render
     const _props = { style: { ...props.style } }

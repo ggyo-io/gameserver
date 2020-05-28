@@ -761,7 +761,6 @@ window.jQuery = $;
     // our square size
     function calculateSquareSize () {
       var containerWidth = parseInt($container.width(), 10)
-      console.log("container width=" + containerWidth)
 
       // defensive, prevent infinite loop
       if (!containerWidth || containerWidth <= 0) {
@@ -1561,7 +1560,6 @@ window.jQuery = $;
     widget.resize = function () {
       // calulate the new square size
       squareSize = calculateSquareSize()
-      console.log("resize width=" + squareSize)
 
       // set board width
       $board.css('width', squareSize * 8 + 'px')
