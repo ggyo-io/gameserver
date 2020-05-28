@@ -1703,14 +1703,18 @@ window.jQuery = $;
       // NOTE: this should never happen, but it's a safeguard
       if (isDragging) return
 
-      // exit if they did not provide a onMouseoverSquare function
-      if (!isFunction(config.onMouseoverSquare)) return
-
       // get the square
       var square = $(evt.currentTarget).attr('data-square')
 
       // NOTE: this should never happen; defensive
       if (!validSquare(square)) return
+
+      if ($(evt.currentTarget).hasClass('possible-move')){
+        $(evt.currentTarget).addClass(CSS.highlight2)
+      }
+
+      // exit if they did not provide a onMouseoverSquare function
+      if (!isFunction(config.onMouseoverSquare)) return
 
       // get the piece on this square
       var piece = false
@@ -1727,14 +1731,18 @@ window.jQuery = $;
       // NOTE: this should never happen, but it's a safeguard
       if (isDragging) return
 
-      // exit if they did not provide an onMouseoutSquare function
-      if (!isFunction(config.onMouseoutSquare)) return
-
       // get the square
       var square = $(evt.currentTarget).attr('data-square')
 
       // NOTE: this should never happen; defensive
       if (!validSquare(square)) return
+
+      if ($(evt.currentTarget).hasClass('possible-move')){
+        $(evt.currentTarget).removeClass(CSS.highlight2)
+      }
+
+      // exit if they did not provide an onMouseoutSquare function
+      if (!isFunction(config.onMouseoutSquare)) return
 
       // get the piece on this square
       var piece = false
