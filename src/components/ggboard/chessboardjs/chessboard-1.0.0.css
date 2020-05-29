@@ -69,6 +69,10 @@
     background: radial-gradient(circle, gray 15%, transparent 25%), #b58863;
 }
 
-.in-check {
-    box-shadow: inset 0 0 1rem 1rem red;
+.in-check.white-1e1d7 {
+    background: radial-gradient(circle, red 15%, transparent 75%), #f0d9b5;
+}
+
+.in-check.black-3c85d {
+    background: radial-gradient(circle, red 30%, transparent 75%), #b58863;
 }
