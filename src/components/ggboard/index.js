@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import './chessboardjs/chessboard-1.0.0.css'
 import { Chessboard } from './chessboardjs/chessboard-1.0.0'
+import {usePrevious} from "../../util/utli";
 
 const unhl = () => {
     const squareClass = '.square-55d63'
@@ -23,7 +24,6 @@ const hl = (props) => {
 }
 
 let board
-
 const GGBoard = (props) => {
     let element = null;
 
@@ -45,16 +45,14 @@ const GGBoard = (props) => {
             board.position(props.position, false)
     }, [props.position]);
 
+    const width = props.style.width;
+    const prevWidth = usePrevious(width)
     useEffect(() => {
-        if (board)
+        if (board && prevWidth !== width)
             board.resize()
-        hl(props)
-    }, [props.style.width]);
-
-    useEffect(() => {
         unhl()
         hl(props)
-    }, [props.squareStyles]);
+    }, [width, props.squareStyles]);
 
     if (board)
         board.setConfig({
