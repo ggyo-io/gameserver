@@ -48,9 +48,13 @@ const GGBoard = (props) => {
     useEffect(() => {
         if (board)
             board.resize()
+        hl(props)
+    }, [props.style.width]);
+
+    useEffect(() => {
         unhl()
         hl(props)
-    }, [props.style.width, props.squareStyles]);
+    }, [props.squareStyles]);
 
     if (board)
         board.setConfig({
