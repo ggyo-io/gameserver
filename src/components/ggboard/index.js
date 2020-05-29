@@ -17,6 +17,7 @@ const hl = (props) => {
     const { squareStyles } = props
     for (let [key, value] of Object.entries(squareStyles)) {
         const el = document.querySelector(".square-" + key)
+        console.log(el)
         if (el)
             el.classList.add(value);
     }
@@ -41,11 +42,6 @@ const GGBoard = (props) => {
     }, []);
 
     useEffect(() => {
-        unhl()
-        hl(props)
-    }, [props.squareStyles]);
-
-    useEffect(() => {
         if (board)
             board.position(props.position, false)
     }, [props.position]);
@@ -53,7 +49,9 @@ const GGBoard = (props) => {
     useEffect(() => {
         if (board)
             board.resize()
-    }, [props.style.width]);
+        unhl()
+        hl(props)
+    }, [props.style.width, props.squareStyles]);
 
     if (board)
         board.setConfig({
