@@ -1,5 +1,12 @@
 /*! chessboard.js v1.0.0 | (c) 2019 Chris Oakman | MIT License chessboardjs.com/license */
 
+:root {
+    --white-bg-color: #f0d9b5;
+    --black-bg-color: #b58863;
+    --possible-move: radial-gradient(circle, gray 15%, transparent 25%);
+    --check: radial-gradient(circle, red 30%, transparent 75%);
+}
+
 .clearfix-7da63 {
     clear: both;
 }
@@ -22,12 +29,12 @@
 }
 
 .white-1e1d7 {
-    background-color: #f0d9b5;
+    background-color: var(--white-bg-color);
     color: #b58863;
 }
 
 .black-3c85d {
-    background-color: #b58863;
+    background-color: var(--black-bg-color);
     color: #f0d9b5;
 }
 
@@ -62,17 +69,17 @@
 }
 
 .possible-move.white-1e1d7 {
-    background: radial-gradient(circle, gray 15%, transparent 25%), #f0d9b5;
+    background: var(--possible-move), var(--white-bg-color);
 }
 
 .possible-move.black-3c85d {
-    background: radial-gradient(circle, gray 15%, transparent 25%), #b58863;
+    background: var(--possible-move), var(--black-bg-color);
 }
 
 .in-check.white-1e1d7 {
-    background: radial-gradient(circle, red 15%, transparent 75%), #f0d9b5;
+    background: var(--check), var(--white-bg-color);
 }
 
 .in-check.black-3c85d {
-    background: radial-gradient(circle, red 30%, transparent 75%), #b58863;
+    background: var(--check), var(--black-bg-color);
 }
