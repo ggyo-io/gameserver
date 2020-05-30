@@ -4,6 +4,7 @@ import {useStoreActions, useStoreState} from "easy-peasy";
 import {
     calcPosition,
     checkSquareStyling,
+    combineStyles,
     lastMoveSquareStyling,
     pieceSquareStyling,
     possibleMovesSquareStyling
@@ -108,12 +109,11 @@ export const ChessGame = (props) => {
     }
 
     const position = calcPosition(history, browseIndex, game);
-    const squareStyles = {
-        ...checkSquareStyling(game),
-        ...pieceSquareStyling(pieceSquare),
-        ...lastMoveSquareStyling(history, browseIndex),
-        ...possibleMovesSquareStyling(pieceSquare, game)
-    };
+    const squareStyles = combineStyles(
+        [checkSquareStyling(game),
+            pieceSquareStyling(pieceSquare),
+            lastMoveSquareStyling(history, browseIndex),
+            possibleMovesSquareStyling(pieceSquare, game)])
 
     return (
         <GGBoard

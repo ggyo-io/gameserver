@@ -10,19 +10,10 @@ export const calcPosition = (history, browseIndex, game) => {
     return game.fen()
 }
 
-function isBlack(square) {
-    if (!square || !square.length || square.length !== 2)
-        return false
-
-    const x = square.charCodeAt(0)
-    const y = square.charCodeAt(1);
-    return (x + y) % 2 === 0
-}
-
 export const pieceSquareStyling = (square) => {
     return {
         ...(square && {
-            [square]: selectedSquareColor(square)
+            [square]: 'selected-square'
         })
     }
 }
@@ -55,18 +46,16 @@ export const checkSquareStyling = (game) => {
     }
 }
 
-const selectedSquareColor = square => isBlack(square) ? 'selected-square-black' : 'selected-square-white'
-
 export const lastMoveSquareStyling = (history, browseIndex) => {
     const sourceSquare = browseIndex && history[browseIndex - 1].from
     const targetSquare = browseIndex && history[browseIndex - 1].to
 
     return {
         ...(browseIndex && {
-            [sourceSquare]: selectedSquareColor(sourceSquare)
+            [sourceSquare]: 'selected-square'
         }),
         ...(browseIndex && {
-            [targetSquare]: selectedSquareColor(targetSquare)
+            [targetSquare]: 'selected-square'
         })
     }
 }
@@ -83,7 +72,7 @@ export const possibleMovesSquareStyling = (square, game) => {
     if (moves.length === 0) return {}
 
     return {
-        ...{ [square]: selectedSquareColor(square) },
+        ...{ [square]: 'selected-square' },
         ...moves.map(x => x.to).reduce(
             (a, c) => {
                 return {
@@ -96,5 +85,18 @@ export const possibleMovesSquareStyling = (square, game) => {
             {}
         )
     }
+}
 
+export const combineStyles = (args) => {
+    const result = {}
+
+    for (let i = 0; i < args.length; i++) {
+        const next = args[i];
+        for (let [key, value] of Object.entries(next)) {
+            const arr = result[key] || [];
+            arr.push(value)
+            result[key] = arr
+        }
+    }
+    return result
 }

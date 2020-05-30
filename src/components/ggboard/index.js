@@ -4,10 +4,10 @@ import { Chessboard } from './chessboardjs/chessboard-1.0.0'
 
 const unhl = () => {
     const squareClass = '.square-55d63'
-    const highlights = ['possible-move', 'selected-square-black', 'selected-square-white', 'in-check']
+    const highlights = ['possible-move', 'selected-square', 'in-check']
 
-    highlights.forEach(function (cn) {
-        document.querySelectorAll(squareClass).forEach(function (el) {
+    highlights.forEach((cn) => {
+        document.querySelectorAll(squareClass).forEach((el) => {
             el.classList.remove(cn);
         })
     });
@@ -18,7 +18,7 @@ const hl = (props) => {
     for (let [key, value] of Object.entries(squareStyles)) {
         const el = document.querySelector(".square-" + key)
         if (el)
-            el.classList.add(value);
+            value.forEach((v)=>el.classList.add(v))
     }
 }
 
