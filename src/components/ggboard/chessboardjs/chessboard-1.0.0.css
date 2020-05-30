@@ -7,6 +7,7 @@
     --check: radial-gradient(circle, red 30%, transparent 75%);
     --highlight: inset 0 0 3px 3px yellow;
     --selected-square: linear-gradient(rgba(255, 242, 0, 0.45), rgba(241, 178, 18, 0.45));
+    --takes: inset 0 0 10px 6px gray;
 }
 
 .clearfix-7da63 {
@@ -95,5 +96,5 @@
 }
 
 .possible-move .piece-417db {
-    box-shadow: var(--highlight);
+    box-shadow: var(--takes);
 }
