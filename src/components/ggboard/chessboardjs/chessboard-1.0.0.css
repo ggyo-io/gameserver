@@ -5,6 +5,7 @@
     --black-bg-color: #b58863;
     --possible-move: radial-gradient(circle, gray 15%, transparent 25%);
     --check: radial-gradient(circle, red 30%, transparent 75%);
+    --highlight: inset 0 0 3px 3px yellow;
 }
 
 .clearfix-7da63 {
@@ -30,17 +31,17 @@
 
 .white-1e1d7 {
     background-color: var(--white-bg-color);
-    color: #b58863;
+    color: var(--black-bg-color);
 }
 
 .black-3c85d {
     background-color: var(--black-bg-color);
-    color: #f0d9b5;
+    color: var(--white-bg-color);
 }
 
 .highlight1-32417,
 .highlight2-9c5d2 {
-    box-shadow: inset 0 0 3px 3px yellow;
+    box-shadow: var(--highlight);
 }
 
 .notation-322f9 {
@@ -82,4 +83,8 @@
 
 .in-check.black-3c85d {
     background: var(--check), var(--black-bg-color);
+}
+
+.possible-move .piece-417db {
+    box-shadow: var(--highlight);
 }
