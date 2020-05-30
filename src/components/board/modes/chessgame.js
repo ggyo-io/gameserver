@@ -1,15 +1,17 @@
 import Chess from "chess.js";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {
     calcPosition,
     checkSquareStyling,
+    dropSquareStyling,
     lastMoveSquareStyling,
     pieceSquareStyling,
-    dropSquareStyling,
     possibleMovesSquareStyling
 } from "./helpers";
 import GGBoard from '../../ggboard'
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 
 const game = new Chess()
 
@@ -72,11 +74,7 @@ export const ChessGame = (props) => {
 
     const onDrop = (sourceSquare, targetSquare) => {
         // see if the move is legal
-        const move = game.move({
-            from: sourceSquare,
-            to: targetSquare,
-            promotion: 'q' // always promote to a queen for example simplicity
-        })
+        const move = makeMove(sourceSquare, targetSquare)
 
         // illegal move
         if (move === null) return 'snapback'
@@ -85,12 +83,23 @@ export const ChessGame = (props) => {
         timer()
     }
 
-    const onSquareClick = (square, piece) => {
+    function makeMove(source, target) {
+        const piece = game.get(source)
+        // show promotion
+        if (piece && piece.type === 'p' && target.indexOf('8') !== -1) {
+            handleShow()
+        }
         let move = game.move({
-            from: pieceSquare,
-            to: square,
+            from: source,
+            to: target,
             promotion: 'q' // always promote to a queen for example simplicity
         })
+
+        return move;
+    }
+
+    const onSquareClick = (square, piece) => {
+        let move = makeMove(pieceSquare, square);
 
         // illegal move
         if (move === null) return
@@ -100,7 +109,7 @@ export const ChessGame = (props) => {
     }
 
     const onMouseoverSquare = (square) => {
-        if (game.moves({square: pieceSquare, verbose: true}).map(x=>x.to).includes(square)) {
+        if (game.moves({square: pieceSquare, verbose: true}).map(x => x.to).includes(square)) {
             setDropSquare(square)
         }
     }
@@ -123,7 +132,7 @@ export const ChessGame = (props) => {
             sq = draggedPieceSource
             setPieceSquare(sq)
         }
-        if (game.moves({ square: sq, verbose: true }).map(x => x.to).includes(square)) {
+        if (game.moves({square: sq, verbose: true}).map(x => x.to).includes(square)) {
             setDropSquare(square)
         }
     }
@@ -133,9 +142,9 @@ export const ChessGame = (props) => {
         draggedPieceSource,
         currentPosition,
         currentOrientation
-      ) => {
+    ) => {
         setDropSquare('')
-      }
+    }
 
     const makeRandomMove = () => {
         let possibleMoves = game.moves()
@@ -162,18 +171,45 @@ export const ChessGame = (props) => {
     pieceSquareStyling(squareStyles, pieceSquare)
     dropSquareStyling(squareStyles, dropSquare)
 
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
     return (
-        <GGBoard
-            position={position}
-            squareStyles={squareStyles}
-            onDrop={onDrop}
-            onSquareClick={onSquareClick}
-            onMouseoverSquare={onMouseoverSquare}
-            onMouseoutSquare={onMouseoutSquare}
-            onDragStart={onDragStart}
-            onDragMove={onDragMove}
-            onSnapbackEnd={onSnapbackEnd}
-            style={props.style}
-        />
+        <>
+            <GGBoard
+                position={position}
+                squareStyles={squareStyles}
+                onDrop={onDrop}
+                onSquareClick={onSquareClick}
+                onMouseoverSquare={onMouseoverSquare}
+                onMouseoutSquare={onMouseoutSquare}
+                onDragStart={onDragStart}
+                onDragMove={onDragMove}
+                onSnapbackEnd={onSnapbackEnd}
+                style={props.style}
+            />
+            <Modal show={show} onHide={handleClose} size="sm" >
+                <Modal.Body>
+                    <div className="d-flex flex-row">
+                    <Button size="sm" variant="secondary" onClick={handleClose}>
+                        <img src="img/chesspieces/wikisvg/wQ.svg"/>
+                    </Button>
+                    <Button size="sm" variant="primary" onClick={handleClose}>
+                        <img src="img/chesspieces/wikisvg/wR.svg"/>
+                    </Button>
+                    <Button size="sm" variant="primary" onClick={handleClose}>
+                        <img src="img/chesspieces/wikisvg/wB.svg"/>
+                    </Button>
+                    <Button size="sm" variant="primary" onClick={handleClose}>
+                        <img src="img/chesspieces/wikisvg/wN.svg"/>
+                    </Button>
+                    </div>
+                </Modal.Body>
+            </Modal>
+        </>
     )
 }
+
+
