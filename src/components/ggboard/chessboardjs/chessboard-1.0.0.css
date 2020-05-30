@@ -6,7 +6,8 @@
     --possible-move: radial-gradient(circle, gray 15%, transparent 25%);
     --check: radial-gradient(circle, red 30%, transparent 75%);
     --highlight: inset 0 0 3px 3px yellow;
-    --selected-square: linear-gradient(rgba(255, 242, 0, 0.45), rgba(241, 178, 18, 0.45));
+    --selected-square-black: linear-gradient(rgba(111, 111, 111, 0.55), rgba(205, 204, 204, 0.55));
+    --selected-square-white: linear-gradient(rgba(252, 252, 252, 0.45), rgba(75, 75, 75, 0.45));
     --takes: inset 0 0 10px 6px gray;
 }
 
@@ -64,11 +65,11 @@
 }
 
 .selected-square.white-1e1d7 {
-    background: var(--selected-square), var(--white-bg-color);
+    background: var(--selected-square-white), var(--white-bg-color);
 }
 
 .selected-square.black-3c85d {
-    background: var(--selected-square), var(--black-bg-color);
+    background: var(--selected-square-black), var(--black-bg-color);
 }
 
 .possible-move.white-1e1d7 {
@@ -88,11 +89,11 @@
 }
 
 .in-check.selected-square.white-1e1d7 {
-    background: var(--check), var(--selected-square), var(--white-bg-color);
+    background: var(--check), var(--selected-square-white), var(--white-bg-color);
 }
 
 .in-check.selected-square.black-3c85d {
-    background: var(--check), var(--selected-square), var(--black-bg-color);
+    background: var(--check), var(--selected-square-black), var(--black-bg-color);
 }
 
 .possible-move .piece-417db {
