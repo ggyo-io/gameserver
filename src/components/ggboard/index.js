@@ -4,7 +4,7 @@ import { Chessboard } from './chessboardjs/chessboard-1.0.0'
 
 const unhl = () => {
     const squareClass = '.square-55d63'
-    const highlights = ['possible-move', 'selected-square', 'in-check']
+    const highlights = ['possible-move', 'selected-square', 'in-check', 'piece-square', 'drop-square']
 
     highlights.forEach((cn) => {
         document.querySelectorAll(squareClass).forEach((el) => {
@@ -31,9 +31,6 @@ const GGBoard = (props) => {
         const config = {
             draggable: true,
             position: props.position,
-            onDragStart: props.onDragStart,
-            onDrop: props.onDrop,
-            onSquareClick: props.onSquareClick,
             //pieceTheme: 'img/chesspieces/merida/{piece}.svg'
             pieceTheme: 'img/chesspieces/wikisvg/{piece}.svg'
         }
@@ -58,7 +55,13 @@ const GGBoard = (props) => {
 
     if (board)
         board.setConfig({
-            onSquareClick: props.onSquareClick
+            onDrop: props.onDrop,
+            onSquareClick: props.onSquareClick,
+            onMouseoverSquare: props.onMouseoverSquare,
+            onMouseoutSquare: props.onMouseoutSquare,
+            onDragStart: props.onDragStart,
+            onDragMove: props.onDragMove,
+            onSnapbackEnd:props.onSnapbackEnd
         })
 
     // Render

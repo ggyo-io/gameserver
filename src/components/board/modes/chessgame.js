@@ -7,6 +7,7 @@ import {
     combineStyles,
     lastMoveSquareStyling,
     pieceSquareStyling,
+    dropSquareStyling,
     possibleMovesSquareStyling
 } from "./helpers";
 import GGBoard from '../../ggboard'
@@ -22,23 +23,33 @@ export const ChessGame = (props) => {
     // Store state
     const history = useStoreState(state => state.game.history)
     const pieceSquare = useStoreState(state => state.game.pieceSquare)
+    const dropSquare = useStoreState(state => state.game.dropSquare)
     const browseIndex = useStoreState(state => state.game.browseIndex)
 
     // Actions
     const onMove = useStoreActions(actions => actions.game.update)
     const setPieceSquare = useStoreActions(actions => actions.game.setPieceSquare)
+    const setDropSquare = useStoreActions(actions => actions.game.setDropSquare)
 
     //
     // Game logic
     //
     const timer = () => window.setTimeout(makeRandomMove, 200)
 
-    const onDragStart = (source, piece, position, orientation) => {
+    const onDragStart = (square, piece, position, orientation) => {
         // do not pick up pieces if the game is over
         if (game.game_over()) return false
 
         // only pick up pieces for White
         if (piece.search(/^b/) !== -1) return false
+
+        // double click
+        if (square === pieceSquare) {
+            setPieceSquare('');
+        } else {
+            setPieceSquare(square);
+        }
+
     }
 
     const moveMade = () => {
@@ -75,8 +86,7 @@ export const ChessGame = (props) => {
         timer()
     }
 
-    const onSquareClick = (square) => {
-        setPieceSquare(square)
+    const onSquareClick = (square, piece) => {
         let move = game.move({
             from: pieceSquare,
             to: square,
@@ -84,12 +94,49 @@ export const ChessGame = (props) => {
         })
 
         // illegal move
-        if (move === null) return false
+        if (move === null) return
 
         moveMade()
         timer()
-        return true
     }
+
+    const onMouseoverSquare = (square) => {
+        if (game.moves({square: pieceSquare, verbose: true}).map(x=>x.to).includes(square)) {
+            setDropSquare(square)
+        }
+    }
+
+    const onMouseoutSquare = (square) => {
+        if (dropSquare === square)
+            setDropSquare('')
+    }
+
+    const onDragMove = (
+        square,
+        draggedPieceLocation,
+        draggedPieceSource,
+        draggedPiece,
+        currentPosition,
+        currentOrientation
+    ) => {
+        let sq = pieceSquare
+        if (sq === '') {
+            sq = draggedPieceSource
+            setPieceSquare(sq)
+        }
+        if (game.moves({ square: sq, verbose: true }).map(x => x.to).includes(square)) {
+            setDropSquare(square)
+        }
+    }
+
+    const onSnapbackEnd = (
+        draggedPiece,
+        draggedPieceSource,
+        currentPosition,
+        currentOrientation
+      ) => {
+        setDropSquare('')
+      }
 
     const makeRandomMove = () => {
         let possibleMoves = game.moves()
@@ -109,19 +156,24 @@ export const ChessGame = (props) => {
     }
 
     const position = calcPosition(history, browseIndex, game);
-    const squareStyles = combineStyles(
-        [checkSquareStyling(game),
-            pieceSquareStyling(pieceSquare),
-            lastMoveSquareStyling(history, browseIndex),
-            possibleMovesSquareStyling(pieceSquare, game)])
+    let squareStyles = {}
+    checkSquareStyling(squareStyles, game)
+    lastMoveSquareStyling(squareStyles, history, browseIndex)
+    possibleMovesSquareStyling(squareStyles, pieceSquare, game)
+    pieceSquareStyling(squareStyles, pieceSquare)
+    dropSquareStyling(squareStyles, dropSquare)
 
     return (
         <GGBoard
             position={position}
             squareStyles={squareStyles}
-            onDragStart={onDragStart}
             onDrop={onDrop}
             onSquareClick={onSquareClick}
+            onMouseoverSquare={onMouseoverSquare}
+            onMouseoutSquare={onMouseoutSquare}
+            onDragStart={onDragStart}
+            onDragMove={onDragMove}
+            onSnapbackEnd={onSnapbackEnd}
             style={props.style}
         />
     )

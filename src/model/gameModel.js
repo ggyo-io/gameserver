@@ -9,6 +9,7 @@ export const gameModel = {
 
         // square with the currently clicked piece
         pieceSquare: '',
+        dropSquare: '',
 
         dialogLabel: '',
         top: {

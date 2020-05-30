@@ -1,4 +1,3 @@
-
 export const calcPosition = (history, browseIndex, game) => {
     if (browseIndex === history.length && game.history().length === history.length)
         return game.fen()
@@ -8,14 +7,6 @@ export const calcPosition = (history, browseIndex, game) => {
         game.move(history[i])
 
     return game.fen()
-}
-
-export const pieceSquareStyling = (square) => {
-    return {
-        ...(square && {
-            [square]: 'selected-square'
-        })
-    }
 }
 
 const checkSquare = (game) => {
@@ -39,64 +30,37 @@ const checkSquare = (game) => {
     return ''
 }
 
-export const checkSquareStyling = (game) => {
-    return {
-        ...(game.in_check() &&
-            { [checkSquare(game)]: 'in-check' })
-    }
+export const checkSquareStyling = (squareStyles, game) => {
+    if (!game.in_check()) return;
+    const cs = checkSquare(game);
+    squareStyles[cs] = squareStyles[cs] ? [ ...squareStyles[cs], 'in-check' ] : [ 'in-check' ]
 }
 
-export const lastMoveSquareStyling = (history, browseIndex) => {
-    const sourceSquare = browseIndex && history[browseIndex - 1].from
-    const targetSquare = browseIndex && history[browseIndex - 1].to
+export const lastMoveSquareStyling = (squareStyles, history, browseIndex) => {
+    if (!browseIndex) return;
 
-    return {
-        ...(browseIndex && {
-            [sourceSquare]: 'selected-square'
-        }),
-        ...(browseIndex && {
-            [targetSquare]: 'selected-square'
-        })
-    }
+    const sourceSquare = history[browseIndex - 1].from
+    const targetSquare = history[browseIndex - 1].to
+    squareStyles[sourceSquare] = squareStyles[sourceSquare] ? [ ...squareStyles[sourceSquare], 'selected-square' ] : [ 'selected-square' ]
+    squareStyles[targetSquare] = squareStyles[targetSquare] ? [ ...squareStyles[targetSquare], 'selected-square' ] : [ 'selected-square' ]
 }
 
 // show possible moves
-export const possibleMovesSquareStyling = (square, game) => {
-    // get list of possible moves for this square
-    let moves = game.moves({
-        square: square,
-        verbose: true
-    })
-
-    // exit if there are no moves available for this square
-    if (moves.length === 0) return {}
-
-    return {
-        ...{ [square]: 'selected-square' },
-        ...moves.map(x => x.to).reduce(
-            (a, c) => {
-                return {
-                    ...a,
-                    ...{
-                        [c]: 'possible-move'
-                    },
-                }
-            },
-            {}
-        )
-    }
+export const possibleMovesSquareStyling = (squareStyles, square, game) => {
+    game.moves({square: square, verbose: true}).map(x => x.to).forEach(sq => {
+        squareStyles[sq] = squareStyles[sq] ? [ ...squareStyles[sq], 'possible-move' ]
+                                                : [ 'possible-move' ]
+    });
 }
 
-export const combineStyles = (args) => {
-    const result = {}
+export const pieceSquareStyling = (squareStyles, sq) => {
+    if (sq === '') return;
+    squareStyles[sq] = squareStyles[sq] ? [ ...squareStyles[sq], 'piece-square' ]
+                                                : [ 'piece-square' ]
+}
 
-    for (let i = 0; i < args.length; i++) {
-        const next = args[i];
-        for (let [key, value] of Object.entries(next)) {
-            const arr = result[key] || [];
-            arr.push(value)
-            result[key] = arr
-        }
-    }
-    return result
+export const dropSquareStyling = (squareStyles, sq) => {
+    if (sq === '') return;
+    squareStyles[sq] = squareStyles[sq] ? [ ...squareStyles[sq], 'drop-square' ]
+                                                : [ 'drop-square' ]
 }

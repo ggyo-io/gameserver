@@ -11,10 +11,10 @@ export const Analysis = (props) => {
     const browseIndex = useStoreState(state => state.game.browseIndex)
 
     const position = calcPosition(history, browseIndex, game);
-    const squareStyles = combineStyles([
-        checkSquareStyling(game),
-        lastMoveSquareStyling(history, browseIndex)
-    ])
+
+    let squareStyles = {};
+    checkSquareStyling(squareStyles, game);
+    lastMoveSquareStyling(squareStyles, history, browseIndex)
 
     return (
         <GGBoard

@@ -44,8 +44,6 @@ window.jQuery = $;
   CSS['board'] = 'board-b72b1'
   CSS['chessboard'] = 'chessboard-63f37'
   CSS['clearfix'] = 'clearfix-7da63'
-  CSS['highlight1'] = 'highlight1-32417'
-  CSS['highlight2'] = 'highlight2-9c5d2'
   CSS['notation'] = 'notation-322f9'
   CSS['numeric'] = 'numeric-fc462'
   CSS['piece'] = 'piece-417db'
@@ -1185,20 +1183,12 @@ window.jQuery = $;
       }
     }
 
-    function removeSquareHighlights (cls) {
-      $board
-        .find('.' + CSS.square)
-        .removeClass(cls)
-    }
-
     function snapbackDraggedPiece () {
       // there is no "snapback" for spare pieces
       if (draggedPieceSource === 'spare') {
         trashDraggedPiece()
         return
       }
-
-      removeSquareHighlights(CSS.highlight2)
 
       // animation complete
       function complete () {
@@ -1231,8 +1221,6 @@ window.jQuery = $;
     }
 
     function trashDraggedPiece () {
-      removeSquareHighlights(CSS.highlight1 + ' ' + CSS.highlight2)
-
       // remove the source piece
       var newPosition = deepCopy(currentPosition)
       delete newPosition[draggedPieceSource]
@@ -1249,8 +1237,6 @@ window.jQuery = $;
     }
 
     function dropDraggedPieceOnSquare (square) {
-      removeSquareHighlights(CSS.highlight1 + ' ' + CSS.highlight2)
-
       // update position
       var newPosition = deepCopy(currentPosition)
       delete newPosition[draggedPieceSource]
@@ -1316,7 +1302,6 @@ window.jQuery = $;
       if (source !== 'spare') {
         // highlight the source square and hide the piece
         $('#' + squareElsIds[source])
-          .addClass(CSS.highlight1)
           .find('.' + CSS.piece)
           .css('display', 'none')
       }
@@ -1334,16 +1319,6 @@ window.jQuery = $;
 
       // do nothing if the location has not changed
       if (location === draggedPieceLocation) return
-
-      // remove highlight from previous square
-      if (validSquare(draggedPieceLocation)) {
-        $('#' + squareElsIds[draggedPieceLocation]).removeClass(CSS.highlight2)
-      }
-
-      // add highlight to new square
-      if (validSquare(location)) {
-        $('#' + squareElsIds[location]).addClass(CSS.highlight2)
-      }
 
       // run onDragMove
       if (isFunction(config.onDragMove)) {
@@ -1605,11 +1580,9 @@ window.jQuery = $;
       // do nothing if there is no piece on this square
       var square = $(this).attr('data-square')
       if (!validSquare(square)) return
-      removeSquareHighlights(CSS.highlight1 + ' ' + CSS.highlight2)
+
       if (isFunction(config.onSquareClick))
-        if (!config.onSquareClick(square)) {
-          $(evt.currentTarget).addClass(CSS.highlight1)
-        }
+        config.onSquareClick(square, currentPosition[square])
       if (!currentPosition.hasOwnProperty(square)) return
 
       beginDraggingPiece(square, currentPosition[square], evt.pageX, evt.pageY)
@@ -1623,7 +1596,7 @@ window.jQuery = $;
       var square = $(this).attr('data-square')
       if (!validSquare(square)) return
       if (isFunction(config.onSquareClick))
-        config.onSquareClick(square)
+        config.onSquareClick(square, currentPosition[square])
       if (!currentPosition.hasOwnProperty(square)) return
 
       e = e.originalEvent
@@ -1712,10 +1685,6 @@ window.jQuery = $;
       // NOTE: this should never happen; defensive
       if (!validSquare(square)) return
 
-      if ($(evt.currentTarget).hasClass('possible-move')){
-        $(evt.currentTarget).addClass(CSS.highlight2)
-      }
-
       // exit if they did not provide a onMouseoverSquare function
       if (!isFunction(config.onMouseoverSquare)) return
 
@@ -1739,10 +1708,6 @@ window.jQuery = $;
 
       // NOTE: this should never happen; defensive
       if (!validSquare(square)) return
-
-      if ($(evt.currentTarget).hasClass('possible-move')){
-        $(evt.currentTarget).removeClass(CSS.highlight2)
-      }
 
       // exit if they did not provide an onMouseoutSquare function
       if (!isFunction(config.onMouseoutSquare)) return

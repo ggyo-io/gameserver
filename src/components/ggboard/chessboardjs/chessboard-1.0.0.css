@@ -40,8 +40,8 @@
     color: var(--white-bg-color);
 }
 
-.highlight1-32417,
-.highlight2-9c5d2 {
+.piece-square,
+.drop-square {
     box-shadow: var(--highlight);
 }
 
