@@ -6,7 +6,7 @@
     --possible-move: radial-gradient(circle, gray 15%, transparent 25%);
     --check: radial-gradient(circle, red 30%, transparent 75%);
     --highlight: inset 0 0 3px 3px yellow;
-    --selected-square-black: linear-gradient(rgba(111, 111, 111, 0.55), rgba(205, 204, 204, 0.55));
+    --selected-square-black: linear-gradient(rgba(111, 111, 111, 0.45), rgba(205, 204, 204, 0.55));
     --selected-square-white: linear-gradient(rgba(252, 252, 252, 0.45), rgba(75, 75, 75, 0.45));
     --takes: inset 0 0 10px 6px gray;
 }
