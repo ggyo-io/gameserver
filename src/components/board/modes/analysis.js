@@ -1,7 +1,7 @@
 import React from "react";
 import Chess from "chess.js";
 import {useStoreState} from "easy-peasy";
-import {calcPosition, checkSquareStyling, combineStyles, lastMoveSquareStyling} from "./helpers";
+import {calcPosition, checkSquareStyling, lastMoveSquareStyling} from "./helpers";
 import GGBoard from "../../ggboard";
 
 const game = new Chess()

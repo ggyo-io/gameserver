@@ -4,7 +4,6 @@ import {useStoreActions, useStoreState} from "easy-peasy";
 import {
     calcPosition,
     checkSquareStyling,
-    combineStyles,
     lastMoveSquareStyling,
     pieceSquareStyling,
     dropSquareStyling,
