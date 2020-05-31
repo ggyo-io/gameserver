@@ -10,8 +10,6 @@ import {
     possibleMovesSquareStyling
 } from "./helpers";
 import GGBoard from '../../ggboard'
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
 
 const game = new Chess()
 
@@ -78,34 +76,47 @@ export const ChessGame = (props) => {
 
         // illegal move
         if (move === null) return 'snapback'
-
-        moveMade()
-        timer()
     }
 
-    function makeMove(source, target) {
+    function showPromotion(source, target) {
+        game.undo()
+        const onPromote = (promotion) => {
+            let move = game.move({
+                from: source,
+                to: target,
+                promotion: promotion
+            })
+            if (move) {
+                moveMade()
+                timer()
+            }
+        }
+        onMove({promote: true, onPromote: onPromote})
+    }
+
+    const makeMove = (source, target) => {
         const piece = game.get(source)
         // show promotion
-        if (piece && piece.type === 'p' && target.indexOf('8') !== -1) {
-            handleShow()
-        }
         let move = game.move({
             from: source,
             to: target,
-            promotion: 'q' // always promote to a queen for example simplicity
+            promotion: 'q'
         })
 
-        return move;
+        if (move == null)
+            return null
+
+        if (piece && piece.type === 'p' && target.indexOf('8') !== -1) {
+            showPromotion(source, target);
+        } else {
+            moveMade()
+            timer()
+        }
+        return move
     }
 
     const onSquareClick = (square, piece) => {
-        let move = makeMove(pieceSquare, square);
-
-        // illegal move
-        if (move === null) return
-
-        moveMade()
-        timer()
+        makeMove(pieceSquare, square);
     }
 
     const onMouseoverSquare = (square) => {
@@ -171,13 +182,7 @@ export const ChessGame = (props) => {
     pieceSquareStyling(squareStyles, pieceSquare)
     dropSquareStyling(squareStyles, dropSquare)
 
-    const [show, setShow] = useState(false);
-
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-
     return (
-        <>
             <GGBoard
                 position={position}
                 squareStyles={squareStyles}
@@ -190,25 +195,6 @@ export const ChessGame = (props) => {
                 onSnapbackEnd={onSnapbackEnd}
                 style={props.style}
             />
-            <Modal show={show} onHide={handleClose} size="sm" >
-                <Modal.Body>
-                    <div className="d-flex flex-row">
-                    <Button size="sm" variant="secondary" onClick={handleClose}>
-                        <img src="img/chesspieces/wikisvg/wQ.svg"/>
-                    </Button>
-                    <Button size="sm" variant="primary" onClick={handleClose}>
-                        <img src="img/chesspieces/wikisvg/wR.svg"/>
-                    </Button>
-                    <Button size="sm" variant="primary" onClick={handleClose}>
-                        <img src="img/chesspieces/wikisvg/wB.svg"/>
-                    </Button>
-                    <Button size="sm" variant="primary" onClick={handleClose}>
-                        <img src="img/chesspieces/wikisvg/wN.svg"/>
-                    </Button>
-                    </div>
-                </Modal.Body>
-            </Modal>
-        </>
     )
 }
 

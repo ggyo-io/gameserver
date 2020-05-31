@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import './chessboardjs/chessboard-1.0.0.scss'
 import { Chessboard } from './chessboardjs/chessboard-1.0.0'
+import {Promote} from "../board/components/promote";
 
 const unhl = () => {
     const squareClass = '.square-55d63'
@@ -14,11 +15,11 @@ const unhl = () => {
 }
 
 const hl = (props) => {
-    const { squareStyles } = props
+    const {squareStyles} = props
     for (let [key, value] of Object.entries(squareStyles)) {
         const el = document.querySelector(".square-" + key)
         if (el)
-            value.forEach((v)=>el.classList.add(v))
+            value.forEach((v) => el.classList.add(v))
     }
 }
 
@@ -61,12 +62,17 @@ const GGBoard = (props) => {
             onMouseoutSquare: props.onMouseoutSquare,
             onDragStart: props.onDragStart,
             onDragMove: props.onDragMove,
-            onSnapbackEnd:props.onSnapbackEnd
+            onSnapbackEnd: props.onSnapbackEnd
         })
 
     // Render
-    const _props = { style: { ...props.style } }
-    return <div ref={el => element = el} {..._props} />
+    const _props = {style: {...props.style}}
+    return (
+        <>
+            <Promote/>
+            <div ref={el => element = el} {..._props} />
+        </>
+    )
 }
 
 export default GGBoard;
