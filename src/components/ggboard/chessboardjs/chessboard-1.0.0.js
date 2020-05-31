@@ -6,7 +6,7 @@
 // https://github.com/oakmac/chessboardjs/blob/master/LICENSE.md
 
 
-import './chessboard-1.0.0.css'
+import './chessboard-1.0.0.scss'
 import $ from "jquery";
 window.$ = $;
 window.jQuery = $;

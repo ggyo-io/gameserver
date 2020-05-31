@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import './chessboardjs/chessboard-1.0.0.css'
+import './chessboardjs/chessboard-1.0.0.scss'
 import { Chessboard } from './chessboardjs/chessboard-1.0.0'
 
 const unhl = () => {
