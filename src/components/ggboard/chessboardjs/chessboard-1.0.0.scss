@@ -1,14 +1,15 @@
 /*! chessboard.js v1.0.0 | (c) 2019 Chris Oakman | MIT License chessboardjs.com/license */
 
+/* High contrast color scheme */
 :root {
     --white-bg-color: #f0d9b5;
+    --selected-square-white: #b5ccf0;
     --black-bg-color: #b58863;
-    --possible-move: radial-gradient(circle, gray 15%, transparent 25%);
+    --selected-square-black: #6390b5;
     --check: radial-gradient(circle, red 30%, transparent 75%);
-    --highlight: inset 0 0 3px 3px yellow;
-    --selected-square-black: linear-gradient(rgba(111, 111, 111, 0.45), rgba(205, 204, 204, 0.55));
-    --selected-square-white: linear-gradient(rgba(252, 252, 252, 0.45), rgba(75, 75, 75, 0.45));
-    --takes: inset 0 0 10px 6px gray;
+    --highlight: inset 0 0 0 3px black;
+    --possible-move: radial-gradient(circle, #8863b5 15%, transparent 25%);
+    --takes: inset 0 0 10px 6px #8863b5;
 }
 
 .clearfix-7da63 {
@@ -32,67 +33,6 @@
     user-select: none;
 }
 
-.white-1e1d7 {
-    background-color: var(--white-bg-color);
-    color: var(--black-bg-color);
-    &.selected-square {
-        background: var(--selected-square-white), var(--white-bg-color);
-        &.possible-move {
-            background: var(--possible-move), var(--selected-square-white), var(--white-bg-color);
-            .piece-417db {
-                background: var(--selected-square-white), var(--white-bg-color);
-                box-shadow: var(--takes);
-            }
-        }
-    }
-    &.possible-move {
-        background: var(--possible-move), var(--white-bg-color);
-        .piece-417db {
-            background: var(--white-bg-color);
-            box-shadow: var(--takes);
-        }
-    }
-    &.in-check {
-        background: var(--check), var(--white-bg-color);
-        &.selected-square {
-            background: var(--check), var(--selected-square-white), var(--white-bg-color);
-        }
-    }
-}
-
-.black-3c85d {
-    background-color: var(--black-bg-color);
-    color: var(--white-bg-color);
-    &.selected-square.black-3c85d {
-        background: var(--selected-square-black), var(--black-bg-color);
-        &.possible-move {
-            background: var(--possible-move), var(--selected-square-black), var(--black-bg-color);
-            .piece-417db {
-                background: var(--selected-square-black), var(--black-bg-color);
-                box-shadow: var(--takes);
-            }
-        }
-    }
-    &.possible-move {
-        background: var(--possible-move), var(--black-bg-color);
-        .piece-417db {
-            background: var(--black-bg-color);
-            box-shadow: var(--takes);
-        }
-    }
-    &.in-check {
-        background: var(--check), var(--black-bg-color);
-        &.selected-square {
-            background: var(--check), var(--selected-square-black), var(--black-bg-color);
-        }
-    }
-}
-
-.piece-square,
-.drop-square {
-    box-shadow: var(--highlight);
-}
-
 .notation-322f9 {
     cursor: default;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -110,3 +50,45 @@
     left: 2px;
 }
 
+$squares:
+    "white" "1e1d7",
+    "black" "3c85d";
+
+@each $color, $uuid in $squares {
+    .#{$color}-#{$uuid} {
+        background-color: var(--#{$color}-bg-color);
+        color: var(--black-bg-color);
+        &.selected-square {
+            background: var(--selected-square-#{$color});
+            &.possible-move {
+                background: var(--possible-move), var(--selected-square-#{$color});
+                .piece-417db {
+                     box-shadow: var(--takes);
+                 }
+                 &.drop-square {
+                    .piece-417db {
+                        box-shadow: var(--highlight), var(--takes);
+                    }
+                }
+            }
+        }
+        &.possible-move {
+            background: var(--possible-move), var(--#{$color}-bg-color);
+            .piece-417db {
+                box-shadow: var(--takes);
+            }
+             &.drop-square {
+                box-shadow: var(--highlight);
+                .piece-417db {
+                    box-shadow: var(--highlight), var(--takes);
+                }
+            }
+       }
+        &.in-check {
+            background: var(--check), var(--#{$color}-bg-color);
+            &.selected-square {
+                background: var(--check), var(--selected-square-#{$color});
+            }
+        }
+    }
+}
