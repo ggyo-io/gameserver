@@ -7,7 +7,8 @@
     --black-bg-color: #b58863;
     --selected-square-black: #6390b5;
     --check: radial-gradient(circle, red 30%, transparent 75%);
-    --highlight: inset 0 0 0 3px black;
+    --highlight-drop: inset 0 0 0 3px #343d52;
+    --highlight-piece: inset 0 0 0 3px #c5cddb;
     --possible-move: radial-gradient(circle, #8863b5 15%, transparent 25%);
     --takes: inset 0 0 10px 6px #8863b5;
 }
@@ -67,7 +68,7 @@ $squares:
                  }
                  &.drop-square {
                     .piece-417db {
-                        box-shadow: var(--highlight), var(--takes);
+                        box-shadow: var(--highlight-drop), var(--takes);
                     }
                 }
             }
@@ -78,9 +79,9 @@ $squares:
                 box-shadow: var(--takes);
             }
              &.drop-square {
-                box-shadow: var(--highlight);
+                box-shadow: var(--highlight-drop);
                 .piece-417db {
-                    box-shadow: var(--highlight), var(--takes);
+                    box-shadow: var(--highlight-drop), var(--takes);
                 }
             }
        }
@@ -91,4 +92,8 @@ $squares:
             }
         }
     }
+}
+
+.piece-square {
+    box-shadow: var(--highlight-piece);
 }
