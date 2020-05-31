@@ -66,9 +66,9 @@
     &.selected-square.black-3c85d {
         background: var(--selected-square-black), var(--black-bg-color);
         &.possible-move {
-            background: var(--possible-move), var(--selected-square-white), var(--black-bg-color);
+            background: var(--possible-move), var(--selected-square-black), var(--black-bg-color);
             .piece-417db {
-                background: var(--selected-square-white), var(--black-bg-color);
+                background: var(--selected-square-black), var(--black-bg-color);
                 box-shadow: var(--takes);
             }
         }
