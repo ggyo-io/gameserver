@@ -14,12 +14,20 @@ export const gameModel = {
         dialogLabel: '',
         top: {
             name: 'Annonymous',
-            elo: '1000'
+            elo: '1000',
+            time: 15 * 60,
+
         },
         bottom: {
             name: 'Annonymous',
-            elo: '1000'
+            elo: '1000',
+            time: 15 * 60,
+
         },
+
+        turn: "bottom",
+        turnStart: Date.now(),
+        startTurnClock: 15 * 60,
 
         result: '',
 

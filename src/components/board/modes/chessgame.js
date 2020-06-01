@@ -1,5 +1,5 @@
 import Chess from "chess.js";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {
     calcPosition,
@@ -15,9 +15,6 @@ const game = new Chess()
 
 export const ChessGame = (props) => {
 
-    useEffect(() => (() => {
-        window.clearTimeout(timer())
-    }))
 
     // Store state
     const history = useStoreState(state => state.game.history)
@@ -33,7 +30,7 @@ export const ChessGame = (props) => {
     //
     // Game logic
     //
-    const timer = () => window.setTimeout(makeRandomMove, 200)
+    const timer = () => setTimeout(makeRandomMove, 200)
 
     const onDragStart = (square, piece, position, orientation) => {
         // do not pick up pieces if the game is over
@@ -52,6 +49,10 @@ export const ChessGame = (props) => {
     }
 
     const moveMade = () => {
+
+        // TODO: flip turn, reset start times,
+
+        // TODO: result based on whose turn
         let result = ''
         if (game.game_over())
             if (game.in_draw())
@@ -87,11 +88,16 @@ export const ChessGame = (props) => {
                 promotion: promotion
             })
             if (move) {
-                moveMade()
-                timer()
+                onMyMove()
             }
         }
         onMove({promote: true, onPromote: onPromote})
+    }
+
+    function onMyMove() {
+        //onMove({turn: "top", })
+        moveMade()
+        timer()
     }
 
     const makeMove = (source, target) => {
@@ -109,8 +115,7 @@ export const ChessGame = (props) => {
         if (piece && piece.type === 'p' && target.indexOf('8') !== -1) {
             showPromotion(source, target);
         } else {
-            moveMade()
-            timer()
+            onMyMove();
         }
         return move
     }

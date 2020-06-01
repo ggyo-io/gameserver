@@ -18,8 +18,14 @@ export const actions = {
     setDropSquare: action((state, payload) => {
         state.dropSquare = payload
     }),
+
     setDialogLabel: action((state, payload) => {
         state.dialogLabel = payload
+    }),
+
+    setTime: action((state, payload) => {
+        state[payload.player].time = payload.time
     })
+
 
 }
