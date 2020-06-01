@@ -16,11 +16,20 @@ export const Analysis = (props) => {
     checkSquareStyling(squareStyles, game);
     lastMoveSquareStyling(squareStyles, history, browseIndex)
 
+    //const update = useStoreActions(actions => actions.game.update)
+    //useEffect(() => {
+    //    update({promote: true, onPromote: (x) => console.log(x)})
+    //})
+
+
     return (
         <GGBoard
             position={position}
             style={props.style}
+            width={props.width}
             squareStyles={squareStyles}
         />
     )
 }
+
+const game = new Chess()

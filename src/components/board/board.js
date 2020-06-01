@@ -35,7 +35,7 @@ export const Board = (props) => {
 const ResizableBoard = (props) => {
     const { Mode, RightPanel } = props
     const { size, styleWidth } = getSizes(props)
-    const ModeWithProps = React.cloneElement(Mode, { style: styleWidth })
+    const ModeWithProps = React.cloneElement(Mode, { style: styleWidth, width: size})
     const RightPanelWithProps = React.cloneElement(RightPanel, { style: styleWidth })
 
     return <React.Fragment>
