@@ -31,5 +31,3 @@ export const Analysis = (props) => {
         />
     )
 }
-
-const game = new Chess()
