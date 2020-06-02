@@ -21,7 +21,46 @@ export default function fetchHistory(url, setGames) {
     setGames(games)
 }
 
-const pgns = [`[Event "Shamkir Chess"]
+const pgns = [ `[Event "Lindores Abbey Rapid Challenge Final 8"]
+[Site "Online"]
+[Date "2020.05.29"]
+[Round "6"]
+[White "Nakamura, Hikaru"]
+[Black "Carlsen, Magnus"]
+[Result "1-0"]
+[Board "3"]
+[WhiteTitle "GM"]
+[WhiteElo "2829"]
+[WhiteCountry "USA"]
+[WhiteFideId "2016192"]
+[WhiteEloChange "6"]
+[BlackTitle "GM"]
+[BlackElo "2881"]
+[BlackCountry "NOR"]
+[BlackFideId "1503014"]
+[BlackEloChange "-6"]
+
+1. e4 {[%clk 0:15:10]} e5 {[%clk 0:15:10]} 2. Nf3 {[%clk 0:15:06]} Nc6 {[%clk
+0:15:05]} 3. Bb5 {[%clk 0:15:14]} Nf6 {[%clk 0:15:13]} 4. d3 {[%clk 0:15:23]} Bc5
+{[%clk 0:15:21]} 5. Bxc6 {[%clk 0:15:32]} dxc6 {[%clk 0:15:30]} 6. O-O {[%clk
+0:15:41]} Bg4 {[%clk 0:15:35]} 7. h3 {[%clk 0:15:49]} Bh5 {[%clk 0:15:44]} 8. g4
+{[%clk 0:15:37]} Nxg4 {[%clk 0:15:52]} 9. hxg4 {[%clk 0:15:45]} Bxg4 {[%clk
+0:16:02]} 10. Be3 {[%clk 0:15:53]} Be7 {[%clk 0:16:10]} 11. Kh1 {[%clk 0:15:46]}
+f5 {[%clk 0:14:22]} 12. Rg1 {[%clk 0:14:46]} h5 {[%clk 0:13:02]} 13. Nc3 {[%clk
+0:13:58]} f4 {[%clk 0:12:07]} 14. Bd2 {[%clk 0:13:36]} g5 {[%clk 0:10:40]} 15.
+Nb1 {[%clk 0:10:18]} Bc5 {[%clk 0:09:13]} 16. Bc3 {[%clk 0:09:43]} Bxf2 {[%clk
+0:07:25]} 17. Nbd2 {[%clk 0:09:49]} Qe7 {[%clk 0:05:54]} 18. Qf1 {[%clk 0:08:05]}
+Bxg1 {[%clk 0:05:02]} 19. Qxg1 {[%clk 0:08:15]} Bxf3+ {[%clk 0:03:40]} 20. Nxf3
+{[%clk 0:08:25]} g4 {[%clk 0:03:49]} 21. Nxe5 {[%clk 0:08:33]} Rg8 {[%clk
+0:03:57]} 22. Rf1 {[%clk 0:08:36]} Qg5 {[%clk 0:01:23]} 23. Qd4 {[%clk 0:08:04]}
+Qh4+ {[%clk 0:01:31]} 24. Kg1 {[%clk 0:08:12]} Qg3+ {[%clk 0:01:40]} 25. Kh1
+{[%clk 0:08:21]} Qh3+ {[%clk 0:01:48]} 26. Kg1 {[%clk 0:08:31]} g3 {[%clk
+0:01:52]} 27. Nf3 {[%clk 0:08:20]} g2 {[%clk 0:01:51]} 28. Re1 {[%clk 0:08:10]}
+Qxf3 {[%clk 0:00:28]} 29. Qe5+ {[%clk 0:08:16]} Kd8 {[%clk 0:00:36]} 30. Qf6+
+{[%clk 0:08:20]} Ke8 {[%clk 0:00:40]} 31. Bb4 {[%clk 0:08:09]} c5 {[%clk
+0:00:39]} 32. Bxc5 {[%clk 0:08:03]} Kd7 {[%clk 0:00:40]} 33. Qf7+ {[%clk
+0:08:10]} 1-0`,
+    `[Event "Shamkir Chess"]
 [Site "chess24.com"]
 [Date "2019.04.01"]
 [Round "2"]
