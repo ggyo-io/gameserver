@@ -2,6 +2,14 @@ import { actions } from "./actions";
 
 export const gameModel = {
     game: {
+        myColor: 'any',
+        opponent: 'human',
+
+        timeControl: {
+            seconds: 5*60,
+            increment:0
+        },
+
         history: [],
 
         // browsing where?
