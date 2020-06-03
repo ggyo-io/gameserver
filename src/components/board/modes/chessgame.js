@@ -15,7 +15,6 @@ const game = new Chess()
 
 export const ChessGame = (props) => {
 
-
     // Store state
     const history = useStoreState(state => state.game.history)
     const pieceSquare = useStoreState(state => state.game.pieceSquare)
@@ -23,9 +22,10 @@ export const ChessGame = (props) => {
     const browseIndex = useStoreState(state => state.game.browseIndex)
 
     // Actions
-    const onMove = useStoreActions(actions => actions.game.update)
+    const onMove = useStoreActions(actions => actions.game.onMove)
     const setPieceSquare = useStoreActions(actions => actions.game.setPieceSquare)
     const setDropSquare = useStoreActions(actions => actions.game.setDropSquare)
+    const promote = useStoreActions(actions => actions.game.promote)
 
     //
     // Game logic
@@ -60,14 +60,10 @@ export const ChessGame = (props) => {
             else
                 result = '1-0'
 
-        const update = {
-            position: game.fen(),
+        onMove({
             history: game.history({verbose: true}),
-            browseIndex: game.history().length,
-            pieceSquare: '',
-            result: result
-        }
-        onMove(update)
+            result: result,
+        })
     }
 
 
@@ -91,7 +87,7 @@ export const ChessGame = (props) => {
                 onMyMove()
             }
         }
-        onMove({promote: true, onPromote: onPromote})
+        promote(onPromote)
     }
 
     function onMyMove() {

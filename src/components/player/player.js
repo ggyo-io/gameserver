@@ -8,20 +8,20 @@ export function Player(props) {
 
     // top or bottom
     const posish = props.posish;
-    const {turn, turnStart, startTurnClock, result} = useStoreState(state => state.game)
-    const {name, elo} = useStoreState(state => state.game[posish])
+    const {turn, lastMoveTimestamp, result} = useStoreState(state => state.game)
+    const {name, elo, serverTime} = useStoreState(state => state.game[posish])
 
     // timer
     useEffect(() => {
         if (posish === turn && !result) {
             const interval = setInterval(() => {
-                const elapsed = Math.round((Date.now() - turnStart) / 1000)
-                const clock = startTurnClock - elapsed
+                const elapsed = Math.round((Date.now() - lastMoveTimestamp) / 1000)
+                const clock = serverTime - elapsed
                 setTime(clock > 0 ? clock : 0)
             }, 100)
             return () => clearInterval(interval)
         }
-    }, [turn, turnStart, startTurnClock, posish, result])
+    }, [turn, lastMoveTimestamp, serverTime, posish, result])
 
     // mm:ss
     const timeMin = Math.floor(time / 60) + ":" + ('0' + time % 60).substr(-2)

@@ -15,9 +15,7 @@ export const Promote = (props) => {
 
     const update = useStoreActions(actions => actions.game.update);
     const handleClose = (promo) => {
-        update({
-            promote: false,
-        });
+        update({promote: false});
         onPromote(promo)
     }
 

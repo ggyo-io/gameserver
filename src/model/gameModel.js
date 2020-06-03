@@ -24,15 +24,16 @@ export const gameModel = {
         top: {
             name: 'Annonymous',
             elo: '1000',
+            serverTime: 15 * 60,
         },
         bottom: {
             name: 'Annonymous',
             elo: '1000',
+            serverTime: 15 * 60,
         },
 
         turn: computed(state => state.history.length % 2 ? "top" : "bottom"),
-        turnStart: Date.now(),
-        startTurnClock: 15 * 60,
+        lastMoveTimestamp: Date.now(),
 
         result: '',
 
