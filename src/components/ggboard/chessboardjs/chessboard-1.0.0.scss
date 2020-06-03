@@ -3,14 +3,14 @@
 /* High contrast color scheme */
 :root {
     --white-bg-color: #f0d9b5;
-    --selected-square-white: #b5ccf0;
+    --selected-square-white: #c4f2e7;
     --black-bg-color: #b58863;
-    --selected-square-black: #6390b5;
+    --selected-square-black: #5e96ae;
     --check: radial-gradient(circle, red 30%, transparent 75%);
     --highlight-drop: inset 0 0 0 3px #343d52;
     --highlight-piece: inset 0 0 0 3px #c5cddb;
-    --possible-move: radial-gradient(circle, #6b5580 17%, transparent 23%);
-    --takes: inset 0 0 10px 4px #e27845;
+    --possible-move: radial-gradient(circle, #38908f 17%, transparent 23%);
+    --takes: inset 0 0 10px 4px #fa6e4f;
 }
 
 .clearfix-7da63 {
