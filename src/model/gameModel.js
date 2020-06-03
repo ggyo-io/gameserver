@@ -1,4 +1,5 @@
 import { actions } from "./actions";
+import {computed} from "easy-peasy";
 
 export const gameModel = {
     game: {
@@ -23,17 +24,13 @@ export const gameModel = {
         top: {
             name: 'Annonymous',
             elo: '1000',
-            time: 15 * 60,
-
         },
         bottom: {
             name: 'Annonymous',
             elo: '1000',
-            time: 15 * 60,
-
         },
 
-        turn: "bottom",
+        turn: computed(state => state.history.length % 2 ? "top" : "bottom"),
         turnStart: Date.now(),
         startTurnClock: 15 * 60,
 
