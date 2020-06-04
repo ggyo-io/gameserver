@@ -5,7 +5,7 @@ import './navigation-bar.scss'
 
 export const NavigationBar = () => (
         <Navbar expand="lg" variant="dark">
-            <Navbar.Brand href="/"><strong>Gg</strong>ameserver</Navbar.Brand>
+            <LinkContainer to="/home"><Navbar.Brand><strong>Gg</strong>ameserver</Navbar.Brand></LinkContainer>
             <Navbar.Toggle aria-controls="basic-navbar-nav"/>
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="ml-auto">
