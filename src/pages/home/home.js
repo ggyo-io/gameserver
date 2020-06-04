@@ -8,7 +8,7 @@ export const Home = () => (
     <Container>
        <Row><h1>Choose game</h1></Row>
         <Row><ChooseGame/></Row>
-        <p/><br/>
+        <div className="mb-lg-4"/>
         <Row><h1>History</h1></Row>
         <Row><History/></Row>
     </Container>
