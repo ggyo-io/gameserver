@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+import {BrowserRouter as Router, Route, Switch, Redirect} from 'react-router-dom';
 import {Home} from '../home/home';
 import {Signup} from '../signup/signup';
 import {Layout} from '../../components/layout/layout';
@@ -15,8 +15,9 @@ const Routing = () => {
             <Router>
                 <NavigationBar/>
                 <Layout>
+                    <Redirect from="/" to="/home"/>
                     <Switch>
-                        <Route exact path="/" component={Home}/>
+                        <Route exact path="/home" component={Home}/>
                         <Route path="/playboard" component={Playboard}/>
                         <Route path="/analysisboard" component={Analysisboard}/>
                         <Route path="/contact" component={Contact}/>

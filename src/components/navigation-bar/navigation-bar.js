@@ -9,7 +9,7 @@ export const NavigationBar = () => (
             <Navbar.Toggle aria-controls="basic-navbar-nav"/>
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="ml-auto">
-                    <LinkContainer to="/"><NavLink>Home</NavLink></LinkContainer>
+                    <LinkContainer to="/home"><NavLink>Home</NavLink></LinkContainer>
                     <LinkContainer to="/analysisboard"><NavLink>Analize</NavLink></LinkContainer>
                     <LinkContainer to="/about"><NavLink>About</NavLink></LinkContainer>
                     <LinkContainer to="/signup"><NavLink>Sign Up!</NavLink></LinkContainer>
