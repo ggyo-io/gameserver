@@ -1,20 +1,19 @@
 import React from 'react';
-import { Nav, Navbar } from 'react-bootstrap';
+import { Nav, Navbar, NavLink } from 'react-bootstrap';
+import { LinkContainer } from "react-router-bootstrap";
 import './navigation-bar.scss'
 
 export const NavigationBar = () => (
-    <>
         <Navbar expand="lg" variant="dark">
             <Navbar.Brand href="/"><strong>Gg</strong>ameserver</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav"/>
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="ml-auto">
-                    <Nav.Link  href="/">Home</Nav.Link>
-                    <Nav.Link  href="/analysisboard">Analize</Nav.Link>
-                    <Nav.Link  href="/about">About</Nav.Link>
-                    <Nav.Link  href="/signup">Sign Up!</Nav.Link>
+                    <LinkContainer to="/"><NavLink>Home</NavLink></LinkContainer>
+                    <LinkContainer to="/analysisboard"><NavLink>Analize</NavLink></LinkContainer>
+                    <LinkContainer to="/about"><NavLink>About</NavLink></LinkContainer>
+                    <LinkContainer to="/signup"><NavLink>Sign Up!</NavLink></LinkContainer>
                 </Nav>
             </Navbar.Collapse>
         </Navbar>
-    </>
 )
