@@ -12,10 +12,9 @@ import {About} from "../about/about";
 
 const Routing = () => {
     return (
-        <React.Fragment>
-            <NavigationBar/>
-            <Layout>
-                <Router>
+            <Router>
+                <NavigationBar/>
+                <Layout>
                     <Switch>
                         <Route exact path="/" component={Home}/>
                         <Route path="/playboard" component={Playboard}/>
@@ -24,9 +23,8 @@ const Routing = () => {
                         <Route path="/about" component={About}/>
                         <Route path="/signup" component={Signup}/>
                     </Switch>
-                </Router>
-            </Layout>
-        </React.Fragment>
+                </Layout>
+            </Router>
     )
 };
 
