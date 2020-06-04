@@ -11,9 +11,11 @@ export function Player(props) {
     const {turn, lastMoveTimestamp, result} = useStoreState(state => state.game)
     const {name, elo, serverTime} = useStoreState(state => state.game[posish])
 
+    const shouldTick =  posish === turn && !result;
+
     // timer
     useEffect(() => {
-        if (posish === turn && !result) {
+        if (shouldTick) {
             const interval = setInterval(() => {
                 const elapsed = Math.round((Date.now() - lastMoveTimestamp) / 1000)
                 const clock = serverTime - elapsed
@@ -36,8 +38,8 @@ export function Player(props) {
                             <span className="ml-2" role="value">{elo}</span>
                         </span>
                     </span>
-                    <span className="mr-2" role="img" aria-label="clock">⌛
-                        <span className="ml-2" role="time">{timeMin}</span>
+                    <span className={shouldTick ? "text-warning ml-2" : "ml-2" } role="img" aria-label="clock">{shouldTick ? '⌛' : ''}
+                        <span className="ml-2 text-monospace" role="time">{timeMin}</span>
                     </span>
                 </div>
             </Card.Body>
