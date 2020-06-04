@@ -1,10 +1,11 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
-import {ToggleButton, ToggleButtonGroup} from "react-bootstrap";
+import {NavLink, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {useStoreActions} from "easy-peasy";
+import {LinkContainer} from "react-router-bootstrap";
 
 
 export const ChooseGame = () => {
@@ -63,14 +64,14 @@ export const ChooseGame = () => {
         <p/><br/>
         <Row className="justify-content-md-center">
             <Col sm={9}>
-            <Button
-                size="lg"
-                block
-                onClick={() => console.log("play clicked")}
-                href="/playboard"
-            >
-                PLAY
-            </Button></Col>
+                <LinkContainer to="/playboard">
+                    <Button
+                        size="lg"
+                        block
+                        onClick={() => console.log("play clicked")}>PLAY
+                    </Button>
+                </LinkContainer>
+            </Col>
         </Row>
     </Container>
 }
