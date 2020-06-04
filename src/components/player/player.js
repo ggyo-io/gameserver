@@ -17,7 +17,7 @@ export function Player(props) {
     useEffect(() => {
         if (shouldTick) {
             const interval = setInterval(() => {
-                const elapsed = Math.round((Date.now() - lastMoveTimestamp) / 1000)
+                const elapsed = Math.floor((Date.now() - lastMoveTimestamp) / 1000)
                 const clock = serverTime - elapsed
                 setTime(clock > 0 ? clock : 0)
             }, 100)
