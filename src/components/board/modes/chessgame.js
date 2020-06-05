@@ -117,7 +117,10 @@ export const ChessGame = (props) => {
         if (move == null)
             return null
 
-        if (piece && piece.type === 'p' && target.indexOf('8') !== -1) {
+        if (piece
+            && ((piece.color === 'w' && piece.type === 'p' && target.indexOf('8') !== -1)
+            ||  (piece.color === 'b' && piece.type === 'p' && target.indexOf('1') !== -1))
+            ) {
             showPromotion(source, target);
         } else {
             onMyMove();
