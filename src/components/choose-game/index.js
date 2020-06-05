@@ -25,28 +25,6 @@ export const ChooseGame = () => {
 
     const playColor = () => myColor === 'any' ? 'white' : myColor
 
-    const newGame = () =>
-        update({
-            history: [],
-            browseIndex: 0,
-            pieceSquare: '',
-            dropSquare: '',
-            result: '',
-            orientation: playColor(),
-            myColor: playColor(),
-            top: {
-                name: 'Lasker',
-                elo: '3100',
-                serverTime: timeControl.seconds,
-            },
-            bottom: {
-                name: 'Nakamura',
-                elo: '3200',
-                serverTime: timeControl.seconds,
-            },
-            lastMoveTimestamp: Date.now(),
-        })
-
     return <Container>
        <Row><h5>Time control</h5></Row>
         <Row>
@@ -70,9 +48,10 @@ export const ChooseGame = () => {
             defaultValue={opponent}
             onChange={doOpponentChange}
         >
+            <ToggleButton value="random" variant="outline-secondary">Random</ToggleButton>
             <ToggleButton value="human" variant="outline-secondary">Human</ToggleButton>
             <ToggleButton value="stockfish" variant="outline-secondary">Sotckfish</ToggleButton>
-            <ToggleButton value="leela" variant="outline-secondary">Leela</ToggleButton>
+            <ToggleButton value="lc0" variant="outline-secondary">Leela</ToggleButton>
         </ToggleButtonGroup>
         </Row>
         <p/>
@@ -95,7 +74,7 @@ export const ChooseGame = () => {
                     <Button
                         size="lg"
                         block
-                        onClick={newGame}>PLAY
+                        onClick={() => console.log("Play click")}>PLAY
                     </Button>
                 </LinkContainer>
             </Col>

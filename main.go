@@ -20,7 +20,7 @@ func main() {
 	initDb()
 	defer db.Close()
 
-	port := 9000
+	port := 8383
 	log.Printf("Listening on %d\n", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), loggedRouter))
 }

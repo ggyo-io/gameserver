@@ -4,7 +4,7 @@ export const actions = {
 
     onMove: action((state, payload) => {
         state.history = payload.history
-        state.result = payload.result
+        //state.result = payload.result
         state.browseIndex = state.history.length
         state.pieceSquare = ''
 

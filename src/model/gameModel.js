@@ -5,7 +5,7 @@ export const gameModel = {
     game: {
         myColor: 'any',
         orientation: 'white',
-        opponent: 'human',
+        opponent: 'random',
 
         timeControl: {
             seconds: 5*60,

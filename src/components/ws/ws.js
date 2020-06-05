@@ -1,14 +1,15 @@
 //------------------------------------------------------------------------------
 // Websocket handler
 //------------------------------------------------------------------------------
-var wsConn = {
+const wsConn = {
     connect: function(onmessage) {
         if (wsConn.q === undefined) {
             wsConn.q = [];
         }
-        var addr = "ws://" + document.location.host + "/ws";
-        console.log('wsConn: connecting to: ' + addr);
-        wsConn.ws = new WebSocket("ws://" + document.location.host + "/ws");
+
+        //wsConn.ws = new WebSocket("ws://" + document.location.host + "/ws");
+        const goServer='ws://localhost:8383/ws';
+        wsConn.ws = new WebSocket(goServer);
         wsConn.ws.onopen = function() {
             console.log('wsConn: Socket is open, q length: ' + wsConn.q.length);
             wsConn.flush();
@@ -39,19 +40,15 @@ var wsConn = {
                 var msg = JSON.stringify(obj);
                 console.log('wsConn: sending: ' + msg + ' object: ' + obj);
                 wsConn.ws.send(msg);
-
             } catch (e) {
                 console.log("wsConn: Caught an error while sending: " + e);
-                if (!WebSocket.OPEN) {
-                    console.log('wsConn: Error sending: ' + e + ', enqueue object: ' + o);
-                    return;
-                } else { // Assume Json SYNTAX_ERR 
-                    console.log('wsConn: Error sending: ' + e + ', discard object: ' + o);
-
-                }
+                console.log('wsConn: Error sending: ' + e + ', enqueue object: ' + JSON.stringify(o));
+                return;
             }
             wsConn.q.pop();
         }
     },
     flush: function() { wsConn.send(null); }
 };
+
+export default wsConn;
