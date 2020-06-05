@@ -74,11 +74,12 @@ const GGBoard = (props) => {
             onSnapbackEnd: props.onSnapbackEnd
         })
 
+    const promote = useStoreState(state => state.game.promote);
     // Render
     const _props = {style: {...props.style}}
     return (
         <>
-            <Promote/>
+            {promote? <Promote/> : null}
             <div ref={el => element = el} {..._props} />
         </>
     )

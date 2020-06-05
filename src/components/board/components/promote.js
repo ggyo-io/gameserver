@@ -6,7 +6,6 @@ const pieces = ['q', 'r', 'b', 'k']
 
 export const Promote = (props) => {
 
-    const show = useStoreState(state => state.game.promote);
     const onPromote = useStoreState(state => state.game.onPromote);
     const history = useStoreState(state => state.game.history);
     const [selection, setSelection] = useState(0)
@@ -54,7 +53,7 @@ export const Promote = (props) => {
 
     return (
         <Modal
-            show={show}
+            show={true}
             backdrop="static"
             size="sm"
             dialogClassName="modal-promo"
