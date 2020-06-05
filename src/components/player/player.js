@@ -22,6 +22,8 @@ export function Player(props) {
                 setTime(clock > 0 ? clock : 0)
             }, 100)
             return () => clearInterval(interval)
+        } else {
+            setTime(serverTime)
         }
     }, [turn, lastMoveTimestamp, serverTime, posish, result])
 
