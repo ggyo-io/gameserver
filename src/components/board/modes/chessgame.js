@@ -65,8 +65,10 @@ export const ChessGame = (props) => {
         if (game.game_over())
             if (game.in_draw())
                 result = '1/2-1/2'
-            else
+            else if (turnColor(history) == 'white')
                 result = '1-0'
+            else
+                result = '0-1'
 
         onMove({
             history: game.history({verbose: true}),
