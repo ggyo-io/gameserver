@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import './chessboardjs/chessboard-1.0.0.scss'
 import { Chessboard } from './chessboardjs/chessboard-1.0.0'
-import {Promote} from "../board/components/promote";
+import { Promote } from "../board/components/promote";
+import { useStoreState } from "easy-peasy";
 
 const unhl = () => {
     const squareClass = '.square-55d63'
@@ -27,11 +28,13 @@ let board
 
 const GGBoard = (props) => {
     let element = null;
+    const orientation = useStoreState(state => state.game.orientation)
 
     useEffect(() => {
         const config = {
             draggable: true,
             position: props.position,
+            orientation: orientation,
             //pieceTheme: 'img/chesspieces/merida/{piece}.svg'
             pieceTheme: 'img/chesspieces/wikisvg/{piece}.svg'
         }
@@ -42,6 +45,12 @@ const GGBoard = (props) => {
         if (board)
             board.position(props.position, false)
     }, [props.position]);
+
+    useEffect(() => {
+        console.log('orientation')
+        if (board)
+            board.orientation(orientation)
+    }, [orientation]);
 
     useEffect(() => {
         if (board)

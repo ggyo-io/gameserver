@@ -16,6 +16,7 @@ const game = new Chess()
 export const ChessGame = (props) => {
 
     // Store state
+    const myColor = useStoreState(state => state.game.myColor)
     const history = useStoreState(state => state.game.history)
     const pieceSquare = useStoreState(state => state.game.pieceSquare)
     const dropSquare = useStoreState(state => state.game.dropSquare)

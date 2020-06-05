@@ -99,8 +99,10 @@ export const PGN = (props) => {
     const style = {"maxHeight": Math.ceil(props.size / 2) + 'px'};
     const browseIndex = useStoreState(state => state.game.browseIndex)
     const history = useStoreState(state => state.game.history)
+    const orientation = useStoreState(state => state.game.orientation)
     const moves = history ? history.map(x => x.san) : []
     const setBrowseIndex = useStoreActions(actions => actions.game.setBrowseIndex)
+    const update = useStoreActions(actions => actions.game.update)
     const _renderMoves = renderMoves({moves, browseIndex, setBrowseIndex});
 
     useEffect(() => keydownEffects({moves, browseIndex, setBrowseIndex}))
@@ -122,7 +124,8 @@ export const PGN = (props) => {
                             <PagingButton name="First" onClick={() => setBrowseIndex(0)}/>
                             <PagingButton name="Previous" onClick={() => setBrowseIndex(browseIndex - 1)}/>
                             <PagingButton name="Next" onClick={() => setBrowseIndex(browseIndex + 1)}/>
-                            <PagingButton name="Last" utf="&raquo;" onClick={() => setBrowseIndex(moves.length)}/>
+                            <PagingButton name="Last" onClick={() => setBrowseIndex(moves.length)}/>
+                            <PagingButton name="Flip" onClick={() => update({orientation: orientation === 'white' ? 'black' : 'white'})}/>
                         </ul>
                     </nav>
                 </div>

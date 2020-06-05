@@ -2,6 +2,8 @@ import React from "react";
 
 
 const Arrow = ({name}) => {
+    if (name === "Flip")
+        return <span aria-hidden="true">&#8597;</span>
     if (name === "First")
         return <span aria-hidden="true">&laquo;</span>
     if (name === "Previous")

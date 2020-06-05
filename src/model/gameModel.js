@@ -4,6 +4,7 @@ import {computed} from "easy-peasy";
 export const gameModel = {
     game: {
         myColor: 'any',
+        orientation: 'white',
         opponent: 'human',
 
         timeControl: {

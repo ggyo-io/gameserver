@@ -21,6 +21,14 @@ export const ChooseGame = () => {
         }})
     }
 
+    const newGame = () => update({
+        history: [],
+        browseIndex: 0,
+        pieceSquare: '',
+        dropSquare: '',
+        result: '',
+    })
+
     return <Container>
        <Row><h5>Time control</h5></Row>
         <Row>
