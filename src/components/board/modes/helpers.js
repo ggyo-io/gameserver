@@ -1,4 +1,7 @@
 export const calcPosition = (history, browseIndex, game) => {
+    if (history.length === 0)
+        game.reset()
+
     if (browseIndex === history.length && game.history().length === history.length)
         return game.fen()
 
