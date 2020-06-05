@@ -23,17 +23,18 @@ export const gameModel = {
 
         dialogLabel: '',
         top: {
-            name: 'Annonymous',
-            elo: '1000',
+            name: 'Lasker',
+            elo: '3100',
             serverTime: 15 * 60,
         },
         bottom: {
-            name: 'Annonymous',
-            elo: '1000',
+            name: 'Nakamura',
+            elo: '3200',
             serverTime: 15 * 60,
         },
 
-        turn: computed(state => state.history.length % 2 ? "top" : "bottom"),
+        turn: computed(state => state.history.length % 2 ? (state.orientation === "white" ? "top" : "bottom") :
+                                                           (state.orientation === "white" ? "bottom" : "top" )),
         lastMoveTimestamp: Date.now(),
 
         result: '',
