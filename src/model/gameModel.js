@@ -23,14 +23,14 @@ export const gameModel = {
 
         dialogLabel: '',
         top: {
-            name: 'Lasker',
-            elo: '3100',
-            serverTime: 15 * 60,
+            name: '',
+            elo: '',
+            serverTime: 0,
         },
         bottom: {
-            name: 'Nakamura',
-            elo: '3200',
-            serverTime: 15 * 60,
+            name: '',
+            elo: '',
+            serverTime: 0,
         },
 
         turn: computed(state => state.history.length % 2 ? (state.orientation === "white" ? "top" : "bottom") :

@@ -10,6 +10,7 @@ import {LinkContainer} from "react-router-bootstrap";
 
 export const ChooseGame = () => {
     const myColor = useStoreState(state => state.game.myColor)
+    const timeControl = useStoreState(state => state.game.timeControl)
     const update = useStoreActions(actions => actions.game.update)
     const doColorChange = (v) => update({myColor: v})
     const doOpponentChange = (v) => update({oppenent: v})
@@ -31,7 +32,17 @@ export const ChooseGame = () => {
             dropSquare: '',
             result: '',
             orientation: playColor(),
-            myColor: playColor()
+            myColor: playColor(),
+            top: {
+                name: 'Lasker',
+                elo: '3100',
+                serverTime: timeControl.seconds,
+            },
+            bottom: {
+                name: 'Nakamura',
+                elo: '3200',
+                serverTime: timeControl.seconds,
+            }
         })
 
     return <Container>
