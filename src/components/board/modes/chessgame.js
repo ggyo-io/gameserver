@@ -1,5 +1,5 @@
 import Chess from "chess.js";
-import React from "react";
+import React, { useEffect } from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {
     calcPosition,
@@ -101,7 +101,6 @@ export const ChessGame = (props) => {
     }
 
     function onMyMove() {
-        //onMove({turn: "top", })
         moveMade()
         timer()
     }
@@ -192,6 +191,10 @@ export const ChessGame = (props) => {
     possibleMovesSquareStyling(squareStyles, pieceSquare, game)
     pieceSquareStyling(squareStyles, pieceSquare)
     dropSquareStyling(squareStyles, dropSquare)
+
+    useEffect(() => {
+        if (myColor === 'black') timer()
+    }, []);
 
     return (
             <GGBoard
