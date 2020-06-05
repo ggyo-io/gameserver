@@ -43,7 +43,8 @@ export const ChooseGame = () => {
                 name: 'Nakamura',
                 elo: '3200',
                 serverTime: timeControl.seconds,
-            }
+            },
+            lastMoveTimestamp: Date.now(),
         })
 
     return <Container>
