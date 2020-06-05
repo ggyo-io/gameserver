@@ -10,10 +10,11 @@ import {LinkContainer} from "react-router-bootstrap";
 
 export const ChooseGame = () => {
     const myColor = useStoreState(state => state.game.myColor)
+    const opponent = useStoreState(state => state.game.opponent)
     const timeControl = useStoreState(state => state.game.timeControl)
     const update = useStoreActions(actions => actions.game.update)
     const doColorChange = (v) => update({myColor: v})
-    const doOpponentChange = (v) => update({oppenent: v})
+    const doOpponentChange = (v) => update({opponent: v})
     const doTimeControlChange = (v) => {
         const pair = v.split('+')
         update({timeControl: {
@@ -50,7 +51,8 @@ export const ChooseGame = () => {
         <Row>
         <ToggleButtonGroup
             size="lg" type="radio" name="timeControl"
-            defaultValue={'5+0'}
+            defaultValue={(timeControl.seconds / 60).toString() + '+' +
+                           timeControl.increment.toString()}
             onChange={doTimeControlChange}
         >
             <ToggleButton value={'5+0'} variant="outline-secondary">5+0</ToggleButton>
@@ -64,7 +66,7 @@ export const ChooseGame = () => {
         <Row>
         <ToggleButtonGroup
             size="lg" type="radio" name="opponent"
-            defaultValue={["human"]}
+            defaultValue={opponent}
             onChange={doOpponentChange}
         >
             <ToggleButton value="human" variant="outline-secondary">Human</ToggleButton>
@@ -77,7 +79,7 @@ export const ChooseGame = () => {
         <Row>
         <ToggleButtonGroup
             size="lg" type="radio" name="color"
-            defaultValue={["any"]}
+            defaultValue={myColor}
             onChange={doColorChange}
         >
             <ToggleButton value='any' variant="outline-secondary">Any</ToggleButton>
