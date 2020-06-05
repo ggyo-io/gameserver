@@ -34,6 +34,8 @@ export const actions = {
         if (payload < 0 || payload > state.history.length)
             return
         state.browseIndex = payload
+        state.pieceSquare = ''
+        state.dropSquare = ''
     }),
     setPieceSquare: action((state, payload) => {
         state.pieceSquare = payload
