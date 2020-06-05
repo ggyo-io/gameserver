@@ -47,9 +47,9 @@ const GGBoard = (props) => {
     }, [props.position]);
 
     useEffect(() => {
-        console.log('orientation')
         if (board)
             board.orientation(orientation)
+        hl(props)
     }, [orientation]);
 
     useEffect(() => {
