@@ -3,7 +3,7 @@ import React from "react";
 
 const Arrow = ({name}) => {
     if (name === "Flip")
-        return <span aria-hidden="true">&#8597;</span>
+        return <span aria-hidden="true">&#8635;</span>
     if (name === "First")
         return <span aria-hidden="true">&laquo;</span>
     if (name === "Previous")
@@ -21,10 +21,9 @@ export const PagingButton = (props) => {
         e.preventDefault();
         onClick()
     };
-    return <li className="page-item">
-        <a className="page-link" href="#" aria-label="First" onClick={handleClick}>
+    return <li title={name} className="page-item">
+        <a className="page-link" href="#" aria-label={name} onClick={handleClick}>
             <Arrow name={name}/>
-            <span className="sr-only">{name}</span>
         </a>
     </li>
 }
