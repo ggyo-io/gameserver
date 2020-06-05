@@ -50,14 +50,15 @@ const renderMoves = ({moves, browseIndex, setBrowseIndex} ) => {
 }
 
 const reactToKeys = (props, e) => {
-    const {setBrowseIndex, browseIndex, moves} = props
+    const {setBrowseIndex, browseIndex, moves, modalOpen} = props
     const left = 37;
     const up = 38;
     const right = 39;
     const down = 40;
+
     let browse_where
 
-    if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey)
+    if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || modalOpen)
         return;
 
     switch (e.which) {
@@ -106,8 +107,10 @@ export const PGN = (props) => {
     const setBrowseIndex = useStoreActions(actions => actions.game.setBrowseIndex)
     const update = useStoreActions(actions => actions.game.update)
     const _renderMoves = renderMoves({moves, browseIndex, setBrowseIndex});
+    const modalOpen = useStoreState(state => state.game.promote);
 
-    useEffect(() => keydownEffects({moves, browseIndex, setBrowseIndex}))
+
+    useEffect(() => keydownEffects({moves, browseIndex, setBrowseIndex, modalOpen}))
     useEffect(scrollEffect)
 
     return <Card>
