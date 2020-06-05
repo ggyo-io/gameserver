@@ -76,7 +76,7 @@ export const ChooseGame = () => {
                     <Button
                         size="lg"
                         block
-                        onClick={() => console.log("play clicked")}>PLAY
+                        onClick={newGame}>PLAY
                     </Button>
                 </LinkContainer>
             </Col>
