@@ -97,6 +97,8 @@ const scrollEffect = () => {
 
 export const PGN = (props) => {
     const style = {"maxHeight": Math.ceil(props.size / 2) + 'px'};
+    const top = useStoreState(state => state.game.top)
+    const bottom = useStoreState(state => state.game.bottom)
     const browseIndex = useStoreState(state => state.game.browseIndex)
     const history = useStoreState(state => state.game.history)
     const orientation = useStoreState(state => state.game.orientation)
@@ -125,7 +127,14 @@ export const PGN = (props) => {
                             <PagingButton name="Previous" onClick={() => setBrowseIndex(browseIndex - 1)}/>
                             <PagingButton name="Next" onClick={() => setBrowseIndex(browseIndex + 1)}/>
                             <PagingButton name="Last" onClick={() => setBrowseIndex(moves.length)}/>
-                            <PagingButton name="Flip" onClick={() => update({orientation: orientation === 'white' ? 'black' : 'white'})}/>
+                            <PagingButton
+                                name="Flip"
+                                onClick={() => update({
+                                    orientation: orientation === 'white' ? 'black' : 'white',
+                                    top: bottom,
+                                    bottom: top})
+                                }
+                            />
                         </ul>
                     </nav>
                 </div>
