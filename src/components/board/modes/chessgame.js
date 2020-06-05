@@ -3,6 +3,7 @@ import React from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {
     calcPosition,
+    turnColor,
     checkSquareStyling,
     dropSquareStyling,
     lastMoveSquareStyling,
@@ -37,8 +38,14 @@ export const ChessGame = (props) => {
         // do not pick up pieces if the game is over
         if (game.game_over()) return false
 
-        // only pick up pieces for White
-        if (piece.search(/^b/) !== -1) return false
+        // browsing
+        if (browseIndex !== history.length) return false
+
+        // not my turn
+        if (turnColor(history) !== myColor) return false
+
+        // only pick up pieces for my color
+        if (piece.charAt(0) !== myColor.charAt(0)) return false
 
         // double click
         if (square === pieceSquare) {

@@ -8,6 +8,7 @@ export const calcPosition = (history, browseIndex, game) => {
 
     return game.fen()
 }
+export const turnColor = (history) => history.length % 2 === 0 ? "white" : "black"
 
 const checkSquare = (game) => {
     const board = game.board()

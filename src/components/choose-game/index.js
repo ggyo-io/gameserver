@@ -1,15 +1,15 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
-import {NavLink, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
+import {ToggleButton, ToggleButtonGroup} from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import {useStoreActions} from "easy-peasy";
+import {useStoreActions, useStoreState} from "easy-peasy";
 import {LinkContainer} from "react-router-bootstrap";
 
 
 export const ChooseGame = () => {
-
+    const myColor = useStoreState(state => state.game.myColor)
     const update = useStoreActions(actions => actions.game.update)
     const doColorChange = (v) => update({myColor: v})
     const doOpponentChange = (v) => update({oppenent: v})
@@ -21,13 +21,18 @@ export const ChooseGame = () => {
         }})
     }
 
-    const newGame = () => update({
-        history: [],
-        browseIndex: 0,
-        pieceSquare: '',
-        dropSquare: '',
-        result: '',
-    })
+    const playColor = () => myColor === 'any' ? 'white' : myColor
+
+    const newGame = () =>
+        update({
+            history: [],
+            browseIndex: 0,
+            pieceSquare: '',
+            dropSquare: '',
+            result: '',
+            orientation: playColor(),
+            myColor: playColor()
+        })
 
     return <Container>
        <Row><h5>Time control</h5></Row>
