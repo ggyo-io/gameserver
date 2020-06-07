@@ -14,9 +14,11 @@ const renderRows = (games) => {
         return (
             <tr key={index} onClick={onClick}>
                 <td>{game.time}</td>
-                <td><span className="mr-2">{game.p1}</span><span className="badge badge-light badge-pill">{game.p1Elo}</span></td>
-                <td><span className="mr-2">{game.p2}</span><span className="badge badge-light badge-pill">{game.p2Elo}</span></td>
-                <td>{game.result === "1/2-1/2"? draw: game.result}</td>
+                <td><span className="mr-2">{game.p1}</span><span
+                    className="badge badge-light badge-pill">{game.p1Elo}</span></td>
+                <td><span className="mr-2">{game.p2}</span><span
+                    className="badge badge-light badge-pill">{game.p2Elo}</span></td>
+                <td>{game.result === "1/2-1/2" ? draw : game.result}</td>
             </tr>
         );
     })
@@ -24,7 +26,7 @@ const renderRows = (games) => {
 
 export const History = (props) => {
     const [games, setGames] = useState([])
-    useEffect(()=> {
+    useEffect(() => {
         fetchHistory("/history", setGames);
     }, [])
     const _renderRows = renderRows(games)

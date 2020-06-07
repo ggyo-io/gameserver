@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import Modal from "react-bootstrap/Modal";
 import {useStoreActions, useStoreState} from "easy-peasy";
 
 const pieces = ['q', 'r', 'b', 'k']
@@ -52,20 +51,29 @@ export const Promote = (props) => {
 
 
     return (
-        <Modal
-            show={true}
-            backdrop="static"
-            size="sm"
-            dialogClassName="modal-promo"
-            centered
+        <div className="modal" tabindex="-1" role="dialog"
+            //show={true}
+            //backdrop="static"
+            //size="sm"
+            //dialogClassName="modal-promo"
+            //centered
         >
-            <div className="d-flex flex-row">
-                <PieceButton piece="Q" color={color} idx={0} selection={selection} buttonStyle={buttonStyle} onClick={onSelect} />
-                <PieceButton piece="R" color={color} idx={1} selection={selection} buttonStyle={buttonStyle} onClick={onSelect} />
-                <PieceButton piece="B" color={color} idx={2} selection={selection} buttonStyle={buttonStyle} onClick={onSelect} />
-                <PieceButton piece="N" color={color} idx={3} selection={selection} buttonStyle={buttonStyle} onClick={onSelect} />
+            <div className="modal-dialog">
+                <div className="modal-content">
+                    <div className="d-flex flex-row">
+
+                        <PieceButton piece="Q" color={color} idx={0} selection={selection} buttonStyle={buttonStyle}
+                                     onClick={onSelect}/>
+                        <PieceButton piece="R" color={color} idx={1} selection={selection} buttonStyle={buttonStyle}
+                                     onClick={onSelect}/>
+                        <PieceButton piece="B" color={color} idx={2} selection={selection} buttonStyle={buttonStyle}
+                                     onClick={onSelect}/>
+                        <PieceButton piece="N" color={color} idx={3} selection={selection} buttonStyle={buttonStyle}
+                                     onClick={onSelect}/>
+                    </div>
+                </div>
             </div>
-        </Modal>
+        </div>
     )
 }
 

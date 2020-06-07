@@ -7,13 +7,15 @@ import Col from "react-bootstrap/Col";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {wsSend} from '../ws/ws';
 import {useHistory} from "react-router-dom"
+import MatchModal from "./matchModal";
 
 
 export const ChooseGame = () => {
 
-    const {colorPreference, opponent, timeControl} = useStoreState(state => state.game)
+    const {colorPreference, opponent, timeControl, showMatchModal} = useStoreState(state => state.game)
 
     const update = useStoreActions(actions => actions.game.update)
+    
     const doColorChange = (v) => update({colorPreference: v})
     const doOpponentChange = (v) => update({opponent: v})
     const doTimeControlChange = (v) => {
@@ -49,7 +51,8 @@ export const ChooseGame = () => {
         }
     }
 
-    return <Container>
+    return <>
+        <Container>
         <Row><h5>Time control</h5></Row>
         <Row>
             <ToggleButtonGroup
@@ -90,4 +93,6 @@ export const ChooseGame = () => {
             </Col>
         </Row>
     </Container>
+    {/*{showMatchModal ? <MatchModal/> : null}*/}
+    </>
 }

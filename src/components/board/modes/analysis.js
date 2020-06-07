@@ -1,6 +1,6 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Chess from "chess.js";
-import {useStoreState} from "easy-peasy";
+import {useStoreActions, useStoreState} from "easy-peasy";
 import {calcPosition, checkSquareStyling, lastMoveSquareStyling} from "./helpers";
 import GGBoard from "../../ggboard";
 
@@ -16,10 +16,10 @@ export const Analysis = (props) => {
     checkSquareStyling(squareStyles, game);
     lastMoveSquareStyling(squareStyles, history, browseIndex)
 
-    //const update = useStoreActions(actions => actions.game.update)
-    //useEffect(() => {
-    //    update({promote: true, onPromote: (x) => console.log(x)})
-    //})
+    const update = useStoreActions(actions => actions.game.update)
+    useEffect(() => {
+        update({promote: true, onPromote: (x) => console.log(x)})
+    })
 
 
     return (
