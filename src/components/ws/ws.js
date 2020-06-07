@@ -1,34 +1,35 @@
 //------------------------------------------------------------------------------
 // Websocket handler
 //------------------------------------------------------------------------------
-const wsConn = {
-    connect: function(onmessage) {
+
+export const wsConn = {
+    connect: function () {
         if (wsConn.q === undefined) {
             wsConn.q = [];
         }
 
         //wsConn.ws = new WebSocket("ws://" + document.location.host + "/ws");
-        const goServer='ws://localhost:8383/ws';
+        const goServer = 'ws://localhost:8383/ws';
         wsConn.ws = new WebSocket(goServer);
-        wsConn.ws.onopen = function() {
+        wsConn.ws.onopen = function () {
             console.log('wsConn: Socket is open, q length: ' + wsConn.q.length);
             wsConn.flush();
         };
-        wsConn.ws.onmessage = onmessage;
-        wsConn.ws.onclose = function(e) {
+            wsConn.ws.onmessage = onmessage;
+        wsConn.ws.onclose = function (e) {
             console.log('wsConn: Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
-            setTimeout(function() {
+            setTimeout(function () {
                 wsConn.connect();
             }, 1000);
         };
-        wsConn.ws.onerror = function(err) {
+        wsConn.ws.onerror = function (err) {
             console.error('wsConn: Socket encountered error: ', err.message, 'Closing socket');
             wsConn.ws.close();
         };
 
     },
 
-    send: function(o) {
+    send: function (o) {
         if (o !== null) {
             wsConn.q.push(o);
         }
@@ -48,7 +49,23 @@ const wsConn = {
             wsConn.q.pop();
         }
     },
-    flush: function() { wsConn.send(null); }
+    flush: function () {
+        wsConn.send(null);
+    }
 };
 
-export default wsConn;
+const handlers = {}
+
+export const registerCmd = (name, handler) => handlers[name] = handler
+
+const onmessage = (evt) => {
+    const msg = JSON.parse(evt.data);
+    console.log('onWebSocketMessage: evt.data: ' + evt.data + ' msg: ' + msg);
+    //debugger
+    const handler = handlers[msg.Cmd]
+    if (handler)
+        handler(msg)
+}
+
+
+export const wsSend = wsConn.send

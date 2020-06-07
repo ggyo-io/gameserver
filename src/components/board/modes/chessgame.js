@@ -11,7 +11,7 @@ import {
     possibleMovesSquareStyling
 } from "./helpers";
 import GGBoard from '../../ggboard'
-import wsConn from '../../ws/ws'
+import {wsSend, registerCmd} from '../../ws/ws'
 
 const game = new Chess()
 
@@ -37,38 +37,39 @@ export const ChessGame = (props) => {
     // WebSocket
     //
 
-    // dispatch message by type
-    const  onWebSocketMessage = (evt) => {
-        var msg = JSON.parse(evt.data);
-        console.log('onWebSocketMessage: evt.data: ' + evt.data + ' msg: ' + msg);
-        if (msg.Cmd == "start") {
-            newGame(msg);
-        } else if (msg.Cmd == "move") {
-            move(msg);
-        } else if (msg.Cmd == "outcome") {
-            outcome(msg.Params);
-            /*
-        } else if (msg.Cmd == "offer") {
-            //modal.offer(msg.Params); // make visible
-        } else if (msg.Cmd == "disconnect") {
-            //disconnect();
-        } else if (msg.Cmd == "reconnected") {
-            //reconnected();
-        } else if (msg.Cmd == "must_login") {
-            //must_login();
-        } else if (msg.Cmd == "nomatch") {
-            //nomatch();
-        } else if (msg.Cmd == "accept_undo") {
-            //accept_undo(msg);
-        } else if (msg.Cmd == "undo") {
-            //modal.offer(msg.Cmd);
-        } else if (msg.Cmd == "queues_status") {
-            //selectGame.updateMatching(msg);
-            */
-        } else {
-            console.log("Unknown command: '" + msg.Cmd + "'");
-        }
-    }
+
+    //// dispatch message by type
+    //const  onWebSocketMessage = (evt) => {
+    //    var msg = JSON.parse(evt.data);
+    //    console.log('onWebSocketMessage: evt.data: ' + evt.data + ' msg: ' + msg);
+    //    if (msg.Cmd == "start") {
+    //        newGame(msg);
+    //    } else if (msg.Cmd == "move") {
+    //        move(msg);
+    //    } else if (msg.Cmd == "outcome") {
+    //        outcome(msg.Params);
+    //        /*
+    //    } else if (msg.Cmd == "offer") {
+    //        //modal.offer(msg.Params); // make visible
+    //    } else if (msg.Cmd == "disconnect") {
+    //        //disconnect();
+    //    } else if (msg.Cmd == "reconnected") {
+    //        //reconnected();
+    //    } else if (msg.Cmd == "must_login") {
+    //        //must_login();
+    //    } else if (msg.Cmd == "nomatch") {
+    //        //nomatch();
+    //    } else if (msg.Cmd == "accept_undo") {
+    //        //accept_undo(msg);
+    //    } else if (msg.Cmd == "undo") {
+    //        //modal.offer(msg.Cmd);
+    //    } else if (msg.Cmd == "queues_status") {
+    //        //selectGame.updateMatching(msg);
+    //        */
+    //    } else {
+    //        console.log("Unknown command: '" + msg.Cmd + "'");
+    //    }
+    //}
 
     // Server game: start message handler
     // TODO:
@@ -123,7 +124,7 @@ export const ChessGame = (props) => {
     }
 
     // Recieved outcome from server
-    const outcome = (r) => update({result: r})
+    const outcome = (msg) => update({result: msg.Params})
 
     // Send last local move to server
     const onMyMoveVsRemote = (move) => {
@@ -133,10 +134,10 @@ export const ChessGame = (props) => {
         console.log("move: " + JSON.stringify(move))
         const { from, to, promotion } = move
         let last_move = from + to
-        if (promotion !== undefined) last_move += '=' + promotion
+        if (promotion !== undefined) last_move += promotion
         console.log("last_move: " + last_move)
 
-        wsConn.send({
+        wsSend({
             Cmd: 'move',
             Params: last_move
         })
@@ -233,12 +234,11 @@ export const ChessGame = (props) => {
                 promotion: promotion
             })
             if (!move) return
+            debugger
             if (opponent === 'random')
                 onMyMoveVsLocal()
             else
-                onMove({
-                    history: game.history({verbose: true})
-                })
+                onMyMoveVsRemote(move)
         }
         promote(onPromote)
     }
@@ -346,8 +346,10 @@ export const ChessGame = (props) => {
 
             if (myColor === 'black') timer()
         } else {
-            wsConn.connect(onWebSocketMessage);
-            wsConn.send({
+            registerCmd('start', newGame)
+            registerCmd("move", move)
+            registerCmd("outcome", outcome)
+            wsSend({
                 Cmd: "start",
                 Params: opponent,
                 Color: myColor,
