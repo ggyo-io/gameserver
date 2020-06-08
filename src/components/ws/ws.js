@@ -29,7 +29,25 @@ export const wsConn = {
 
     },
 
+    disconnect: function() {
+        if (wsConn.q) {
+            console.log('wsConn: disconnect, q length: ' + wsConn.q.length);
+            wsConn.q = undefined
+        }
+
+        if (!wsConn.ws)
+            return
+
+        wsConn.ws.onclose = function () {}; // disable onclose handler first
+        wsConn.ws.close()
+        wsConn.ws = undefined
+    },
+
     send: function (o) {
+        if (wsConn.q === undefined) {
+            wsConn.q = [];
+        }
+
         if (o !== null) {
             wsConn.q.push(o);
         }

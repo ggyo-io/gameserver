@@ -9,7 +9,13 @@ const store = createStore(gameModel)
 export const App = () => {
     useEffect(()=>{
         wsConn.connect()
-    })
+
+        // Specify how to clean up after this effect:
+        return function cleanup() {
+            wsConn.disconnect();
+        };
+    }, [])
+
     return (
         <StoreProvider store={store}>
             <Routing/>
