@@ -6,6 +6,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {LinkContainer} from "react-router-bootstrap";
+import {wsSend} from '../../components/ws/ws';
 
 
 export const ChooseGame = () => {
@@ -24,6 +25,19 @@ export const ChooseGame = () => {
     }
 
     const playColor = () => myColor === 'any' ? 'white' : myColor
+
+    const play = () => {
+        console.log("Play click")
+        if (opponent === 'random') return
+
+        wsSend({
+            Cmd: "start",
+            Params: opponent,
+            Color: myColor,
+            TimeControl: timeControl.seconds.toString() + '+' +
+                         timeControl.increment.toString()
+        });
+    }
 
     return <Container>
        <Row><h5>Time control</h5></Row>
@@ -74,7 +88,7 @@ export const ChooseGame = () => {
                     <Button
                         size="lg"
                         block
-                        onClick={() => console.log("Play click")}>PLAY
+                        onClick={play}>PLAY
                     </Button>
                 </LinkContainer>
             </Col>

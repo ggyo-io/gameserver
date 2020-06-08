@@ -115,13 +115,6 @@ export const ChessGame = (props) => {
             registerCmd('start', start)
             registerCmd("move", move)
             registerCmd("outcome", outcome)
-            wsSend({
-                Cmd: "start",
-                Params: opponent,
-                Color: myColor,
-                TimeControl: timeControl.seconds.toString() + '+' +
-                             timeControl.increment.toString()
-            });
 
     }, []);
 
