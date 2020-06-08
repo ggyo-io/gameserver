@@ -4,7 +4,7 @@ import {useStoreState} from "easy-peasy";
 
 export function Player(props) {
 
-    const [time, setTime] = useState(15 * 60)
+    const [time, setTime] = useState(0)
 
     // top or bottom
     const posish = props.posish;
@@ -23,7 +23,8 @@ export function Player(props) {
             }, 100)
             return () => clearInterval(interval)
         } else {
-            setTime(serverTime)
+            if (serverTime !== undefined)
+                setTime(serverTime)
         }
     }, [turn, lastMoveTimestamp, serverTime, posish, result])
 
