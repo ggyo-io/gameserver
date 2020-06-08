@@ -24,19 +24,19 @@ export const Random = (props) => {
         if (game.in_draw())
             result = '1/2-1/2'
         else if (turnColor(game.history()) == 'white')
-            result = '1-0'
-        else
             result = '0-1'
+        else
+            result = '1-0'
+
         update({result: result})
     }
 
     const moveMade = (game) => {
-        updateResult(game)
-
         onMove({
             history: game.history({verbose: true}),
             localTime: true
         })
+        updateResult(game)
     }
 
     const timer = (game) => setTimeout(() => makeRandomMove(game), 200)
