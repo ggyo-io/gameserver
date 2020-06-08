@@ -68,7 +68,7 @@ export const Random = (props) => {
             WhiteClock: timeControl.seconds * 1000,
             BlackClock: timeControl.seconds * 1000,
         })
-        if (myColor === 'black') timer()
+        if (myColor === 'black') timer(game)
     }, []);
 
     return (
