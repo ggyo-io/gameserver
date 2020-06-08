@@ -28,7 +28,7 @@ function updateState(headers) {
     })
 }
 
-export const Analysisboard = () => {
+export const AnalysisPage = () => {
     const location = useLocation();
     let pgn = ""
     if (location.state && location.state.game) {

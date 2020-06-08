@@ -5,10 +5,10 @@ import {Signup} from '../signup/signup';
 import {Layout} from '../../components/layout/layout';
 import {NavigationBar} from '../../components/navigation-bar/navigation-bar';
 import {Contact} from "../contacts/contact";
-import {Playboard} from "../playboard/playboard";
-import {Analysisboard} from "../analysisboard/analysisboard"
+import {GamePage} from "../gamepage/gamePage";
+import {AnalysisPage} from "../analysispage/analysisPage"
 import {About} from "../about/about";
-import {Randomboard} from "../random/randomboard";
+import {RandomPage} from "../random/randomPage";
 
 
 const Routing = () => {
@@ -19,9 +19,9 @@ const Routing = () => {
                     <Redirect from="/" to="/home"/>
                     <Switch>
                         <Route exact path="/home" component={Home}/>
-                        <Route path="/playboard" component={Playboard}/>
-                        <Route path="/random" component={Randomboard}/>
-                        <Route path="/analysisboard" component={Analysisboard}/>
+                        <Route path="/playboard" component={GamePage}/>
+                        <Route path="/random" component={RandomPage}/>
+                        <Route path="/analysisboard" component={AnalysisPage}/>
                         <Route path="/contact" component={Contact}/>
                         <Route path="/about" component={About}/>
                         <Route path="/signup" component={Signup}/>
