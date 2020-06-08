@@ -9,7 +9,7 @@ const store = createStore(gameModel)
 export const App = () => {
     useEffect(()=>{
         wsConn.connect()
-    },[])
+    })
     return (
         <StoreProvider store={store}>
             <Routing/>

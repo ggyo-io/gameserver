@@ -16,7 +16,6 @@ export const actions = {
             state.top.serverTime = state.top.serverTime - 5
             state.bottom.serverTime = state.bottom.serverTime - Math.round((state.lastMoveTimestamp - prevMoveTimestamp) / 1000)
         }
-
     }),
 
     promote: action((state, payload) => {
@@ -50,7 +49,29 @@ export const actions = {
 
     setTime: action((state, payload) => {
         state[payload.player].time = payload.time
-    })
+    }),
 
+    newGame: action((state, {Color, BlackElo, WhiteElo, WhiteTime, BlackTime, User}) => {
+        Object.assign(state, {
+            history: [],
+            browseIndex: 0,
+            pieceSquare: '',
+            dropSquare: '',
+            result: '',
+            orientation: Color,
+            myColor: Color,
+            top: {
+                name: User || 'Anonymous',
+                elo: Color === 'white' ? BlackElo: WhiteElo,
+                serverTime: Color === 'white' ? BlackTime: WhiteTime,
+            },
+            bottom: {
+                name: "Hey that's me",
+                elo: Color === 'white' ? WhiteElo : BlackElo,
+                serverTime: Color === 'white' ? BlackTime: WhiteTime,
+            },
+            lastMoveTimestamp: Date.now()
+        })
+    }),
 
 }

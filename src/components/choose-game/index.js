@@ -70,7 +70,7 @@ export const ChooseGame = () => {
         <p/><br/>
         <Row className="justify-content-md-center">
             <Col sm={9}>
-                <LinkContainer to="/playboard">
+                <LinkContainer to={opponent === "random"? "/random" : "/playboard"}>
                     <Button
                         size="lg"
                         block

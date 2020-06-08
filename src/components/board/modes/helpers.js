@@ -1,3 +1,5 @@
+import {useStoreActions} from "easy-peasy";
+
 export const calcPosition = (history, browseIndex, game) => {
     if (history.length === 0)
         game.reset()
@@ -67,4 +69,14 @@ export const dropSquareStyling = (squareStyles, sq) => {
     if (sq === '') return;
     squareStyles[sq] = squareStyles[sq] ? [ ...squareStyles[sq], 'drop-square' ]
                                                 : [ 'drop-square' ]
+}
+
+export const gameSquareStyles = (game, history, pieceSquare, dropSquare, browseIndex) => {
+    let squareStyles = {}
+    checkSquareStyling(squareStyles, game)
+    lastMoveSquareStyling(squareStyles, history, browseIndex)
+    possibleMovesSquareStyling(squareStyles, pieceSquare, game)
+    pieceSquareStyling(squareStyles, pieceSquare)
+    dropSquareStyling(squareStyles, dropSquare)
+    return squareStyles
 }

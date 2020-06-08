@@ -8,6 +8,7 @@ import {Contact} from "../contacts/contact";
 import {Playboard} from "../playboard/playboard";
 import {Analysisboard} from "../analysisboard/analysisboard"
 import {About} from "../about/about";
+import {Randomboard} from "../random/randomboard";
 
 
 const Routing = () => {
@@ -19,6 +20,7 @@ const Routing = () => {
                     <Switch>
                         <Route exact path="/home" component={Home}/>
                         <Route path="/playboard" component={Playboard}/>
+                        <Route path="/random" component={Randomboard}/>
                         <Route path="/analysisboard" component={Analysisboard}/>
                         <Route path="/contact" component={Contact}/>
                         <Route path="/about" component={About}/>
