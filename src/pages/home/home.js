@@ -1,6 +1,6 @@
 import React from "react";
 import {History} from "../../components/history/history";
-import {ChooseGame} from "../../components/choose-game";
+import {ChooseGame} from "../../components/choose-game/choosegame";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 

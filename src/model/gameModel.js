@@ -3,7 +3,8 @@ import {computed} from "easy-peasy";
 
 export const gameModel = {
     game: {
-        myColor: 'any',
+        myColor: 'white',
+        colorPreference: 'any',
         orientation: 'white',
         opponent: 'random',
 
@@ -22,6 +23,7 @@ export const gameModel = {
         dropSquare: '',
 
         dialogLabel: '',
+
         top: {
             name: '',
             elo: '',

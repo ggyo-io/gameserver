@@ -8,18 +8,10 @@ const game = new Chess()
 
 export const ChessGame = (props) => {
 
-    // Store state
-    const { myColor, opponent, timeControl} = useStoreState(state => state.game)
-
     // Actions
     const {onMove, update, newGame} = useStoreActions(actions => actions.game)
 
-    //
-    // WebSocket
-    //
-
-
-    //// dispatch message by type
+   //// dispatch message by type
     //const  onWebSocketMessage = (evt) => {
     //    var msg = JSON.parse(evt.data);
     //    console.log('onWebSocketMessage: evt.data: ' + evt.data + ' msg: ' + msg);
@@ -52,11 +44,9 @@ export const ChessGame = (props) => {
     //    }
     //}
 
-
     const start = (msg) => {
         newGame(msg)
     }
-
 
     // Recieved move command from server
     const move = (msg) => {
@@ -76,10 +66,8 @@ export const ChessGame = (props) => {
             promotion: promotePiece
         });
 
-        console.log("computa mr begin from: " + from_sq + " to: " + to_sq + " promo: " + promotePiece);
-        console.log(JSON.stringify(mr));
-        console.log("computa mr end");
-        console.log("game fen: " + game.fen());
+        if (!mr)
+            console.error("illegal move received: " + JSON.stringify(msg))
 
         onMove({
             history: game.history({verbose: true}),
@@ -92,15 +80,13 @@ export const ChessGame = (props) => {
     const outcome = (msg) => update({result: msg.Params})
 
     // Send last local move to server
-    const onMakeMove = (move, game) => {
+    const onMakeMove = (move) => {
         onMove({
             history: game.history({verbose: true})
         })
-        console.log("move: " + JSON.stringify(move))
         const { from, to, promotion } = move
         let last_move = from + to
         if (promotion !== undefined) last_move += promotion
-        console.log("last_move: " + last_move)
 
         wsSend({
             Cmd: 'move',
@@ -108,10 +94,7 @@ export const ChessGame = (props) => {
         })
     }
 
-
-
     useEffect(() => {
-
             registerCmd('start', start)
             registerCmd("move", move)
             registerCmd("outcome", outcome)

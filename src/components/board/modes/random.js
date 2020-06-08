@@ -18,7 +18,7 @@ export const Random = (props) => {
 
     //
     // Local game vs. random
-    const updateResult = (game) => {
+    const updateResult = () => {
         if (!game.game_over()) return
         let result = ''
         if (game.in_draw())
@@ -31,17 +31,17 @@ export const Random = (props) => {
         update({result: result})
     }
 
-    const moveMade = (game) => {
+    const moveMade = () => {
         onMove({
             history: game.history({verbose: true}),
             localTime: true
         })
-        updateResult(game)
+        updateResult()
     }
 
-    const timer = (game) => setTimeout(() => makeRandomMove(game), 200)
+    const timer = () => setTimeout(() => makeRandomMove(), 200)
 
-    const makeRandomMove = (game) => {
+    const makeRandomMove = () => {
         let possibleMoves = game.moves()
 
         // exit if the game is over
@@ -52,12 +52,12 @@ export const Random = (props) => {
 
         let randomIndex = Math.floor(Math.random() * possibleMoves.length)
         game.move(possibleMoves[randomIndex])
-        moveMade(game)
+        moveMade()
     }
 
-    const onMakeMove = (move, game) => {
-        moveMade(game)
-        timer(game)
+    const onMakeMove = (move) => {
+        moveMade()
+        timer()
     }
 
     useEffect(() => {
@@ -68,7 +68,7 @@ export const Random = (props) => {
             WhiteClock: timeControl.seconds * 1000,
             BlackClock: timeControl.seconds * 1000,
         })
-        if (myColor === 'black') timer(game)
+        if (myColor === 'black') timer()
     }, []);
 
     return (
