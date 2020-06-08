@@ -1,5 +1,5 @@
 import Chess from "chess.js";
-import React, { useEffect } from "react";
+import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {turnColor} from "./helpers";
 import {Gameboard} from "../components/gameboard";
@@ -9,11 +9,11 @@ const game = new Chess()
 export const Random = (props) => {
 
     // Store state
-    const { myColor, timeControl } =
+    const {myColor, timeControl} =
         useStoreState(state => state.game)
 
     // Actions
-    const { onMove, update, newGame } =
+    const {onMove, update, newGame} =
         useStoreActions(actions => actions.game)
 
     //
@@ -21,20 +21,21 @@ export const Random = (props) => {
     const updateResult = (game) => {
         if (!game.game_over()) return
         let result = ''
-            if (game.in_draw())
-                result = '1/2-1/2'
-            else if (turnColor(game.history()) == 'white')
-                result = '1-0'
-            else
-                result = '0-1'
-            update({ result: result })
+        if (game.in_draw())
+            result = '1/2-1/2'
+        else if (turnColor(game.history()) == 'white')
+            result = '1-0'
+        else
+            result = '0-1'
+        update({result: result})
     }
 
     const moveMade = (game) => {
         updateResult(game)
 
         onMove({
-            history: game.history({ verbose: true })
+            history: game.history({verbose: true}),
+            localTime: true
         })
     }
 
@@ -64,17 +65,17 @@ export const Random = (props) => {
             Color: myColor === 'any' ? 'white' : myColor,
             BlackElo: 1,
             WhiteElo: 1300,
-            WhiteTime: timeControl.seconds,
-            BlackTime: timeControl.seconds,
+            WhiteClock: timeControl.seconds * 1000,
+            BlackClock: timeControl.seconds * 1000,
         })
         if (myColor === 'black') timer()
     }, []);
 
     return (
-            <Gameboard
-                onMakeMove={onMakeMove}
-                style={props.style}
-                game={game}
-            />
+        <Gameboard
+            onMakeMove={onMakeMove}
+            style={props.style}
+            game={game}
+        />
     )
 }

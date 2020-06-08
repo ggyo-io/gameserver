@@ -83,6 +83,8 @@ export const ChessGame = (props) => {
 
         onMove({
             history: game.history({verbose: true}),
+            WhiteClock: msg.WhiteClock,
+            BlackClock: msg.BlackClock,
         })
     }
 

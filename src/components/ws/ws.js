@@ -60,8 +60,7 @@ export const registerCmd = (name, handler) => handlers[name] = handler
 
 const onmessage = (evt) => {
     const msg = JSON.parse(evt.data);
-    console.log('onWebSocketMessage: evt.data: ' + evt.data + ' msg: ' + msg);
-    //debugger
+    console.log('onWebSocketMessage: evt.data: ' + evt.data);
     const handler = handlers[msg.Cmd]
     if (handler)
         handler(msg)
