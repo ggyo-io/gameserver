@@ -15,7 +15,7 @@ export const ChooseGame = () => {
     const {colorPreference, opponent, timeControl, showMatchModal} = useStoreState(state => state.game)
 
     const update = useStoreActions(actions => actions.game.update)
-    
+
     const doColorChange = (v) => update({colorPreference: v})
     const doOpponentChange = (v) => update({opponent: v})
     const doTimeControlChange = (v) => {
@@ -40,6 +40,7 @@ export const ChooseGame = () => {
             update({myColor: color})
             routerHistory.push('/random')
         } else {
+            // TODO: handle no connection to server
             wsSend({
                 Cmd: "start",
                 Params: opponent,
@@ -47,8 +48,17 @@ export const ChooseGame = () => {
                 TimeControl: timeControl.seconds.toString() + '+' +
                     timeControl.increment.toString()
             });
-            routerHistory.push('/playboard')
+            if (opponent === 'human') {
+                update({showMatchModal:true})
+            } else {
+                routerHistory.push('/playboard')
+            }
         }
+    }
+
+    const handleClose = () => {
+        update({showMatchModal:false})
+        routerHistory.push('/playboard')
     }
 
     return <>
@@ -93,6 +103,6 @@ export const ChooseGame = () => {
             </Col>
         </Row>
     </Container>
-    {/*{showMatchModal ? <MatchModal/> : null}*/}
+    {showMatchModal ? <MatchModal handleClose={handleClose}/> : null}
     </>
 }
