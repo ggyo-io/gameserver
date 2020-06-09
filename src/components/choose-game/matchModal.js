@@ -1,13 +1,21 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import {Spinner} from "react-bootstrap";
+import {registerCmd} from "../ws/ws";
 
 const MatchModal = (props) => {
-
     const handleClose = props.handleClose
-    let playing = 20000
-    let queueing = 42
+    const [playing, setPlaying] = useState(0)
+    const [queueing, setQueueing] = useState(0)
+    const onQueuesStatus = (msg) => {
+        setPlaying(msg.Map.PlayersPlaying)
+        setQueueing(msg.Map.PlayersInQueue)
+    }
+    useEffect(() => {
+        registerCmd('queues_status', onQueuesStatus)
+    })
+
     return (
         <Modal show={true} centered onHide={handleClose}>
             <Modal.Header><h2>Waiting for match...</h2></Modal.Header>

@@ -58,7 +58,7 @@ export const ChooseGame = () => {
 
     const handleClose = () => {
         update({showMatchModal:false})
-        routerHistory.push('/playboard')
+        wsSend({Cmd: "cancel"})
     }
 
     return <>
