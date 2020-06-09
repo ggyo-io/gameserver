@@ -1,5 +1,3 @@
-import {useStoreActions} from "easy-peasy";
-
 export const calcPosition = (history, browseIndex, game) => {
     if (history.length === 0)
         game.reset()
