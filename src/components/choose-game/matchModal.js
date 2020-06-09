@@ -17,7 +17,7 @@ const MatchModal = (props) => {
     })
 
     return (
-        <Modal show={true} centered onHide={handleClose}>
+        <Modal show={true} centered onHide={handleClose} backdrop="static">
             <Modal.Header><h2>Waiting for match...</h2></Modal.Header>
             <Modal.Body className="text-center">
                 <h4 className="text-center">Players playing: {playing}</h4>
@@ -25,7 +25,7 @@ const MatchModal = (props) => {
                 <Spinner animation="border"/>
             </Modal.Body>
             <Modal.Footer>
-                <Button onClick={handleClose}>Close</Button>
+                <Button onClick={handleClose}>Cancel</Button>
             </Modal.Footer>
         </Modal>
     )
