@@ -9,7 +9,7 @@ const game = new Chess()
 export const ChessGame = (props) => {
 
     // Actions
-    const {onMove, update, newGame} = useStoreActions(actions => actions.game)
+    const {onMove, update} = useStoreActions(actions => actions.game)
 
    //// dispatch message by type
     //const  onWebSocketMessage = (evt) => {
@@ -43,10 +43,6 @@ export const ChessGame = (props) => {
     //        console.log("Unknown command: '" + msg.Cmd + "'");
     //    }
     //}
-
-    const start = (msg) => {
-        newGame(msg)
-    }
 
     // Recieved move command from server
     const move = (msg) => {
@@ -95,7 +91,6 @@ export const ChessGame = (props) => {
     }
 
     useEffect(() => {
-            registerCmd('start', start)
             registerCmd("move", move)
             registerCmd("outcome", outcome)
 

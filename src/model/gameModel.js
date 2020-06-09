@@ -41,8 +41,6 @@ export const gameModel = {
 
         result: '',
 
-        showMatchModal: false,
-
         // actions
         ...actions
 

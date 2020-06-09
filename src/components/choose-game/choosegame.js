@@ -1,20 +1,20 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Button from "react-bootstrap/Button";
 import {ToggleButton, ToggleButtonGroup} from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {wsSend} from '../ws/ws';
+import {registerCmd, wsSend} from '../ws/ws';
 import {useHistory} from "react-router-dom"
 import MatchModal from "./matchModal";
 
 
 export const ChooseGame = () => {
 
-    const {colorPreference, opponent, timeControl, showMatchModal} = useStoreState(state => state.game)
-
-    const update = useStoreActions(actions => actions.game.update)
+    const [showMatchModal, setShowMatchModal] = useState(false)
+    const {colorPreference, opponent, timeControl} = useStoreState(state => state.game)
+    const {update, newGame} = useStoreActions(actions => actions.game)
 
     const doColorChange = (v) => update({colorPreference: v})
     const doOpponentChange = (v) => update({opponent: v})
@@ -48,18 +48,24 @@ export const ChooseGame = () => {
                 TimeControl: timeControl.seconds.toString() + '+' +
                     timeControl.increment.toString()
             });
-            if (opponent === 'human') {
-                update({showMatchModal:true})
-            } else {
-                routerHistory.push('/playboard')
-            }
+            setShowMatchModal(true)
         }
     }
 
     const handleClose = () => {
-        update({showMatchModal:false})
+        setShowMatchModal(false)
         wsSend({Cmd: "cancel"})
     }
+
+    const start = (msg) => {
+        setShowMatchModal(false)
+        newGame(msg)
+        routerHistory.push('/playboard')
+    }
+
+    useEffect(() => {
+        registerCmd('start', start)
+    }, []);
 
     return <>
         <Container>
