@@ -1,6 +1,5 @@
 import React from "react";
 import GGBoard from "../../ggboard";
-import Chess from "chess.js";
 import {calcPosition, gameSquareStyles, turnColor} from "../modes/helpers";
 import {useStoreActions, useStoreState} from "easy-peasy";
 
@@ -8,7 +7,7 @@ import {useStoreActions, useStoreState} from "easy-peasy";
 export const Gameboard = (props) => {
 
     // Store state
-    const { history, pieceSquare, dropSquare, browseIndex, myColor, timeControl} =
+    const { history, pieceSquare, dropSquare, browseIndex, myColor} =
         useStoreState(state => state.game)
 
     // Actions

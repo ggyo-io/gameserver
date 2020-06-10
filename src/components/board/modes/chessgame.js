@@ -1,7 +1,7 @@
 import Chess from "chess.js";
-import React, { useEffect } from "react";
-import {useStoreActions, useStoreState} from "easy-peasy";
-import {wsSend, registerCmd} from '../../ws/ws'
+import React, {useEffect} from "react";
+import {useStoreActions} from "easy-peasy";
+import {registerCmd, wsSend} from '../../ws/ws'
 import {Gameboard} from "../components/gameboard";
 
 const game = new Chess()
@@ -9,9 +9,9 @@ const game = new Chess()
 export const ChessGame = (props) => {
 
     // Actions
-    const {onMove, update} = useStoreActions(actions => actions.game)
+    const {onMove, update, newGame} = useStoreActions(actions => actions.game)
 
-   //// dispatch message by type
+    //// dispatch message by type
     //const  onWebSocketMessage = (evt) => {
     //    var msg = JSON.parse(evt.data);
     //    console.log('onWebSocketMessage: evt.data: ' + evt.data + ' msg: ' + msg);
@@ -80,7 +80,7 @@ export const ChessGame = (props) => {
         onMove({
             history: game.history({verbose: true})
         })
-        const { from, to, promotion } = move
+        const {from, to, promotion} = move
         let last_move = from + to
         if (promotion !== undefined) last_move += promotion
 
@@ -90,18 +90,27 @@ export const ChessGame = (props) => {
         })
     }
 
+    const start = (msg) => {
+        if (msg.Params) {
+            game.load_pgn(msg.Params, {sloppy: true})
+            msg = {...msg, History: game.history({verbose:true})}
+        }
+        newGame(msg)
+    }
+
     useEffect(() => {
-            registerCmd("move", move)
-            registerCmd("outcome", outcome)
+        registerCmd("move", move)
+        registerCmd("outcome", outcome)
+        registerCmd("start", start)
 
     }, []);
 
     return (
-            <Gameboard
-                onMakeMove={onMakeMove}
-                style={props.style}
-                game={game}
-            />
+        <Gameboard
+            onMakeMove={onMakeMove}
+            style={props.style}
+            game={game}
+        />
     )
 }
 

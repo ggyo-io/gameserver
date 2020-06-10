@@ -61,27 +61,25 @@ export const actions = {
         state[payload.player].time = payload.time
     }),
 
-    newGame: action((state, {Color, BlackElo, WhiteElo, WhiteClock, BlackClock, User}) => {
-        Object.assign(state, {
-            history: [],
-            browseIndex: 0,
-            pieceSquare: '',
-            dropSquare: '',
-            result: '',
-            orientation: Color,
-            myColor: Color,
-            top: {
-                name: User || 'Anonymous',
-                elo: Color === 'white' ? BlackElo: WhiteElo,
-                serverTime: adjustTime(Color === 'white' ? BlackClock: WhiteClock),
-            },
-            bottom: {
+    newGame: action((state, {Color, BlackElo, WhiteElo, WhiteClock, BlackClock, User, History}) => {
+        state.history = History ? History : []
+        state.browseIndex = History ? History.length : 0
+        state.pieceSquare = ''
+        state.dropSquare = ''
+        state.result = ''
+        state.orientation = Color
+        state.myColor = Color
+        state.top = {
+            name: User || 'Anonymous',
+            elo: Color === 'white' ? BlackElo : WhiteElo,
+            serverTime: adjustTime(Color === 'white' ? BlackClock : WhiteClock)
+        }
+        state.bottom = {
                 name: "Hey that's me",
                 elo: Color === 'white' ? WhiteElo : BlackElo,
-                serverTime: adjustTime(Color === 'white' ? BlackClock: WhiteClock),
-            },
-            lastMoveTimestamp: Date.now()
-        })
+                serverTime: adjustTime(Color === 'white' ? WhiteClock: BlackClock)
+            }
+        state.lastMoveTimestamp = Date.now()
     }),
 
 }
