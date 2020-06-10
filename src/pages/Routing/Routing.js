@@ -16,9 +16,8 @@ const Routing = () => {
             <Router>
                 <NavigationBar/>
                 <Layout>
-                    <Redirect from="/" to="/home"/>
                     <Switch>
-                        <Route exact path="/home" component={Home}/>
+                        <Route exact path="/" component={Home}/>
                         <Route path="/playboard" component={GamePage}/>
                         <Route path="/random" component={RandomPage}/>
                         <Route path="/analysisboard" component={AnalysisPage}/>
