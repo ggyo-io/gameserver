@@ -2,98 +2,107 @@
 
 /* High contrast color scheme */
 :root {
-    --white-bg-color: #f0d9b5;
-    --selected-square-white: #c4f2e7;
-    --black-bg-color: #b58863;
-    --selected-square-black: #84b4c8;
-    --check: radial-gradient(circle, red 30%, transparent 75%);
-    --highlight-drop: inset 0 0 0 3px #343d52;
-    --highlight-piece: inset 0 0 0 3px #c5cddb;
-    --possible-move: radial-gradient(circle, #38908f 17%, transparent 23%);
-    --takes: inset 0 0 10px 4px #fa6e4f;
+  --white-bg-color: #f0d9b5;
+  --black-bg-color: #b58863;
+  --selected-square-white: #c4f2e7;
+  --selected-square-black: #84b4c8;
+  --check: radial-gradient(circle, red 30%, transparent 75%);
+  --highlight-drop: inset 0 0 0 3px #343d52;
+  --highlight-piece: inset 0 0 0 3px #c5cddb;
+  --possible-move: radial-gradient(circle, #38908f 17%, transparent 23%);
+  --takes: inset 0 0 10px 4px #fa6e4f;
 }
 
 .clearfix-7da63 {
-    clear: both;
+  clear: both;
 }
 
 .board-b72b1 {
-    border: 2px solid #404040;
-    box-sizing: content-box;
+  border: 2px solid #404040;
+  box-sizing: content-box;
 }
 
 .square-55d63 {
-    float: left;
-    position: relative;
-    /* disable any native browser highlighting */
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  float: left;
+  position: relative;
+  /* disable any native browser highlighting */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .notation-322f9 {
-    cursor: default;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    position: absolute;
+  cursor: default;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  position: absolute;
 }
 
 .alpha-d2270 {
-    bottom: 1px;
-    right: 3px;
+  bottom: 1px;
+  right: 3px;
 }
 
 .numeric-fc462 {
-    top: 2px;
-    left: 2px;
+  top: 2px;
+  left: 2px;
 }
 
-$squares:
-    "white" "1e1d7",
-    "black" "3c85d";
+$squares: "white" "1e1d7",
+"black" "3c85d";
 
 @each $color, $uuid in $squares {
-    .#{$color}-#{$uuid} {
-        background-color: var(--#{$color}-bg-color);
-        color: var(--black-bg-color);
-        &.selected-square {
-            background: var(--selected-square-#{$color});
-            &.possible-move {
-                background: var(--possible-move), var(--selected-square-#{$color});
-                .piece-417db {
-                     box-shadow: var(--takes);
-                 }
-                 &.drop-square {
-                    .piece-417db {
-                        box-shadow: var(--highlight-drop), var(--takes);
-                    }
-                }
-            }
+  .#{$color}-#{$uuid} {
+    background-color: var(--#{$color}-bg-color);
+    color: var(--black-bg-color);
+
+    &.selected-square {
+      background: var(--selected-square-#{$color});
+
+      &.possible-move {
+        background: var(--possible-move), var(--selected-square-#{$color});
+
+        .piece-417db {
+          box-shadow: var(--takes);
         }
-        &.possible-move {
-            background: var(--possible-move), var(--#{$color}-bg-color);
-            .piece-417db {
-                box-shadow: var(--takes);
-            }
-             &.drop-square {
-                box-shadow: var(--highlight-drop);
-                .piece-417db {
-                    box-shadow: var(--highlight-drop), var(--takes);
-                }
-            }
-       }
-        &.in-check {
-            background: var(--check), var(--#{$color}-bg-color);
-            &.selected-square {
-                background: var(--check), var(--selected-square-#{$color});
-            }
+
+        &.drop-square {
+          .piece-417db {
+            box-shadow: var(--highlight-drop), var(--takes);
+          }
         }
+      }
     }
+
+    &.possible-move {
+      background: var(--possible-move), var(--#{$color}-bg-color);
+
+      .piece-417db {
+        box-shadow: var(--takes);
+      }
+
+      &.drop-square {
+        box-shadow: var(--highlight-drop);
+
+        .piece-417db {
+          box-shadow: var(--highlight-drop), var(--takes);
+        }
+      }
+    }
+
+    &.in-check {
+      background: var(--check), var(--#{$color}-bg-color);
+
+      &.selected-square {
+        background: var(--check), var(--selected-square-#{$color});
+      }
+    }
+  }
 }
 
 .piece-square {
-    box-shadow: var(--highlight-piece);
+  box-shadow: var(--highlight-piece);
 }
