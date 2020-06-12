@@ -6,14 +6,15 @@ import (
 
 // Player is a base for UCI and WS players
 type Player struct {
-	hub    *Hub
-	user   string
-	color  string
-	foe    string
-	gameID string
-	send   chan *Message // Buffered channel of outbound messages
-	match  chan *Match   // Channel for when a match was found
-	board  chan *Message
+	hub      *Hub
+	user     string
+	clientID string
+	color    string
+	foe      string
+	gameID   string
+	send     chan *Message // Buffered channel of outbound messages
+	match    chan *Match   // Channel for when a match was found
+	board    chan *Message
 }
 
 // Match upon game start or resume
@@ -37,6 +38,10 @@ func (c *Player) Send() chan *Message {
 // User implements Client's interface
 func (c *Player) User() string {
 	return c.user
+}
+
+func (c *Player) ClientID() string {
+	return c.clientID
 }
 
 // Match implements Client's interface

@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	uuid "github.com/satori/go.uuid"
 	"html/template"
 	"log"
 	"net/http"
@@ -52,7 +54,7 @@ func (i *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if game := findGame(gameID); game != nil {
 		data.PGN = game.State
 	}
-	user := getUserName(r, true)
+	user, _ := getUserName(r, true)
 	if user != "" {
 		data.UserName = user
 		data.IsAnnon = false
@@ -115,8 +117,16 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 302)
 }
 
-func getUserName(r *http.Request, verify bool) (userName string) {
+func getUserName(r *http.Request, verify bool) (userName string, clientId string) {
 	session, _ := store.Get(r, "cookie-name")
+
+	clientRef, _ := session.Values["client-id"]
+	switch clientRef.(type) {
+	case string:
+		clientId = clientRef.(string)
+	default:
+		clientId = ""
+	}
 
 	// Check if user is authenticated
 	userRef, _ := session.Values["user"]
@@ -125,18 +135,20 @@ func getUserName(r *http.Request, verify bool) (userName string) {
 		name := userRef.(string)
 		if verify {
 			if findUserByName(name) != nil {
-				return name
+				return name, clientId
 			}
 		} else {
-			return name
+			return name, clientId
 		}
 	}
-	return ""
+	return "", clientId
 }
 
 func setSession(userName string, w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 	session.Values["user"] = userName
+	clientId := fmt.Sprintf("%s-%s", userName, str(uuid.NewV4()))
+	session.Values["client-id"] = clientId
 	session.Save(r, w)
 }
 
@@ -147,7 +159,7 @@ func clearSession(w http.ResponseWriter, r *http.Request) {
 }
 
 func history(w http.ResponseWriter, r *http.Request) {
-	user := getUserName(r, true)
+	user, _ := getUserName(r, true)
 	if user == "" {
 		w.WriteHeader(http.StatusForbidden)
 		return
@@ -162,5 +174,19 @@ func history(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Print("ERROR marshaling game history json", err)
 	}
+}
 
+func checkauth(w http.ResponseWriter, r *http.Request) {
+	log.Print("check auth called")
+	userName, clientId := getUserName(r, true)
+	log.Printf("chackauth user [%s], client-id [%s]", userName, clientId)
+	if clientId == "" {
+		setSession(userName, w, r)
+	}
+	idxData := &indexData{UserName: userName}
+	if msgb, err := json.Marshal(idxData); err == nil {
+		w.Write(msgb)
+	} else {
+		log.Print("checkauth: ERROR marshaling indexData", err)
+	}
 }

@@ -31,7 +31,7 @@ const (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool { return true },
+	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
 // WSPlayer is a Player middleman between the websocket connection and the hub.
@@ -190,8 +190,8 @@ func (c *WSPlayer) SetElo(elo int, mode string) {
 	c.ranksMap[mode] = elo
 }
 
-func newWSPlayer(hub *Hub, user string, conn *websocket.Conn) *WSPlayer {
-	player := &Player{hub: hub, user: user, send: make(chan *Message, 256), match: make(chan *Match)}
+func newWSPlayer(hub *Hub, user string, clientID string, conn *websocket.Conn) *WSPlayer {
+	player := &Player{hub: hub, user: user, clientID: clientID, send: make(chan *Message, 256), match: make(chan *Match)}
 	client := &WSPlayer{Player: player, conn: conn, ranksMap: make(map[string]int)}
 	ranks := getRanks(user)
 	client.setRanks(ranks)
@@ -206,13 +206,13 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	user := getUserName(r, false)
-	wcconnect(hub, user, conn)
+	user, clientId := getUserName(r, false)
+	wcconnect(hub, user, clientId, conn)
 }
 
-func wcconnect(hub *Hub, user string, conn *websocket.Conn) {
-	log.Printf("wsconnect %s\n", user)
-	player := newWSPlayer(hub, user, conn)
+func wcconnect(hub *Hub, user string, clientId string, conn *websocket.Conn) {
+	log.Printf("wsconnect user: %s, clientID: %s\n", user, clientId)
+	player := newWSPlayer(hub, user, clientId, conn)
 
 	go player.writePump()
 	go player.readPump()

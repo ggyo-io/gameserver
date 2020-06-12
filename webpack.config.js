@@ -16,7 +16,11 @@ module.exports = {
         publicPath: '/'
     },
     devServer: {
-        historyApiFallback: true
+        historyApiFallback: true,
+        proxy: [{
+            context: ['/auth', '/login', "/logout", "/register", "/history"],
+            target: 'http://localhost:8383',
+        }]
     },
     module: {
         rules: [

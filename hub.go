@@ -9,6 +9,7 @@ import (
 // Client represents a playing user registered to the hub
 type Client interface {
 	User() string
+	ClientID() string
 	Match() chan *Match
 	Send() chan *Message
 	Elo(string) int
@@ -71,7 +72,7 @@ func (h *Hub) run() {
 		case rq := <-h.register:
 			switch rq.request {
 			case "connected":
-				b := h.disconnected[rq.player.User()]
+				b := h.disconnected[rq.player.ClientID()]
 				log.Printf("board user %s connected found board %#v", rq.player.User(), b)
 				if b != nil {
 					b.control <- rq.player
@@ -80,7 +81,7 @@ func (h *Hub) run() {
 				close(rq.player.Match())
 				b := h.boards[rq.player]
 				if b != nil {
-					h.disconnected[rq.player.User()] = b
+					h.disconnected[rq.player.ClientID()] = b
 				}
 				delete(h.boards, rq.player)
 				delete(h.clients, rq.player)
@@ -105,7 +106,7 @@ func (h *Hub) run() {
 }
 
 func (h *Hub) removeBoardPlayer(bp *boardPlayer) {
-	delete(h.disconnected, bp.User())
+	delete(h.disconnected, bp.ClientID())
 	delete(h.boards, bp.Client)
 }
 

@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 
 export const wsConn = {
-    connect: function () {
+    wsConnect: function () {
         if (wsConn.q === undefined) {
             wsConn.q = [];
         }
@@ -15,18 +15,27 @@ export const wsConn = {
             console.log('wsConn: Socket is open, q length: ' + wsConn.q.length);
             wsConn.flush();
         };
-            wsConn.ws.onmessage = onmessage;
+        wsConn.ws.onmessage = onmessage;
         wsConn.ws.onclose = function (e) {
             console.log('wsConn: Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
             setTimeout(function () {
-                wsConn.connect();
+                wsConn.wsConnect();
             }, 1000);
         };
         wsConn.ws.onerror = function (err) {
             console.error('wsConn: Socket encountered error: ', err.message, 'Closing socket');
             wsConn.ws.close();
         };
+    },
 
+    connect: function () {
+        // TODO: can we skip auth if cookie is present?
+        fetch("/auth", {credentials: "same-origin"})
+            .then(resp => {
+                wsConn.wsConnect();
+                return resp.json()
+            })
+            .then(data=> console.log(data))
     },
 
     disconnect: function() {

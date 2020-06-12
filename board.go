@@ -281,7 +281,7 @@ func (b *Board) reconnect(client Client) *Match {
 	color := "white"
 	foe := b.black.User()
 	var bp *boardPlayer
-	if client.User() == b.black.User() {
+	if client.ClientID() == b.black.ClientID() {
 		color = "black"
 		foe = b.white.User()
 		b.black = newBoardPlayer(client)

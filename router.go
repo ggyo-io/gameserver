@@ -28,7 +28,7 @@ func newRouter(hub *Hub) *mux.Router {
 	router.HandleFunc("/logout", logout)
 
 	router.Methods("GET").Path("/history").HandlerFunc(history)
-
+	router.Methods("GET").Path("/auth").HandlerFunc(checkauth)
 
 	return router
 }
