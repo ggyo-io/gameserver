@@ -30,12 +30,11 @@ export const wsConn = {
 
     connect: function () {
         // TODO: can we skip auth if cookie is present?
-        fetch("/auth", {credentials: "same-origin"})
+        fetch("/api/auth", {credentials: "same-origin"})
             .then(resp => {
                 wsConn.wsConnect();
-                return resp.json()
+                resp.json().then(data=> console.log(data))
             })
-            .then(data=> console.log(data))
     },
 
     disconnect: function() {

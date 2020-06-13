@@ -18,7 +18,7 @@ module.exports = {
     devServer: {
         historyApiFallback: true,
         proxy: [{
-            context: ['/auth', '/login', "/logout", "/register", "/history"],
+            context: ['/api'],
             target: 'http://localhost:8383',
         }]
     },

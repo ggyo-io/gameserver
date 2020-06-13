@@ -23,12 +23,11 @@ func newRouter(hub *Hub) *mux.Router {
 	})
 
 	/* REST and other coded http requests */
-	router.Methods("POST").Path("/login").HandlerFunc(login)
-	router.Methods("POST").Path("/register").HandlerFunc(register)
-	router.HandleFunc("/logout", logout)
-
-	router.Methods("GET").Path("/history").HandlerFunc(history)
-	router.Methods("GET").Path("/auth").HandlerFunc(checkauth)
+	router.Methods("POST").Path("/api/login").HandlerFunc(login)
+	router.Methods("POST").Path("/api/register").HandlerFunc(register)
+	router.HandleFunc("/api/logout", logout)
+	router.Methods("GET").Path("/api/history").HandlerFunc(history)
+	router.Methods("GET").Path("/api/auth").HandlerFunc(checkauth)
 
 	return router
 }

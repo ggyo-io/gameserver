@@ -70,51 +70,67 @@ func (i *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type credentials struct {
+	Username string
+	Password string
+	Email    string
+}
+
 func register(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("username")
-	pass := r.FormValue("password")
-	email := r.FormValue("email")
+	decoder := json.NewDecoder(r.Body)
+	var c credentials
+	err := decoder.Decode(&c)
+	if err != nil {
+		http.Error(w, "invalid input", http.StatusForbidden)
+		return
+	}
+	name, pass, email := c.Username, c.Password, c.Email
 
 	if name == "" || pass == "" || email == "" || !strings.Contains(email, "@") || !strings.Contains(email, ".") {
-		http.Redirect(w, r, "/static/signup.html?err=invalid input", 302)
+		http.Error(w, "invalid input", http.StatusForbidden)
 		return
 	}
 
 	if existingUser := findUserByName(name); existingUser != nil {
-		http.Redirect(w, r, "/static/signup.html?err=user taken", 302)
+		http.Error(w, "username taken", http.StatusForbidden)
 		return
 	}
 
 	user := &User{Name: name, Password: shastr(pass), Email: email}
 	if err := db.Create(user).Error; err != nil {
 		log.Print("Error creating a user", err)
-		http.Redirect(w, r, "/static/signup.html?err=create failed", 302)
+		http.Error(w, "registration failed", http.StatusForbidden)
 	}
 	// Success!
 	setSession(name, w, r)
-	http.Redirect(w, r, "/", 302)
-
+	w.WriteHeader(http.StatusOK)
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("username")
-	pass := r.FormValue("password")
+	decoder := json.NewDecoder(r.Body)
+	var c credentials
+	err := decoder.Decode(&c)
+	if err != nil {
+		http.Error(w, "invalid input", http.StatusUnauthorized)
+		return
+	}
+	name, pass := c.Username, c.Password
 	if name == "" || pass == "" {
-		http.Redirect(w, r, "/static/login.html?err=invalid input", 302)
+		http.Error(w, "invalid input", http.StatusUnauthorized)
 		return
 	}
 	if findUserByNameAndPass(name, pass) == nil {
-		http.Redirect(w, r, "/static/login.html?err=no such user", 302)
+		http.Error(w, "authentication failed", http.StatusUnauthorized)
 		return
 	}
 	// Success!
 	setSession(name, w, r)
-	http.Redirect(w, r, "/", 302)
+	w.WriteHeader(http.StatusOK)
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
 	clearSession(w, r)
-	http.Redirect(w, r, "/", 302)
+	w.WriteHeader(http.StatusOK)
 }
 
 func getUserName(r *http.Request, verify bool) (userName string, clientId string) {

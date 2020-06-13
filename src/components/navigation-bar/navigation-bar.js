@@ -12,7 +12,7 @@ export const NavigationBar = () => (
                 <Nav className="ml-auto">
                     <LinkContainer to="/analysisboard"><NavLink>Analize</NavLink></LinkContainer>
                     <LinkContainer to="/about"><NavLink>About</NavLink></LinkContainer>
-                    <LinkContainer to="/signup"><NavLink>Sign Up!</NavLink></LinkContainer>
+                    <LinkContainer to="/login"><NavLink>Sign In!</NavLink></LinkContainer>
                 </Nav>
             </Navbar.Collapse>
         </Navbar>
