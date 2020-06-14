@@ -8,10 +8,12 @@ export function Player(props) {
 
     // top or bottom
     const posish = props.posish;
-    const {turn, lastMoveTimestamp, result} = useStoreState(state => state.game)
+    const {mode, browseIndex, gameTurn, browseTurn, lastMoveTimestamp, result} = useStoreState(state => state.game)
     const {name, elo, serverTime} = useStoreState(state => state.game[posish])
 
-    const shouldTick =  posish === turn && !result;
+    const currentBrowseMove = (mode === 'analysis') && ( posish === browseTurn ) && (browseIndex !== 0)
+    const shouldTick =  (posish === gameTurn && !result);
+    const shouldMark = shouldTick || currentBrowseMove
 
     // timer
     useEffect(() => {
@@ -26,7 +28,7 @@ export function Player(props) {
             if (serverTime !== undefined)
                 setTime(serverTime)
         }
-    }, [turn, lastMoveTimestamp, serverTime, posish, result])
+    }, [gameTurn, lastMoveTimestamp, serverTime, posish, result])
 
     // mm:ss
     const timeMin = Math.floor(time / 60) + ":" + ('0' + time % 60).substr(-2)
@@ -41,7 +43,7 @@ export function Player(props) {
                             <span className="ml-2" role="value">{elo}</span>
                         </span>
                     </span>
-                    <span className={shouldTick ? "text-warning ml-2" : "ml-2" } role="img" aria-label="clock">{shouldTick ? '⌛' : ''}
+                    <span className={shouldMark ? "text-warning ml-2" : "ml-2" } role="img" aria-label="clock">{shouldMark ? '⌛' : ''}
                         <span className="ml-2 text-monospace" role="time">{timeMin}</span>
                     </span>
                 </div>

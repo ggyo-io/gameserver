@@ -35,7 +35,9 @@ export const gameModel = {
             serverTime: 0,
         },
 
-        turn: computed(state => state.history.length % 2 ? (state.orientation === "white" ? "top" : "bottom") :
+        gameTurn: computed(state => state.history.length % 2 ? (state.orientation === "white" ? "top" : "bottom") :
+                                                           (state.orientation === "white" ? "bottom" : "top" )),
+        browseTurn: computed(state => state.browseIndex % 2 ? (state.orientation === "white" ? "top" : "bottom") :
                                                            (state.orientation === "white" ? "bottom" : "top" )),
         lastMoveTimestamp: Date.now(),
 
