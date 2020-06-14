@@ -10,11 +10,10 @@ const game = new Chess()
 
 function updateState(headers) {
     const {Black, BlackElo, White, WhiteElo, Result} = headers
-    const update = useStoreActions(actions => actions.game.update)
+    const {update, setBrowseIndex} = useStoreActions(actions => actions.game)
     update({
         mode: "analysis",
         history: game.history({verbose: true}),
-        browseIndex: game.history().length,
         pieceSquare: '',
         top: {
             name: Black,
@@ -26,6 +25,7 @@ function updateState(headers) {
         },
         result: Result
     })
+    setBrowseIndex(game.history().length)
 }
 
 export const AnalysisPage = () => {
