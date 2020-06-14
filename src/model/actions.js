@@ -81,5 +81,8 @@ export const actions = {
             }
         state.lastMoveTimestamp = Date.now()
     }),
+    setUser: action((state, payload) => {
+        state.user = payload
+    })
 
 }

@@ -220,4 +220,5 @@ func wcconnect(hub *Hub, user string, clientId string, conn *websocket.Conn) {
 	// Register with the hub
 	rr := &registerRequest{player: player, request: "connected"}
 	hub.register <- rr
+	player.send <- &Message{User: user, Cmd: "hello"}
 }

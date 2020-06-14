@@ -40,6 +40,7 @@ export const gameModel = {
         lastMoveTimestamp: Date.now(),
 
         result: '',
+        user: '',
 
         // actions
         ...actions

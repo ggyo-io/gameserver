@@ -193,16 +193,10 @@ func history(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkauth(w http.ResponseWriter, r *http.Request) {
-	log.Print("check auth called")
 	userName, clientId := getUserName(r, true)
 	log.Printf("chackauth user [%s], client-id [%s]", userName, clientId)
 	if clientId == "" {
 		setSession(userName, w, r)
 	}
-	idxData := &indexData{UserName: userName}
-	if msgb, err := json.Marshal(idxData); err == nil {
-		w.Write(msgb)
-	} else {
-		log.Print("checkauth: ERROR marshaling indexData", err)
-	}
+	w.WriteHeader(http.StatusOK)
 }
