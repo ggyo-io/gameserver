@@ -33,7 +33,6 @@ export const wsConn = {
         fetch("/api/auth", {credentials: "same-origin"})
             .then(resp => {
                 wsConn.wsConnect();
-                resp.json().then(data=> console.log(data))
             })
     },
 
@@ -65,7 +64,7 @@ export const wsConn = {
             try {
                 var obj = wsConn.q[0];
                 var msg = JSON.stringify(obj);
-                console.log('wsConn: sending: ' + msg + ' object: ' + obj);
+                console.log('wsConn: sending: ' + msg);
                 wsConn.ws.send(msg);
             } catch (e) {
                 console.log("wsConn: Caught an error while sending: " + e);

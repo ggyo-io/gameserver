@@ -1,60 +1,35 @@
 import {action} from "easy-peasy";
+import {clock2millis, timeMin} from "../utils/time";
+import {turnPosish} from "../utils/turns";
 
-const adjustTime = (t) => Math.floor(t/1000)
-const clock2secs = (c) => {
-    const a = c.split(':')
-    let multiplier = 1
-    let secs = 0
-    let digit
-    while (digit = a.pop()) {
-        secs += parseInt(digit) * multiplier
-        multiplier *= 60
-    }
-
-    return secs
-}
-
-const clock = (state, browseIndex) => {
-    const { clock }   = state.history[browseIndex - 1]
-    if (clock === undefined) return
-
-    const secs = clock2secs(clock)
-    if (state.orientation === "white")
-        if (browseIndex % 2) // white clock
-            state.bottom.serverTime = secs
-        else // black clock
-            state.top.serverTime = secs
-    else // orientation black
-        if (browseIndex % 2) // white clock
-            state.top.serverTime = secs
-        else // black clock
-            state.bottom.serverTime = secs
-}
 
 export const actions = {
 
     onMove: action((state, payload) => {
         state.history = payload.history
         const {WhiteClock, BlackClock} = payload
+
         if (WhiteClock !== undefined && BlackClock !== undefined) {
+            // Server update
+            console.log("onMove whiteClock = " + timeMin(WhiteClock) + ", blackClock = " + timeMin(BlackClock))
             if (state.orientation === "white") {
-                state.bottom.serverTime = adjustTime(WhiteClock)
-                state.top.serverTime = adjustTime(BlackClock)
+                state.bottom.serverTime = WhiteClock
+                state.top.serverTime = BlackClock
             } else {
-                state.top.serverTime = adjustTime(WhiteClock)
-                state.bottom.serverTime = adjustTime(BlackClock)
+                state.top.serverTime = WhiteClock
+                state.bottom.serverTime = BlackClock
             }
-        } else if (payload.localTime) {
-            // Local game - for simplicity and since it doesnt really matter update both top and bottom
-            const elapsed = Math.floor((Date.now() - state.lastMoveTimestamp)/1000)
-            state.bottom.serverTime -= elapsed
-            state.top.serverTime -= elapsed
+        } else {
+            // My move
+            const elapsed = Date.now() - state.lastMoveTimestamp
+            if (state.orientation === state.myColor)
+                state.bottom.serverTime -= elapsed
+            else
+                state.top.serverTime -= elapsed
         }
-        //state.result = payload.result
+        state.lastMoveTimestamp = Date.now()
         state.browseIndex = state.history.length
         state.pieceSquare = ''
-        state.lastMoveTimestamp = Date.now()
-
     }),
 
     promote: action((state, payload) => {
@@ -62,12 +37,10 @@ export const actions = {
         state.onPromote = payload
     }),
 
-
     update: action((state, payload) => {
         Object.assign(state, payload)
     }),
 
-    //          ~= Actions =~          //
     setBrowseIndex: action((state, payload) => {
         if (payload < 0 || payload > state.history.length)
             return
@@ -75,13 +48,16 @@ export const actions = {
         state.pieceSquare = ''
         state.dropSquare = ''
 
-        // set current move clock
-        if (payload === 0) return
-        clock(state, payload)
+        // update times only in finished games
+        if (state.result === '') return
 
-        // set previous move clock
-        if (payload === 1) return
-        clock(state, payload - 1)
+        if (payload === 0) return
+        const {clock} = state.history[payload - 1]
+        if (clock === undefined) return
+        const millis = clock2millis(clock)
+        const posish = turnPosish(payload)
+        console.log("payload = " + payload + ", posish = " + posish + ", clock = " + clock + ", millis = " + millis)
+        state[posish].serverTime = millis
     }),
     setPieceSquare: action((state, payload) => {
         state.pieceSquare = payload
@@ -109,15 +85,16 @@ export const actions = {
         state.top = {
             name: User || 'Anonymous',
             elo: Color === 'white' ? BlackElo : WhiteElo,
-            serverTime: adjustTime(Color === 'white' ? BlackClock : WhiteClock)
+            serverTime: Color === 'white' ? BlackClock : WhiteClock
         }
         state.bottom = {
-                name: "Hey that's me",
-                elo: Color === 'white' ? WhiteElo : BlackElo,
-                serverTime: adjustTime(Color === 'white' ? WhiteClock: BlackClock)
-            }
+            name: "Hey that's me",
+            elo: Color === 'white' ? WhiteElo : BlackElo,
+            serverTime: Color === 'white' ? WhiteClock : BlackClock
+        }
         state.lastMoveTimestamp = Date.now()
     }),
+
     setUser: action((state, payload) => {
         state.user = payload
     })
