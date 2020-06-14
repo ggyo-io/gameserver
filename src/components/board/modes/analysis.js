@@ -1,6 +1,6 @@
-import React, {useEffect} from "react";
-import Chess from "chess.js";
-import {useStoreActions, useStoreState} from "easy-peasy";
+import React from "react";
+import Chess from "../../ggboard/chess.js/chess"
+import {useStoreState} from "easy-peasy";
 import {calcPosition, checkSquareStyling, lastMoveSquareStyling} from "./helpers";
 import GGBoard from "../../ggboard";
 

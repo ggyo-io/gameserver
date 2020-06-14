@@ -1,4 +1,4 @@
-import Chess from "chess.js";
+import Chess from "../../ggboard/chess.js/chess"
 import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {turnColor} from "./helpers";

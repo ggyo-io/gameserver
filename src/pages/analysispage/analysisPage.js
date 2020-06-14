@@ -3,8 +3,8 @@ import {Board} from "components/board/board";
 import {AnalysisPanel} from "components/analysis-panel/analysisPanel"
 import {useLocation} from "react-router-dom";
 import {Analysis} from "components/board/modes/analysis";
-import {useStoreActions} from 'easy-peasy'
-import Chess from 'chess.js'
+import {useStoreActions} from 'easy-peasy';
+import Chess from '../../components/ggboard/chess.js/chess';
 
 const game = new Chess()
 

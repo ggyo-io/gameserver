@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Card, Form, InputGroup } from "react-bootstrap";
 import { useStoreActions } from 'easy-peasy'
-import Chess from 'chess.js'
+import Chess from '../ggboard/chess.js/chess'
 
 
 const textareaStyle = {

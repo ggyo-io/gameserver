@@ -1,6 +1,18 @@
 import {action} from "easy-peasy";
 
 const adjustTime = (t) => Math.floor(t/1000)
+const clock2secs = (c) => {
+    const a = c.split(':')
+    let multiplier = 1
+    let secs = 0
+    let digit
+    while (digit = a.pop()) {
+        secs += parseInt(digit) * multiplier
+        multiplier *= 60
+    }
+
+    return secs
+}
 
 export const actions = {
 
@@ -45,6 +57,21 @@ export const actions = {
         state.browseIndex = payload
         state.pieceSquare = ''
         state.dropSquare = ''
+
+        const { clock }   = state.history[payload]
+        if (clock === undefined) return
+
+        const secs = clock2secs(clock)
+        if (state.orientation === "white")
+            if (payload % 2) // white clock
+                state.bottom.serverTime = secs
+            else // black clock
+                state.top.serverTime = secs
+        else // orientation black
+            if (payload % 2) // white clock
+                state.top.serverTime = secs
+            else // black clock
+                state.bottom.serverTime = secs
     }),
     setPieceSquare: action((state, payload) => {
         state.pieceSquare = payload

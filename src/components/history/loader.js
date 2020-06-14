@@ -1,5 +1,5 @@
 import React from "react";
-import Chess from "chess.js"
+import Chess from "../ggboard/chess.js/chess";
 
 const chess = new Chess()
 

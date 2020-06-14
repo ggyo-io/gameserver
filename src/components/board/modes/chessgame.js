@@ -1,4 +1,4 @@
-import Chess from "chess.js";
+import Chess from "../../ggboard/chess.js/chess";
 import React, {useEffect} from "react";
 import {useStoreActions} from "easy-peasy";
 import {registerCmd, wsSend} from '../../ws/ws'

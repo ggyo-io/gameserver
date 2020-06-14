@@ -9,7 +9,6 @@
     "@babel/preset-react": "7.0.0",
     "bootstrap": "4.4.1",
     "bootswatch": "4.4.1",
-    "chess.js": "^0.10.3",
     "easy-peasy": "^3.3.0",
     "ghooks": "^2.0.4",
     "jquery": "3.5.1",
