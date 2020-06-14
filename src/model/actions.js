@@ -58,7 +58,8 @@ export const actions = {
         state.pieceSquare = ''
         state.dropSquare = ''
 
-        const { clock }   = state.history[payload]
+        if (payload === 0) return
+        const { clock }   = state.history[payload - 1]
         if (clock === undefined) return
 
         const secs = clock2secs(clock)
