@@ -14,6 +14,23 @@ const clock2secs = (c) => {
     return secs
 }
 
+const clock = (state, browseIndex) => {
+    const { clock }   = state.history[browseIndex - 1]
+    if (clock === undefined) return
+
+    const secs = clock2secs(clock)
+    if (state.orientation === "white")
+        if (browseIndex % 2) // white clock
+            state.bottom.serverTime = secs
+        else // black clock
+            state.top.serverTime = secs
+    else // orientation black
+        if (browseIndex % 2) // white clock
+            state.top.serverTime = secs
+        else // black clock
+            state.bottom.serverTime = secs
+}
+
 export const actions = {
 
     onMove: action((state, payload) => {
@@ -58,21 +75,13 @@ export const actions = {
         state.pieceSquare = ''
         state.dropSquare = ''
 
+        // set current move clock
         if (payload === 0) return
-        const { clock }   = state.history[payload - 1]
-        if (clock === undefined) return
+        clock(state, payload)
 
-        const secs = clock2secs(clock)
-        if (state.orientation === "white")
-            if (payload % 2) // white clock
-                state.bottom.serverTime = secs
-            else // black clock
-                state.top.serverTime = secs
-        else // orientation black
-            if (payload % 2) // white clock
-                state.top.serverTime = secs
-            else // black clock
-                state.bottom.serverTime = secs
+        // set previous move clock
+        if (payload === 1) return
+        clock(state, payload - 1)
     }),
     setPieceSquare: action((state, payload) => {
         state.pieceSquare = payload
