@@ -51,14 +51,22 @@ export const actions = {
         // update times only in finished games
         if (state.result === '') return
 
-        if (payload === 0) return
-        const {clock} = state.history[payload - 1]
-        if (clock === undefined) return
-        const millis = clock2millis(clock)
-        const posish = turnPosish(payload)
-        console.log("payload = " + payload + ", posish = " + posish + ", clock = " + clock + ", millis = " + millis)
-        state[posish].serverTime = millis
+        const setBrowseClock = (idx) => {
+            const {clock} = state.history[idx - 1]
+            if (clock === undefined) return
+            const millis = clock2millis(clock)
+            const posish = turnPosish(idx)
+            //console.log("payload = " + idx + ", posish = " + posish + ", clock = " + clock + ", millis = " + millis)
+            state[posish].serverTime = millis
+        }
+
+        if (payload > 0)
+            setBrowseClock(payload)
+
+        if (payload > 1)
+            setBrowseClock(payload - 1)
     }),
+
     setPieceSquare: action((state, payload) => {
         state.pieceSquare = payload
     }),
