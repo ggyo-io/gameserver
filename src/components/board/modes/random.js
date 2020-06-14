@@ -1,8 +1,8 @@
 import Chess from "../../ggboard/chess.js/chess"
 import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {turnColor} from "./helpers";
 import {Gameboard} from "../components/gameboard";
+import {turnColor} from "../../../utils/turns";
 
 const game = new Chess()
 
@@ -23,7 +23,7 @@ export const Random = (props) => {
         let result = ''
         if (game.in_draw())
             result = '1/2-1/2'
-        else if (turnColor(game.history()) == 'white')
+        else if (turnColor(game.history().length) == 'white')
             result = '0-1'
         else
             result = '1-0'

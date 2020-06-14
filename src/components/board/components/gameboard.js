@@ -1,7 +1,8 @@
 import React from "react";
 import GGBoard from "../../ggboard";
-import {calcPosition, gameSquareStyles, turnColor} from "../modes/helpers";
+import {calcPosition, gameSquareStyles} from "../modes/helpers";
 import {useStoreActions, useStoreState} from "easy-peasy";
+import {turnColor} from "../../../utils/turns";
 
 
 export const Gameboard = (props) => {
@@ -27,7 +28,7 @@ export const Gameboard = (props) => {
         if (browseIndex !== history.length) return false
 
         // not my turn
-        if (turnColor(history) !== myColor) return false
+        if (turnColor(history.length) !== myColor) return false
 
         // only pick up pieces for my color
         if (piece.charAt(0) !== myColor.charAt(0)) return false

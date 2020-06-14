@@ -1,6 +1,7 @@
 export const adjustTime = (t) => Math.floor(t/1000)
 
-export const timeMin = (t) => Math.floor(adjustTime(t) / 60) + ":" + ('0' + adjustTime(t) % 60).substr(-2)
+export const timeMin = (t) =>
+    t <= 0 ?"00:00" : Math.floor(adjustTime(t) / 60) + ":" + ('0' + adjustTime(t) % 60).substr(-2)
 
 export const clock2millis = (c) => {
     const a = c.split(':')
@@ -9,8 +10,7 @@ export const clock2millis = (c) => {
     let digit
     while (digit = a.pop()) {
         secs += parseInt(digit) * multiplier
-        multiplier *= 60
+        multiplier = 60
     }
-
     return secs * 1000
 }

@@ -1,5 +1,6 @@
 import { actions } from "./actions";
 import {computed} from "easy-peasy";
+import {turnPosish} from "../utils/turns";
 
 export const gameModel = {
     game: {
@@ -34,13 +35,8 @@ export const gameModel = {
             elo: '',
             serverTime: 0,
         },
-
-        gameTurn: computed(state => state.history.length % 2 ? (state.orientation === "white" ? "top" : "bottom") :
-                                                           (state.orientation === "white" ? "bottom" : "top" )),
-        browseTurn: computed(state => state.browseIndex % 2 ? (state.orientation === "white" ? "top" : "bottom") :
-                                                           (state.orientation === "white" ? "bottom" : "top" )),
+        turn: computed(state => turnPosish(state.history.length, state.orientation)),
         lastMoveTimestamp: Date.now(),
-
         result: '',
         user: '',
 
