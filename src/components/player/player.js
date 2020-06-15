@@ -9,10 +9,10 @@ export function Player(props) {
 
     // top or bottom
     const posish = props.posish;
-    const {mode, browseIndex, gameTurn, browseTurn, lastMoveTimestamp, result} = useStoreState(state => state.game)
+    const {mode, browseIndex, gameTurn, browseTurn, lastMoveTimestamp, history, result} = useStoreState(state => state.game)
     const {name, elo, serverTime} = useStoreState(state => state.game[posish])
 
-    const currentBrowseMove = (mode === 'analysis') && ( posish === browseTurn ) && (browseIndex !== 0)
+    const currentBrowseMove = (mode === 'analysis') && ( posish === browseTurn ) && (browseIndex !== 0) && ((browseIndex !== history.length))
     const shouldTick = posish === gameTurn && !result
     const shouldMark = shouldTick || currentBrowseMove
 
