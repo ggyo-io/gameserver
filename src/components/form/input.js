@@ -1,6 +1,6 @@
 import React from "react";
 
-export const Input = ({ errors, register, required, name, label, type, small, setSrvErr }) => {
+export const Input = ({ errors, register, required, name, label, type, small, setSrvErr, autofocus }) => {
     const registerOptions = {}
     if (required)
         registerOptions.required = "Required"
@@ -17,6 +17,7 @@ export const Input = ({ errors, register, required, name, label, type, small, se
         <input type={type} name={name} id={name} placeholder={"Enter " + name} ref={register(registerOptions)}
                className={"form-control" + (errors[name] ? " is-invalid" : "")}
                onChange={()=>setSrvErr('')}
+               autoFocus={autofocus}
         />
         {errors[name] && <div className="invalid-feedback">{errors[name].message}</div>}
         {small && <small id="emailHelp" className="form-text text-muted">{small}</small>}

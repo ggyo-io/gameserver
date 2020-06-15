@@ -26,7 +26,8 @@ export const Signup = () => {
             links={[{to: "/login", name: "Sign in"}, {to: "/reset", name: "Password reset"}]}
             srvErr={srvErr}
         >
-            <Input name="username" label="Username" errors={errors} register={register} required setSrvErr={setSrvErr}/>
+            <Input name="username" label="Username" autofocus
+                   errors={errors} register={register} required setSrvErr={setSrvErr}/>
             <Input name="password" type="password" label="Password" setSrvErr={setSrvErr}
                    errors={errors} register={register} required/>
             <Input name="email" type="email" label="Email"

@@ -14,7 +14,7 @@ export const ResetPassword = () => {
             links={[{to: "/login", name: "Sign in"}, {to: "/signup", name: "Create account"}]}
             srvErr={srvErr}
         >
-            <Input name="email" type="email" label="Email"
+            <Input name="email" type="email" label="Email" autofocus
                    errors={errors} register={register} required setSrvErr={setSrvErr}/>
         </AuthForm>
     )
