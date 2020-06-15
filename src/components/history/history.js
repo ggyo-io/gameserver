@@ -2,23 +2,28 @@ import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
 import fetchHistory from "./loader"
 import {useHistory} from "react-router-dom"
+import {useStoreActions} from "easy-peasy";
 
 const draw = <span>&frac12;-&frac12;</span>
 
 const renderRows = (games) => {
     const history = useHistory();
+    const {setAnalysis} = useStoreActions(actions => actions.game)
+
     return games.map((game, index) => {
         const onClick = () => {
-            history.push('/analysisboard', {game: game})
+            setAnalysis(game)
+            history.push('/analysisboard')
         };
+
         return (
             <tr key={index} onClick={onClick}>
-                <td>{game.time}</td>
-                <td><span className="mr-2">{game.p1}</span><span
-                    className="badge badge-light badge-pill">{game.p1Elo}</span></td>
-                <td><span className="mr-2">{game.p2}</span><span
-                    className="badge badge-light badge-pill">{game.p2Elo}</span></td>
-                <td>{game.result === "1/2-1/2" ? draw : game.result}</td>
+                <td>{game.Date}</td>
+                <td><span className="mr-2">{game.White}</span><span
+                    className="badge badge-light badge-pill">{game.WhiteElo}</span></td>
+                <td><span className="mr-2">{game.Black}</span><span
+                    className="badge badge-light badge-pill">{game.BlackElo}</span></td>
+                <td>{game.Result === "1/2-1/2" ? draw : game.Result}</td>
             </tr>
         );
     })

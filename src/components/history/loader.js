@@ -6,16 +6,10 @@ const chess = new Chess()
 export default function fetchHistory(url, setGames) {
     const games = pgns.map(value => {
         chess.load_pgn(value, {sloppy: true})
-        const {Black, White, BlackElo, WhiteElo, Result, Date} = chess.header()
-
         return {
             pgn: value,
-            time: Date,
-            p1: White,
-            p2: Black,
-            p1Elo: WhiteElo,
-            p2Elo: BlackElo,
-            result: Result
+            history: chess.history({verbose: true}),
+            ...chess.header()
         }
     })
     setGames(games)

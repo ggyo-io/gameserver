@@ -2,6 +2,21 @@ import {action} from "easy-peasy";
 import {clock2millis, timeMin} from "../utils/time";
 import {turnPosish} from "../utils/turns";
 
+const setBrowseClocks = (idx, hist, state) => {
+    if (idx > 0)
+        setBrowseClock(idx, hist, state)
+    if (idx > 1)
+        setBrowseClock(idx - 1, hist, state)
+}
+
+const setBrowseClock = (idx, hist, state) => {
+    const {clock} = hist[idx - 1]
+    if (clock === undefined) return
+    const millis = clock2millis(clock)
+    const posish = turnPosish(idx)
+    //console.log("payload = " + idx + ", posish = " + posish + ", clock = " + clock + ", millis = " + millis)
+    state[posish].serverTime = millis
+}
 
 export const actions = {
 
@@ -51,20 +66,8 @@ export const actions = {
         // update times only in finished games
         if (state.result === '') return
 
-        const setBrowseClock = (idx) => {
-            const {clock} = state.history[idx - 1]
-            if (clock === undefined) return
-            const millis = clock2millis(clock)
-            const posish = turnPosish(idx)
-            //console.log("payload = " + idx + ", posish = " + posish + ", clock = " + clock + ", millis = " + millis)
-            state[posish].serverTime = millis
-        }
+        setBrowseClocks(payload, state.history, state)
 
-        if (payload > 0)
-            setBrowseClock(payload)
-
-        if (payload > 1)
-            setBrowseClock(payload - 1)
     }),
 
     setPieceSquare: action((state, payload) => {
@@ -101,6 +104,23 @@ export const actions = {
             serverTime: Color === 'white' ? WhiteClock : BlackClock
         }
         state.lastMoveTimestamp = Date.now()
+    }),
+
+    setAnalysis: action((state, payload) => {
+        state.mode = "analysis"
+        state.history = payload.history
+        state.pieceSquare = ''
+        state.top = {
+            name: payload.Black,
+            elo: payload.BlackElo
+        }
+        state.bottom = {
+            name: payload.White,
+            elo: payload.WhiteElo
+        }
+        state.result = payload.Result
+        state.browseIndex = payload.history.length
+        setBrowseClocks(payload.history.length, payload.history, state)
     }),
 
     setUser: action((state, payload) => {
