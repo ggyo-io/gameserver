@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {registerCmd, wsSend} from '../ws/ws';
+import {useRegisterCmd, wsSend} from '../ws/ws';
 import {useHistory} from "react-router-dom"
 import MatchModal from "./matchModal";
 
@@ -63,9 +63,7 @@ export const ChooseGame = () => {
         routerHistory.push('/playboard')
     }
 
-    useEffect(() => {
-        registerCmd('start', start)
-    }, []);
+    useRegisterCmd('start', start)
 
     return <>
         <Container>

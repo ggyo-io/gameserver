@@ -1,7 +1,7 @@
 import Chess from "../../ggboard/chess.js/chess";
 import React, {useEffect} from "react";
 import {useStoreActions} from "easy-peasy";
-import {registerCmd, wsSend} from '../../ws/ws'
+import {useRegisterCmd, wsSend} from '../../ws/ws'
 import {Gameboard} from "../components/gameboard";
 
 const game = new Chess()
@@ -98,12 +98,9 @@ export const ChessGame = (props) => {
         newGame(msg)
     }
 
-    useEffect(() => {
-        registerCmd("move", move)
-        registerCmd("outcome", outcome)
-        registerCmd("start", start)
-
-    }, []);
+    useRegisterCmd("move", move)
+    useRegisterCmd("outcome", outcome)
+    useRegisterCmd("start", start)
 
     return (
         <Gameboard

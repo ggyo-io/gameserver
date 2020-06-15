@@ -1,25 +1,26 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Nav, Navbar, NavDropdown, NavLink} from 'react-bootstrap';
 import {LinkContainer} from "react-router-bootstrap";
 import './navigation-bar.scss'
 import {Link} from "react-router-dom";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {registerCmd} from "../ws/ws";
+import {useRegisterCmd} from "../ws/ws";
 
 export const NavigationBar = () => {
     const user = useStoreState(state => state.game.user);
     const setUser = useStoreActions(actions => actions.game.setUser);
 
-    useEffect(() => {
-        registerCmd("hello", (msg) => {
-            if (msg.User)
-                setUser(msg.User)
-        })
-    },[])
+    useRegisterCmd("hello", (msg) => {
+        if (msg.User)
+            setUser(msg.User)
+    })
+
 
     const signout = () => {
         fetch("/api/logout")
-            .then(()=>{setUser("")})
+            .then(() => {
+                setUser("")
+            })
     }
 
     const signedIn = <NavDropdown title={"😎 " + user}>
@@ -37,7 +38,7 @@ export const NavigationBar = () => {
             <Nav className="ml-auto">
                 {/*<LinkContainer to="/analysisboard"><NavLink>Analize</NavLink></LinkContainer>*/}
                 {/*<LinkContainer to="/about"><NavLink>About</NavLink></LinkContainer>*/}
-                { user === '' ? signedOut : signedIn}
+                {user === '' ? signedOut : signedIn}
             </Nav>
         </Navbar.Collapse>
     </Navbar>

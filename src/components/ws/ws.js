@@ -2,6 +2,8 @@
 // Websocket handler
 //------------------------------------------------------------------------------
 
+import {useEffect} from "react";
+
 export const wsConn = {
     wsConnect: function () {
         if (wsConn.q === undefined) {
@@ -81,7 +83,14 @@ export const wsConn = {
 
 const handlers = {}
 
-export const registerCmd = (name, handler) => handlers[name] = handler
+export const useRegisterCmd = (name, handler) => {
+    useEffect(() => {
+        handlers[name] = handler
+        return () => {
+            delete  handlers[name]
+        }
+    }, [])
+}
 
 const onmessage = (evt) => {
     const msg = JSON.parse(evt.data);

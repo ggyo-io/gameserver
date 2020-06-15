@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import {Spinner} from "react-bootstrap";
-import {registerCmd} from "../ws/ws";
+import {useRegisterCmd} from "../ws/ws";
 
 const MatchModal = (props) => {
     const handleClose = props.handleClose
@@ -12,9 +12,7 @@ const MatchModal = (props) => {
         setPlaying(msg.Map.PlayersPlaying)
         setQueueing(msg.Map.PlayersInQueue)
     }
-    useEffect(() => {
-        registerCmd('queues_status', onQueuesStatus)
-    })
+    useRegisterCmd('queues_status', onQueuesStatus)
 
     return (
         <Modal show={true} centered onHide={handleClose} backdrop="static">

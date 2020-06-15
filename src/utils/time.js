@@ -10,7 +10,7 @@ export const clock2millis = (c) => {
     let digit
     while (digit = a.pop()) {
         secs += parseInt(digit) * multiplier
-        multiplier = 60
+        multiplier *= 60
     }
     return secs * 1000
 }
