@@ -1,6 +1,9 @@
 import {action} from "easy-peasy";
 import {clock2millis, timeMin} from "../utils/time";
 import {turnPosish} from "../utils/turns";
+import Chess from "../components/ggboard/chess.js/chess";
+
+const chess = new Chess()
 
 const setBrowseClocks = (idx, hist, state) => {
     if (idx > 0)
@@ -119,8 +122,10 @@ export const actions = {
             elo: payload.WhiteElo
         }
         state.result = payload.Result
-        state.browseIndex = payload.history.length
-        setBrowseClocks(payload.history.length, payload.history, state)
+        chess.load_pgn(payload.pgn, {sloppy: true})
+        state.history = chess.history({verbose: true})
+        state.browseIndex = state.history.length
+        setBrowseClocks(state.history.length, state.history, state)
     }),
 
     setUser: action((state, payload) => {

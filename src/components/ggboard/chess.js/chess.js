@@ -400,6 +400,48 @@ var Chess = function(fen) {
     return [fen, turn, cflags, epflags, half_moves, move_number].join(' ')
   }
 
+  function mask(str) {
+    return str.replace(/\\/g, '\\')
+  }
+  var newline_char =
+    typeof options === 'object' && typeof options.newline_char === 'string'
+    ? options.newline_char
+    : '\r?\n'
+
+  // RegExp to split header. Takes advantage of the fact that header and movetext
+  // will always have a blank line between them (ie, two newline_char's).
+  // With default newline_char, will equal: /^(\[((?:\r?\n)|.)*\])(?:\r?\n){2}/
+  var header_regex = new RegExp(
+    '^(\\[((?:' +
+    mask(newline_char) +
+    ')|.)*\\])' +
+    '(?:' +
+    mask(newline_char) +
+    '){2}'
+  )
+
+  function parse_pgn_header(header, options) {
+    var newline_char =
+      typeof options === 'object' &&
+      typeof options.newline_char === 'string'
+        ? options.newline_char
+        : '\r?\n'
+    var header_obj = {}
+    var headers = header.split(new RegExp(mask(newline_char)))
+    var key = ''
+    var value = ''
+
+    for (var i = 0; i < headers.length; i++) {
+      key = headers[i].replace(/^\[([A-Z][A-Za-z]*)\s.*\]$/, '$1')
+      value = headers[i].replace(/^\[[A-Za-z]+\s"(.*)"\]$/, '$1')
+      if (trim(key).length > 0) {
+        header_obj[key] = value
+      }
+    }
+
+    return header_obj
+  }
+
   function set_header(args) {
     for (var i = 0; i < args.length; i += 2) {
       if (typeof args[i] === 'string' && typeof args[i + 1] === 'string') {
@@ -1469,6 +1511,13 @@ var Chess = function(fen) {
       return result.join('')
     },
 
+    load_header: function(pgn, options) {
+      var header_string = header_regex.test(pgn)
+        ? header_regex.exec(pgn)[1]
+        : ''
+      return parse_pgn_header(header_string, options)
+    },
+
     load_pgn: function(pgn, options) {
       // allow the user to specify the sloppy move parser to work around over
       // disambiguation bugs in Fritz and Chessbase
@@ -1477,37 +1526,11 @@ var Chess = function(fen) {
           ? options.sloppy
           : false
 
-      function mask(str) {
-        return str.replace(/\\/g, '\\')
-      }
-
       function has_keys(object) {
         for (var key in object) {
           return true
         }
         return false
-      }
-
-      function parse_pgn_header(header, options) {
-        var newline_char =
-          typeof options === 'object' &&
-          typeof options.newline_char === 'string'
-            ? options.newline_char
-            : '\r?\n'
-        var header_obj = {}
-        var headers = header.split(new RegExp(mask(newline_char)))
-        var key = ''
-        var value = ''
-
-        for (var i = 0; i < headers.length; i++) {
-          key = headers[i].replace(/^\[([A-Z][A-Za-z]*)\s.*\]$/, '$1')
-          value = headers[i].replace(/^\[[A-Za-z]+\s"(.*)"\]$/, '$1')
-          if (trim(key).length > 0) {
-            header_obj[key] = value
-          }
-        }
-
-        return header_obj
       }
 
       function parse_clocks(moves_with_comments) {
@@ -1533,33 +1556,13 @@ var Chess = function(fen) {
         return result
       }
 
- 
-      var newline_char =
-        typeof options === 'object' && typeof options.newline_char === 'string'
-          ? options.newline_char
-          : '\r?\n'
-
-      // RegExp to split header. Takes advantage of the fact that header and movetext
-      // will always have a blank line between them (ie, two newline_char's).
-      // With default newline_char, will equal: /^(\[((?:\r?\n)|.)*\])(?:\r?\n){2}/
-      var header_regex = new RegExp(
-        '^(\\[((?:' +
-          mask(newline_char) +
-          ')|.)*\\])' +
-          '(?:' +
-          mask(newline_char) +
-          '){2}'
-      )
-
-      // If no header given, begin with moves.
-      var header_string = header_regex.test(pgn)
-        ? header_regex.exec(pgn)[1]
-        : ''
-
       // Put the board in the starting position
       reset()
 
       /* parse PGN header */
+      var header_string = header_regex.test(pgn)
+        ? header_regex.exec(pgn)[1]
+        : ''
       var headers = parse_pgn_header(header_string, options)
       for (var key in headers) {
         set_header([key, headers[key]])
