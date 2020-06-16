@@ -73,7 +73,13 @@ export const ChessGame = (props) => {
     }
 
     // Recieved outcome from server
-    const outcome = (msg) => update({result: msg.Params})
+    const outcome = (msg) => {
+        if (msg.Params === "resign") {
+            update({result: "0-1; Resigned"})
+        } else {
+            update({result: msg.Params})
+        }
+    }
 
     // Send last local move to server
     const onMakeMove = (move) => {
