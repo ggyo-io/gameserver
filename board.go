@@ -66,7 +66,7 @@ func (b *Board) run() {
 			numMoves := len(b.chess.Moves())
 			log.Printf("Flag on move #%v, timeout %v, clock %v", numMoves, to, b.clock)
 			b.hubChannel <- &registerRequest{request: "gameover", board: b}
-			b.onTimeOut(b.clock.flagReason)
+			b.onTimeOut(b.clock.flagReason, b.clock.player)
 			return
 
 		case client := <-b.control:
@@ -233,15 +233,34 @@ func (b *Board) outcome(bp *boardPlayer, message *Message) error {
 	b.game.Active = false
 	b.updateScores()
 	b.recordGame()
-
-	return b.sendToFoe(bp, message)
+	return b.sendBoth(b.outcomeMsg(chessGame.Method()))
 }
 
-func (b *Board) onTimeOut(p string) error {
+func (b *Board) outcomeMsg(reason interface{}) *Message {
+	return &Message{Cmd: "outcome", Map: map[string]interface{}{
+		"Result": b.chess.Outcome(),
+		"Reason": reason,
+	}}
+}
+
+func (b *Board) sendBoth(message *Message) error {
+	b.white.Send() <- message
+	b.black.Send() <- message
+	return nil
+}
+
+func (b *Board) onTimeOut(desc string, player int) error {
 	if b.game.Active {
-		m := &Message{Cmd: "outcome", Params: p}
-		b.sendToFoe(b.white, m)
-		b.sendToFoe(b.black, m)
+		if player == whiteColor {
+			b.chess.Resign(chess.White)
+		} else {
+			b.chess.Resign(chess.Black)
+		}
+		m := b.outcomeMsg(desc)
+		b.sendBoth(m)
+		b.game.Active = false
+		b.updateScores()
+		b.recordGame()
 	}
 	b.white.ch = nil
 	b.black.ch = nil

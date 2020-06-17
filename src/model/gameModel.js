@@ -7,7 +7,7 @@ export const gameModel = {
         myColor: 'white',
         colorPreference: 'any',
         orientation: 'white',
-        opponent: 'random',
+        opponent: 'human',
 
         timeControl: {
             seconds: 5*60,

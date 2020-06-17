@@ -85,8 +85,8 @@ export const ChooseGame = () => {
         <Row><h5>Opponent</h5></Row>
         <Row>
             <ToggleButtonGroup size="lg" type="radio" name="opponent" defaultValue={opponent} onChange={doOpponentChange}>
-                <ToggleButton value="random" variant="outline-secondary">Random</ToggleButton>
                 <ToggleButton value="human" variant="outline-secondary">Human</ToggleButton>
+                <ToggleButton value="random" variant="outline-secondary">Random</ToggleButton>
                 <ToggleButton value="stockfish" variant="outline-secondary">Sotckfish</ToggleButton>
                 <ToggleButton value="lc0" variant="outline-secondary">Leela</ToggleButton>
             </ToggleButtonGroup>

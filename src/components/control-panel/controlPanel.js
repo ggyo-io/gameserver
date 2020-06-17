@@ -6,9 +6,9 @@ import {Result} from "./components/result/result";
 import {Dialog} from "./components/dialog/dialog";
 
 export const ControlPanel = (props) => {
-    const mode = useStoreState(state => state.game.mode)
+    //const mode = useStoreState(state => state.game.mode)
     const result = useStoreState(state => state.game.result)
-    const modeView = mode === 'analysis' || result !== ''? <Result/> : <Dialog/>
+    const modeView = result !== ''? <Result/> : <Dialog/>
 
     return (
         <Card style={{minWidth: 230}}>

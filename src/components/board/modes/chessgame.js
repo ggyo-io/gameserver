@@ -1,8 +1,9 @@
 import Chess from "../../ggboard/chess.js/chess";
 import React, {useEffect} from "react";
-import {useStoreActions} from "easy-peasy";
+import {useStoreActions, useStoreState} from "easy-peasy";
 import {useRegisterCmd, wsSend} from '../../ws/ws'
 import {Gameboard} from "../components/gameboard";
+import {colorResult, outcomeMethod} from "../../../utils/outcome";
 
 const game = new Chess()
 
@@ -10,6 +11,7 @@ export const ChessGame = (props) => {
 
     // Actions
     const {onMove, update, newGame} = useStoreActions(actions => actions.game)
+    const myColor = useStoreState(state => state.game.myColor)
 
     //// dispatch message by type
     //const  onWebSocketMessage = (evt) => {
@@ -74,11 +76,11 @@ export const ChessGame = (props) => {
 
     // Recieved outcome from server
     const outcome = (msg) => {
-        if (msg.Params === "resign") {
-            update({result: "0-1; Resigned"})
-        } else {
-            update({result: msg.Params})
-        }
+        const {Result, Reason} = msg.Map
+
+        const result = {outcome: colorResult(Result, myColor), method: outcomeMethod(Reason)}
+
+        update({result: result})
     }
 
     // Send last local move to server

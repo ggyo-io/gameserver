@@ -28,7 +28,7 @@ export const Random = (props) => {
         else
             result = '1-0'
 
-        update({result: result})
+        update({result: {outcome: result}})
     }
 
     const moveMade = () => {

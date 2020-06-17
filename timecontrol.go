@@ -48,9 +48,9 @@ func (c *chessClock) String() string {
 }
 
 func playerColor(p int) string {
-	color := "white"
+	color := "White"
 	if p == blackColor {
-		color = "black"
+		color = "Black"
 	}
 	return color
 }

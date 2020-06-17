@@ -121,7 +121,7 @@ export const actions = {
             name: payload.White,
             elo: payload.WhiteElo
         }
-        state.result = payload.Result
+        state.result = {outcome: payload.Result}
         chess.load_pgn(payload.pgn, {sloppy: true})
         state.history = chess.history({verbose: true})
         state.browseIndex = state.history.length
