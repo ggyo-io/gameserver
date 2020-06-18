@@ -183,7 +183,11 @@ func (b *Board) move(bp *boardPlayer, message *Message) error {
 	numMoves := len(b.chess.Moves()) + 1
 	clk := b.clock.onMove(numMoves)
 	message.WhiteClock = b.clock.timeLeft[whiteColor].Milliseconds()
-	message.BlackClock = b.clock.timeLeft[blackColor].Milliseconds()
+	if numMoves > 1 {
+		message.BlackClock = b.clock.timeLeft[blackColor].Milliseconds()
+	} else {
+		message.BlackClock = FirstMoveTimeout.Milliseconds()
+	}
 
 	// Apply the move, check if the move is legal
 	if err := chessGame.MoveStr(message.Params + chess.ClkString(clk)); err != nil {
@@ -207,6 +211,7 @@ func (b *Board) move(bp *boardPlayer, message *Message) error {
 	for _, move := range chessGame.Moves() {
 		message.Moves += " " + move.String()
 	}
+	bp.Send() <- &Message{Cmd: "clock", WhiteClock: message.WhiteClock, BlackClock: message.BlackClock}
 	return b.sendToFoe(bp, message)
 }
 

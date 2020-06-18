@@ -10,7 +10,7 @@ const game = new Chess()
 export const ChessGame = (props) => {
 
     // Actions
-    const {onMove, update, newGame} = useStoreActions(actions => actions.game)
+    const {onMove, update, newGame, setClocks} = useStoreActions(actions => actions.game)
     const myColor = useStoreState(state => state.game.myColor)
 
     //// dispatch message by type
@@ -45,6 +45,10 @@ export const ChessGame = (props) => {
     //        console.log("Unknown command: '" + msg.Cmd + "'");
     //    }
     //}
+
+    const clock = (msg) => {
+        setClocks(msg)
+    }
 
     // Recieved move command from server
     const move = (msg) => {
@@ -109,6 +113,7 @@ export const ChessGame = (props) => {
     useRegisterCmd("move", move)
     useRegisterCmd("outcome", outcome)
     useRegisterCmd("start", start)
+    useRegisterCmd("clock", clock)
 
     return (
         <Gameboard

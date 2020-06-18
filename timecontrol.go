@@ -89,9 +89,11 @@ func (c *chessClock) onMove(numMoves int) time.Duration {
 	return d
 }
 
+const FirstMoveTimeout = 30 * time.Second
+
 func (c *chessClock) firstMoveFlag(p int) {
 	log.Printf("chessClock firstMoveFlag for player %v now %v\n", playerColor(p), time.Now())
-	c.flag.Reset(30 * time.Second)
+	c.flag.Reset(FirstMoveTimeout)
 	c.flagReason = playerColor(p) + " first move timeout"
 }
 

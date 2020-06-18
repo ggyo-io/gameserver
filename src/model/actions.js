@@ -21,6 +21,17 @@ const setBrowseClock = (idx, hist, state) => {
     state[posish].serverTime = millis
 }
 
+function setServerClocks(state, WhiteClock, BlackClock) {
+    console.log("setServerClocks whiteClock = " + timeMin(WhiteClock) + ", blackClock = " + timeMin(BlackClock))
+    if (state.orientation === "white") {
+        state.bottom.serverTime = WhiteClock
+        state.top.serverTime = BlackClock
+    } else {
+        state.top.serverTime = WhiteClock
+        state.bottom.serverTime = BlackClock
+    }
+}
+
 export const actions = {
 
     onMove: action((state, payload) => {
@@ -29,14 +40,7 @@ export const actions = {
 
         if (WhiteClock !== undefined && BlackClock !== undefined) {
             // Server update
-            console.log("onMove whiteClock = " + timeMin(WhiteClock) + ", blackClock = " + timeMin(BlackClock))
-            if (state.orientation === "white") {
-                state.bottom.serverTime = WhiteClock
-                state.top.serverTime = BlackClock
-            } else {
-                state.top.serverTime = WhiteClock
-                state.bottom.serverTime = BlackClock
-            }
+            setServerClocks(state, WhiteClock, BlackClock);
         } else {
             // My move
             const elapsed = Date.now() - state.lastMoveTimestamp
@@ -130,6 +134,12 @@ export const actions = {
 
     setUser: action((state, payload) => {
         state.user = payload
-    })
+    }),
 
+    setClocks: action((state, payload) => {
+        const {WhiteClock, BlackClock} = payload
+        if (WhiteClock !== undefined && BlackClock !== undefined) {
+            setServerClocks(state, WhiteClock, BlackClock);
+        }
+    })
 }

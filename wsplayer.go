@@ -124,7 +124,7 @@ func (c *WSPlayer) writePump() {
 			}
 
 			c.send <- &Message{Cmd: "start", Color: c.color, User: c.foe, GameID: c.gameID, Params: match.position,
-				WhiteClock: match.whiteClock, BlackClock: match.blackClock, WhiteElo: whiteElo, BlackElo: blackElo}
+				WhiteClock: FirstMoveTimeout.Milliseconds(), BlackClock: FirstMoveTimeout.Milliseconds(), WhiteElo: whiteElo, BlackElo: blackElo}
 		}
 	}
 }
