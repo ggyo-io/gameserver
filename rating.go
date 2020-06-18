@@ -27,10 +27,10 @@ func updateScores(whiteID string, blackID string, outcome chess.Outcome, mode st
 	ow, ob := elo.Outcome(whiteRank.Score, blackRank.Score, eloScore)
 	whiteRank.Score = ow.Rating
 	blackRank.Score = ob.Rating
-	if err := db.Save(whiteRank); err != nil {
+	if err := db.Save(whiteRank).Error; err != nil {
 		log.Print("ERROR saving white rank", err)
 	}
-	if err := db.Save(blackRank); err != nil {
+	if err := db.Save(blackRank).Error; err != nil {
 		log.Print("ERROR saving black rank", err)
 	}
 	return &ow, &ob
