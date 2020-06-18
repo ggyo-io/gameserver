@@ -41,7 +41,7 @@ func newBoard(hubChannel chan *registerRequest, white Client, black Client, tc t
 
 	board := Board{
 		game:       &game,
-		chess:      chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{})),
+		chess:      chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotationClock{})),
 		clock:      newChessClock(&tc),
 		white:      newBoardPlayer(white),
 		black:      newBoardPlayer(black),
@@ -179,17 +179,17 @@ func (b *Board) move(bp *boardPlayer, message *Message) error {
 		return fmt.Errorf("board '%s' is moving on a game with an outcome '%s' method '%s'", bp.User(), chessGame.Outcome(), chessGame.Method())
 	}
 
+	// update the time control
+	numMoves := len(b.chess.Moves()) + 1
+	clk := b.clock.onMove(numMoves)
+	message.WhiteClock = b.clock.timeLeft[whiteColor].Milliseconds()
+	message.BlackClock = b.clock.timeLeft[blackColor].Milliseconds()
+
 	// Apply the move, check if the move is legal
-	if err := chessGame.MoveStr(message.Params); err != nil {
+	if err := chessGame.MoveStr(message.Params + chess.ClkString(clk)); err != nil {
 		return fmt.Errorf("Illegal move %s by %s, error: %s", message.Params, bp.User(), err)
 	}
 	bp.undood = false
-
-	// update the time control
-	numMoves := len(b.chess.Moves())
-	b.clock.onMove(numMoves)
-	message.WhiteClock = b.clock.timeLeft[whiteColor].Milliseconds()
-	message.BlackClock = b.clock.timeLeft[blackColor].Milliseconds()
 
 	// Check is game is over, GG
 	log.Printf("board '%s' after Move command outcome '%s' method '%s'\n", bp.User(), chessGame.Outcome(), chessGame.Method())

@@ -64,7 +64,7 @@ func (c *chessClock) getClock(p int) int64 {
 	return r.Milliseconds()
 
 }
-func (c *chessClock) onMove(numMoves int) {
+func (c *chessClock) onMove(numMoves int) time.Duration {
 	now := time.Now()
 	log.Printf("chessClock start onMove move %v clock %v now %v\n", numMoves, c, now)
 
@@ -83,8 +83,10 @@ func (c *chessClock) onMove(numMoves int) {
 		// first two moves has to be done within 30 secs
 		c.firstMoveFlag(nextPlayer)
 	}
+	d := c.timeLeft[c.player]
 	c.player = nextPlayer
-	log.Printf("chessClock end   onMove move %v clock %v\n", numMoves, c)
+	log.Printf("chessClock end onMove move %v clock %v, lastClock %v\n", numMoves, c, d)
+	return d
 }
 
 func (c *chessClock) firstMoveFlag(p int) {
