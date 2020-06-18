@@ -164,7 +164,7 @@ func (g *Game) Move(m *Move) error {
 	if valid == nil {
 		return fmt.Errorf("chess: invalid move %s", m)
 	}
-	g.moves = append(g.moves, valid)
+	g.moves = append(g.moves, m)
 	g.pos = g.pos.Update(valid)
 	g.positions = append(g.positions, g.pos)
 	g.updatePosition()

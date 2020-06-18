@@ -196,6 +196,8 @@ func (b *Board) move(bp *boardPlayer, message *Message) error {
 	if chessGame.Outcome() != chess.NoOutcome {
 		game.Active = false
 		b.updateScores()
+		m := b.outcomeMsg(chessGame.Method())
+		b.sendBoth(m)
 	}
 
 	// Record the move in DB

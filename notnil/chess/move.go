@@ -70,7 +70,7 @@ func (a moveSlice) find(m *Move) *Move {
 	}
 	for _, move := range a {
 		if move.String() == m.String() {
-			return m
+			return move
 		}
 	}
 	return nil
