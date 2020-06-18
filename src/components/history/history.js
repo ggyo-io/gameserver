@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
-import fetchHistory from "./loader"
+import fetchHistory, {serverFetchHistory} from "./loader"
 import {useHistory} from "react-router-dom"
 import {useStoreActions} from "easy-peasy";
 
@@ -32,7 +32,7 @@ const renderRows = (games) => {
 export const History = (props) => {
     const [games, setGames] = useState([])
     useEffect(() => {
-        fetchHistory("/history", setGames);
+        serverFetchHistory("/api/history", setGames);
     }, [])
     const _renderRows = renderRows(games)
     return <Table style={{cursor: 'pointer'}} striped bordered hover>

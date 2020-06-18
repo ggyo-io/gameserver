@@ -20,7 +20,7 @@ type indexData struct {
 }
 
 type historyGame struct {
-	URL     string
+	PGN     string
 	Time    int64
 	Name    string
 	White   string

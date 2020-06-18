@@ -3,6 +3,35 @@ import Chess from "../ggboard/chess.js/chess";
 
 const chess = new Chess()
 
+export const serverFetchHistory = (url, setGame) => {
+    const sg = setGame
+    fetch(url)
+        .then(res => res.json())
+        .then(
+            (result) => {
+                const games = result.History.map(value => {
+                    console.log(JSON.stringify(value))
+                    const pgn_header = chess.load_header(value.PGN)
+                    const date = new Date(value.Time * 1000).toDateString()
+                    return {
+                        pgn: value.PGN,
+                        Date: pgn_header.Date ? pgn_header.Date : date,
+                        White: pgn_header.White ? pgn_header.White : value.White,
+                        WhiteElo: pgn_header.WhiteElo ? pgn_header.WhiteElo : value.WhiteElo,
+                        Black: pgn_header.Black ? pgn_header.Black : value.Black,
+                        BlackElo: pgn_header.BlackElo ? pgn_header.BlackElo : value.BlackElo,
+                        Result: pgn_header.Result ? pgn_header.Result : value.Outcome,
+                    }
+                })
+                sg(games)
+            },
+
+            (error) => {
+                console.log("fetch error: " + error)
+            }
+        )
+}
+
 export default function fetchHistory(url, setGames) {
     const games = pgns.map(value => {
         return {

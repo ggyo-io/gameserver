@@ -1,14 +1,13 @@
 package main
 
-
 func loadLoginData(user string, data *indexData) {
 	var games []Game
 	db.Where("white = ? OR black = ?", user, user).Order("created_at DESC").Limit(20).Find(&games)
 	data.History = make([]historyGame, len(games))
 	for i, game := range games {
-		url := "?game=" + game.ID
-		hg := historyGame{White: game.White, Black: game.Black, Time: game.CreatedAt.Unix(), URL: url,
-			Outcome: game.Outcome, WhiteElo:game.WhiteElo, BlackElo:game.BlackElo}
+		pgn := game.State
+		hg := historyGame{White: game.White, Black: game.Black, Time: game.CreatedAt.Unix(), PGN: pgn,
+			Outcome: game.Outcome, WhiteElo: game.WhiteElo, BlackElo: game.BlackElo}
 		data.History[i] = hg
 	}
 }
@@ -37,4 +36,3 @@ func (b *Board) recordGame() {
 		panic(err)
 	}
 }
-
