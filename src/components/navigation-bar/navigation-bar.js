@@ -1,13 +1,14 @@
 import React from 'react';
 import {Nav, Navbar, NavDropdown, NavLink} from 'react-bootstrap';
 import {LinkContainer} from "react-router-bootstrap";
+import Badge from 'react-bootstrap/Badge';
 import './navigation-bar.scss'
 import {Link} from "react-router-dom";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {useRegisterCmd} from "../ws/ws";
 
 export const NavigationBar = () => {
-    const user = useStoreState(state => state.game.user);
+    const {user, serverConnection} = useStoreState(state => state.game)
     const setUser = useStoreActions(actions => actions.game.setUser);
 
     useRegisterCmd("hello", (msg) => {
@@ -32,7 +33,7 @@ export const NavigationBar = () => {
 
 
     return <Navbar expand="lg" variant="dark">
-        <Navbar.Brand><Link to="/"><strong>Gg</strong>ameserver</Link></Navbar.Brand>
+        <Navbar.Brand><Link to="/"><strong>Gg</strong>ameserver</Link>&nbsp;&nbsp;<Badge pill variant={serverConnection.bg}>{serverConnection.text}</Badge></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ml-auto">

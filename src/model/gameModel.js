@@ -40,9 +40,12 @@ export const gameModel = {
         lastMoveTimestamp: Date.now(),
         result: '',
         user: '',
+        serverConnection: {
+            bg: "info",
+            text: "Loading..."
+        },
 
         // actions
         ...actions
-
     }
 }

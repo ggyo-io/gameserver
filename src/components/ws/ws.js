@@ -6,6 +6,10 @@ import {useEffect} from "react";
 
 export const wsConn = {
     wsConnect: function () {
+        wsConn.update ({ serverConnection: {
+            bg: "warning",
+            text: "Connecting"
+        }})
         if (wsConn.q === undefined) {
             wsConn.q = [];
         }
@@ -14,11 +18,20 @@ export const wsConn = {
         const goServer = 'ws://localhost:8383/ws';
         wsConn.ws = new WebSocket(goServer);
         wsConn.ws.onopen = function () {
+            wsConn.update ({ serverConnection: {
+                bg: "success",
+                text: "Connected"
+            }})
+
             console.log('wsConn: Socket is open, q length: ' + wsConn.q.length);
             wsConn.flush();
         };
         wsConn.ws.onmessage = onmessage;
         wsConn.ws.onclose = function (e) {
+            wsConn.update ({ serverConnection: {
+                bg: "danger",
+                text: "Disconnected"
+            }})
             console.log('wsConn: Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
             setTimeout(function () {
                 wsConn.wsConnect();
@@ -30,7 +43,8 @@ export const wsConn = {
         };
     },
 
-    connect: function () {
+    connect: function (update) {
+        wsConn.update = update
         // TODO: can we skip auth if cookie is present?
         fetch("/api/auth", {credentials: "same-origin"})
             .then(resp => {
@@ -39,6 +53,10 @@ export const wsConn = {
     },
 
     disconnect: function() {
+        wsConn.update ({ serverConnection: {
+            bg: "danger",
+            text: "Disconnected"
+        }})
         if (wsConn.q) {
             console.log('wsConn: disconnect, q length: ' + wsConn.q.length);
             wsConn.q = undefined
