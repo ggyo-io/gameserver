@@ -13,14 +13,13 @@ export const actionHandlers = () => {
                     Cmd: "outcome",
                     Params: "resign"
                 });
-                update({result: "0-1", dialogLabel: ""})
             } else if (dialogLabel === 'dialog_draw') {
                 wsSend({
                     Cmd: "offer",
                     Params: "draw"
                 });
-                setDialogLabel("")
             }
+            setDialogLabel("")
         },
         noClick: () => {
             setDialogLabel("")

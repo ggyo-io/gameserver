@@ -24,11 +24,8 @@ export const outcomeMethod = (code) => {
     return code
 }
 
-export const colorResult = (res, myColor) => {
-    console.log("colorResult", res, myColor)
-    if (myColor === "black") {
-        if (res === "1-0") return "0-1"
-        if (res === "0-1") return "1-0"
-    }
-    return res
+export const colorResult = (res) => {
+    if (res === "1-0") return "White Won"
+    if (res === "0-1") return "Black Won"
+    return "Draw"
 }

@@ -11,8 +11,8 @@ export const Result = (props) => {
                 <Table striped bordered className="m-0">
                     <tbody>
                     <tr>
-                        <td className="text-nowrap text-center">{result.outcome}</td>
-                        {!!result.method && <td>{result.method}</td>}
+                        <td className="text-nowrap text-center"><small>{result.outcome}</small></td>
+                        {!!result.method && <td><small>{result.method}</small></td>}
                     </tr>
                     </tbody>
                 </Table>

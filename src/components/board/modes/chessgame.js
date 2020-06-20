@@ -82,7 +82,7 @@ export const ChessGame = (props) => {
     const outcome = (msg) => {
         const {Result, Reason} = msg.Map
 
-        const result = {outcome: colorResult(Result, myColor), method: outcomeMethod(Reason)}
+        const result = {outcome: colorResult(Result), method: outcomeMethod(Reason)}
 
         update({result: result})
     }
