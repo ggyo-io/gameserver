@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 import {useStoreActions} from "easy-peasy";
-import {wsConn} from "./ws";
+import {useRegisterCmd, wsConn} from "./ws";
 
 export const WsReact = () => {
     const {update} = useStoreActions(actions => actions.game)
@@ -13,6 +13,9 @@ export const WsReact = () => {
             wsConn.disconnect();
         };
     }, [])
+
+    useRegisterCmd("disconnect", ()=>{update({opponentOnline: false})})
+    useRegisterCmd("reconnected", ()=>{update({opponentOnline: true})})
 
     return null
 }

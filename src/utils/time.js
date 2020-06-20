@@ -1,5 +1,6 @@
 export const adjustTime = (t) => Math.floor(t/1000)
 
+// mm:ss
 export const timeMin = (t) =>
     t <= 0 ?"00:00" : Math.floor(adjustTime(t) / 60) + ":" + ('0' + adjustTime(t) % 60).substr(-2)
 

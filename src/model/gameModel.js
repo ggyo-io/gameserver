@@ -8,6 +8,7 @@ export const gameModel = {
         colorPreference: 'any',
         orientation: 'white',
         opponent: 'human',
+        opponentOnline: true,
 
         timeControl: {
             seconds: 5*60,
