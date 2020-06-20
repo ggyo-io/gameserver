@@ -21,7 +21,7 @@ export function Player(props) {
     const isOpponent = orientation === myColor && posish === "top" || orientation !== myColor && posish === "bottom"
     const online = !isOpponent || opponentOnline
 
-    console.log("player " + posish + " opponent = " + isOpponent + " online = " + online)
+    //console.log("player " + posish + " opponent = " + isOpponent + " online = " + online)
 
 
     // timer
@@ -50,7 +50,7 @@ export function Player(props) {
                                 {online ? "Online" : "Disconnected"}
                             </Tooltip>
                         }>
-                            <button className={"badge badge-pill " + (online ? "badge-success" : "badge-secondary")}>&nbsp;</button>
+                            <a className={"btn badge badge-pill " + (online ? "badge-success" : "badge-secondary")}>&nbsp;</a>
                         </OverlayTrigger>
                         <span className="ml-2" role="user">{name}</span>
                         <span className="ml-2" role="img" aria-label="score">🏆
