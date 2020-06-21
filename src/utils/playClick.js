@@ -1,13 +1,19 @@
 import {wsSend} from '../components/ws/ws'
 
-export const playClick = (routerHistory, update, opponent, colorPreference, timeControl) => {
+export const playClick = (routerHistory, update, newGame, opponent, colorPreference, timeControl) => {
     console.log("Play click")
     if (opponent === 'random') {
         let color = colorPreference
         if (color === 'any') {
             color =  Math.random() > 0.5 ? "white" : "black"
         }
-        update({myColor: color})
+        newGame({
+            Color: color,
+            BlackElo: 1,
+            WhiteElo: 1300,
+            WhiteClock: timeControl.seconds * 1000,
+            BlackClock: timeControl.seconds * 1000,
+        })
         routerHistory.push('/random')
     } else {
         wsSend({

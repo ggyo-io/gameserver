@@ -12,9 +12,9 @@ import {playClick} from "../../utils/playClick";
 export const ChooseGame = () => {
     const routerHistory = useHistory()
     const {colorPreference, opponent, timeControl} = useStoreState(state => state.game)
-    const {update} = useStoreActions(actions => actions.game)
+    const {update, newGame} = useStoreActions(actions => actions.game)
 
-    const doClickPlay = () => playClick(routerHistory, update, opponent, colorPreference, timeControl)
+    const doClickPlay = () => playClick(routerHistory, update, newGame, opponent, colorPreference, timeControl)
     const doColorChange = (v) => update({colorPreference: v})
     const doOpponentChange = (v) => update({opponent: v})
     const doTimeControlChange = (v) => {

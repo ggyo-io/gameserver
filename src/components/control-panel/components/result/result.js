@@ -8,9 +8,9 @@ import { useHistory } from "react-router-dom";
 
 export const Result = (props) => {
     const routerHistory = useHistory()
-    const { update } = useStoreActions(actions => actions.game)
+    const { update, newGame } = useStoreActions(actions => actions.game)
     const { result, opponent, colorPreference, timeControl } = useStoreState(state => state.game)
-    const doClickPlay = () => playClick(routerHistory, update, opponent, colorPreference, timeControl)
+    const doClickPlay = () => playClick(routerHistory, update, newGame, opponent, colorPreference, timeControl)
 
     return (
         <Card>
