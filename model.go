@@ -19,7 +19,7 @@ type Model struct {
 // Game represents an active or past chess game
 type Game struct {
 	Model
-	State      string `sql:"size:4096"`
+	State      string `sql:"size:65536"`
 	Active     bool
 	White      string
 	Black      string
