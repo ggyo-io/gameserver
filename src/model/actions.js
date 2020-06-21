@@ -106,7 +106,7 @@ export const actions = {
             serverTime: Color === 'white' ? BlackClock : WhiteClock
         }
         state.bottom = {
-            name: "Hey that's me",
+            name: !!state.user ? state.user : "Hey that's me",
             elo: Color === 'white' ? WhiteElo : BlackElo,
             serverTime: Color === 'white' ? WhiteClock : BlackClock
         }
