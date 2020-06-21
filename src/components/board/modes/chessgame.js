@@ -1,9 +1,11 @@
 import Chess from "../../ggboard/chess.js/chess";
-import React, {useEffect} from "react";
+import React from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {useRegisterCmd, wsSend} from '../../ws/ws'
 import {Gameboard} from "../components/gameboard";
 import {colorResult, outcomeMethod} from "../../../utils/outcome";
+import { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 
 const game = new Chess()
 
@@ -11,7 +13,12 @@ export const ChessGame = (props) => {
 
     // Actions
     const {onMove, update, newGame, setClocks} = useStoreActions(actions => actions.game)
-    const myColor = useStoreState(state => state.game.myColor)
+    const {top, bottom, match} = useStoreState(state => state.game)
+    const routerHistory = useHistory()q
+    useEffect(() => {
+        if (top.name === '' && bottom.name === '' && match === false)
+            routerHistory.push('/')
+    })
 
     //// dispatch message by type
     //const  onWebSocketMessage = (evt) => {
@@ -108,6 +115,7 @@ export const ChessGame = (props) => {
             msg = {...msg, History: game.history({verbose:true})}
         }
         newGame(msg)
+        update({match: false})
     }
 
     useRegisterCmd("move", move)
@@ -123,5 +131,3 @@ export const ChessGame = (props) => {
         />
     )
 }
-
-

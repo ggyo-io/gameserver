@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react'
+import { useHistory } from "react-router-dom";
 import './chessboardjs/chessboard-1.0.0.scss'
 import { Chessboard } from './chessboardjs/chessboard-1.0.0'
 import { Promote } from "../board/components/promote";
-import { useStoreState } from "easy-peasy";
+import MatchModal from "../board/components/matchModal";
+import { useStoreState, useStoreActions } from "easy-peasy";
+import { wsSend } from '../../components/ws/ws'
 
 const unhl = () => {
     const squareClass = '.square-55d63'
@@ -74,12 +77,22 @@ const GGBoard = (props) => {
             onSnapbackEnd: props.onSnapbackEnd
         })
 
-    const promote = useStoreState(state => state.game.promote);
+    // modals
+    const {promote, match} = useStoreState(state => state.game)
+    const {update} = useStoreActions(actions => actions.game)
+    const routerHistory = useHistory()
+    const closeMatch = () => {
+        update({match: false})
+        wsSend({Cmd: "cancel"})
+        routerHistory.push('/')
+    }
+
     // Render
     const _props = {style: {...props.style}}
     return (
         <>
             {promote? <Promote/> : null}
+            {match? <MatchModal handleClose={closeMatch}/> : null}
             <div ref={el => element = el} {..._props} />
         </>
     )

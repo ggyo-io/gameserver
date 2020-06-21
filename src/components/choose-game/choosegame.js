@@ -1,21 +1,20 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import Button from "react-bootstrap/Button";
 import {ToggleButton, ToggleButtonGroup} from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {useRegisterCmd, wsSend} from '../ws/ws';
-import {useHistory} from "react-router-dom"
-import MatchModal from "./matchModal";
+import {useHistory} from "react-router-dom";
+import {playClick} from "../../utils/playClick";
 
 
 export const ChooseGame = () => {
-
-    const [showMatchModal, setShowMatchModal] = useState(false)
+    const routerHistory = useHistory()
     const {colorPreference, opponent, timeControl} = useStoreState(state => state.game)
-    const {update, newGame} = useStoreActions(actions => actions.game)
+    const {update} = useStoreActions(actions => actions.game)
 
+    const doClickPlay = () => playClick(routerHistory, update, opponent, colorPreference, timeControl)
     const doColorChange = (v) => update({colorPreference: v})
     const doOpponentChange = (v) => update({opponent: v})
     const doTimeControlChange = (v) => {
@@ -27,43 +26,6 @@ export const ChooseGame = () => {
             }
         })
     }
-
-    const routerHistory = useHistory()
-
-    const play = () => {
-        console.log("Play click")
-        if (opponent === 'random') {
-            let color = colorPreference
-            if (color === 'any') {
-                color =  Math.random() > 0.5 ? "white" : "black"
-            }
-            update({myColor: color})
-            routerHistory.push('/random')
-        } else {
-            // TODO: handle no connection to server
-            wsSend({
-                Cmd: "start",
-                Params: opponent,
-                Color: colorPreference,
-                TimeControl: timeControl.seconds.toString() + '+' +
-                    timeControl.increment.toString()
-            });
-            setShowMatchModal(true)
-        }
-    }
-
-    const handleClose = () => {
-        setShowMatchModal(false)
-        wsSend({Cmd: "cancel"})
-    }
-
-    const start = (msg) => {
-        setShowMatchModal(false)
-        newGame(msg)
-        routerHistory.push('/playboard')
-    }
-
-    useRegisterCmd('start', start)
 
     return <>
         <Container>
@@ -103,10 +65,9 @@ export const ChooseGame = () => {
         <p/><br/>
         <Row className="justify-content-md-center">
             <Col sm={9}>
-                <Button size="lg" block onClick={play}>PLAY</Button>
+                <Button size="lg" block onClick={doClickPlay}>PLAY</Button>
             </Col>
         </Row>
     </Container>
-    {showMatchModal ? <MatchModal handleClose={handleClose}/> : null}
     </>
 }

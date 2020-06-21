@@ -1,6 +1,8 @@
 import React from "react";
 import Chess from "../../ggboard/chess.js/chess"
 import {useStoreState} from "easy-peasy";
+import { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import {calcPosition, checkSquareStyling, lastMoveSquareStyling} from "./helpers";
 import GGBoard from "../../ggboard";
 
@@ -16,11 +18,11 @@ export const Analysis = (props) => {
     checkSquareStyling(squareStyles, game);
     lastMoveSquareStyling(squareStyles, history, browseIndex)
 
-    //const update = useStoreActions(actions => actions.game.update)
-    //useEffect(() => {
-    //    update({promote: true, onPromote: (x) => console.log(x)})
-    //})
-
+    const routerHistory = useHistory()
+    useEffect(() => {
+        if (!history || history.length === 0)
+            routerHistory.push('/')
+    })
 
     return (
         <GGBoard

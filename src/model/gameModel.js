@@ -46,6 +46,10 @@ export const gameModel = {
             text: "Loading..."
         },
 
+        // modals
+        promote: false,
+        match: false,
+
         // actions
         ...actions
     }

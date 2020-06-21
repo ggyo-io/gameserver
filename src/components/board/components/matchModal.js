@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import {Spinner} from "react-bootstrap";
-import {useRegisterCmd} from "../ws/ws";
+import {useRegisterCmd} from "../../ws/ws";
 
 const MatchModal = (props) => {
     const handleClose = props.handleClose
