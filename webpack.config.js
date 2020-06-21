@@ -1,19 +1,24 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const CopyPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const isDevelopment = process.env.NODE_ENV === 'development';
 const path = require("path");
 
 module.exports = {
     mode: 'none',
+    optimization: {
+        minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
+    },
     entry: {
         gameserver: path.resolve(__dirname, './src/index.js')
     },
     output: {
         path: path.resolve(__dirname , "./dist"),
-        filename: "[name].bundle.js",
-        publicPath: '/'
+        filename: isDevelopment ? "[name].bundle.js" : "[name].bundle.[hash].js",
+        publicPath: ''
     },
     devServer: {
         historyApiFallback: true,
@@ -166,8 +171,8 @@ module.exports = {
             filename: "./index.html",
         }),
         new MiniCssExtractPlugin({
-            filename: isDevelopment ? '[name].css' : '[name].[hash].css',
-            chunkFilename: isDevelopment ? '[id].css' : '[id].[hash].css'
+            filename: isDevelopment ? '[name].css' : '[name].[hash].min.css',
+            chunkFilename: isDevelopment ? '[id].css' : '[id].[hash].min.css'
         })
     ]
 };
