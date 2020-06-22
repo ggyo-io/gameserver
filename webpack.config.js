@@ -103,15 +103,8 @@ module.exports = {
                 test: /\.(png|jpe?g|gif)$/i,
                 loader: 'file-loader',
                 options: {
-                    name(resourcePath, resourceQuery) {
-                        // `resourcePath` - `/absolute/path/to/file.js`
-                        // `resourceQuery` - `?foo=bar`
-
-                        if (isDevelopment) {
-                            return '[path][name].[ext]';
-                        }
-
-                        return '[contenthash].[ext]';
+                    name() {
+                        return isDevelopment ? '[path][name].[ext]' : '[contenthash].[ext]';
                     },
                 },
             },
