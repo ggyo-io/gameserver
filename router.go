@@ -8,14 +8,6 @@ import (
 
 func newRouter(hub *Hub) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	/* templates */
-	router.Methods("GET").Path("/v1").Handler(IndexHandler("tmpl/chess.html"))
-	router.Methods("GET").Path("/").Handler(IndexHandler("tmpl/mockup.html"))
-
-	/* static files */
-	router.HandleFunc("/{path}.ico", pathHandler)
-	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	router.PathPrefix("/img/").Handler(http.FileServer(http.Dir("static")))
 
 	/* web-socket */
 	router.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -28,6 +20,9 @@ func newRouter(hub *Hub) *mux.Router {
 	router.HandleFunc("/api/logout", logout)
 	router.Methods("GET").Path("/api/history").HandlerFunc(history)
 	router.Methods("GET").Path("/api/auth").HandlerFunc(checkauth)
+
+	/* Static content */
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("dist")))
 
 	return router
 }

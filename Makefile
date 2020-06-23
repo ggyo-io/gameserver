@@ -12,6 +12,9 @@ endif
 .PHONY: all clean run db
 all: build
 
+npm-build:
+	cd src && npm i && npm run build
+
 build:
 	go build .
 

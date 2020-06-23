@@ -14,8 +14,12 @@ export const wsConn = {
             wsConn.q = [];
         }
 
-        //wsConn.ws = new WebSocket("ws://" + document.location.host + "/ws");
-        const goServer = 'ws://localhost:8383/ws';
+        // NPM/webpack development configuration
+        //const goServer = 'ws://localhost:8383/ws';
+
+        // NPM webpack production configuration
+        const goServer =  "ws://" + document.location.host + "/ws"
+
         wsConn.ws = new WebSocket(goServer);
         wsConn.ws.onopen = function () {
             wsConn.update ({ serverConnection: {
