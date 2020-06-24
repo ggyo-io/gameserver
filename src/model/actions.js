@@ -141,5 +141,9 @@ export const actions = {
         if (WhiteClock !== undefined && BlackClock !== undefined) {
             setServerClocks(state, WhiteClock, BlackClock);
         }
-    })
+    }),
+
+    addChatMessage: action((state, payload) => {
+        state.chatMessages.push(payload)
+    }),
 }

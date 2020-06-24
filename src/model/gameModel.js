@@ -50,6 +50,8 @@ export const gameModel = {
         promote: false,
         match: false,
 
+        chatMessages: [],
+
         // actions
         ...actions
     }
