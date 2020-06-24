@@ -14,9 +14,6 @@ export const wsConn = {
             wsConn.q = [];
         }
 
-        // NPM/webpack development configuration
-        //const goServer = 'ws://localhost:8383/ws';
-
         // NPM webpack production configuration
         const goServer =  "ws://" + document.location.host + "/ws"
 
