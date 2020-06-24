@@ -22,10 +22,16 @@ module.exports = {
     },
     devServer: {
         historyApiFallback: true,
-        proxy: [{
-            context: ['/api'],
-            target: 'http://localhost:8383',
-        }]
+        proxy: [
+            {
+                context: ['/api'],
+                target: 'http://localhost:8383',
+            },
+            {
+                context: ['/ws'],
+                target: 'ws://localhost:8383',
+                ws: true,
+            }]
     },
     module: {
         rules: [
