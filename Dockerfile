@@ -43,12 +43,12 @@ COPY notnil/  ./notnil
 RUN go build .
 
 # final stage - small image
-FROM ubuntu
+FROM ubuntu AS run-env
 ARG LC0_NETWORK_URL=https://training.lczero.org/get_network?sha=47e3f899519dc1bc95496a457b77730fce7b0b89b6187af5c01ecbbd02e88398
 
 WORKDIR /app
 COPY --from=npm-env   /npm-build/dist /app/dist
-COPY --from=build-env /go/gameserver /app/
+COPY --from=build-env /go/gameserver/gameserver /app/
 COPY --from=build-env /go/Stockfish/src/stockfish /app/
 COPY --from=leela-env /lc0/build/release/lc0 /app/
 RUN mkdir networks
