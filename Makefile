@@ -35,7 +35,7 @@ container:
 	rm -rf $(docker-context)
 	mkdir -p $(docker-context)
 	git clone . $(docker-context)
-	docker build -t $(IMAGE):$(TAG) $(docker-context)
+	docker build --build-arg tag=$(TAG) -t $(IMAGE):$(TAG) $(docker-context)
 	docker tag $(IMAGE):$(TAG) $(IMAGE):latest
 	docker tag $(IMAGE):latest $(GKE_IMAGE)
 	rm -rf $(docker-context)
@@ -44,7 +44,10 @@ container:
 push: container
 	docker push $(GKE_IMAGE)
 
-gke:
+gke-redeploy: push
+	kubectl get nodes
+	kubectl delete -f k8s/gke/gs-deployment.yaml
+	kubectl apply -f k8s/gke/gs-deployment.yaml
 
 
 local:
