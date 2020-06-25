@@ -1,8 +1,9 @@
-IMAGE=gs
-GKE_IMAGE=gcr.io/deductive-reach-207607/gs
-TAG = $(shell git describe --abbrev=0)
+IMAGE=ggyo
+GKE_IMAGE=gcr.io/$(GCP_PROJECT)/$(IMAGE)
 BuildDate = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 Commit = $(shell git rev-parse --short HEAD)
+docker-context=docker.context.$$PPID
+TAG=$(shell git log -1 --pretty=format:"%H")
 
 dbpass=
 ifdef DB_PASS
@@ -31,9 +32,13 @@ db-new:
 	mysqladmin -u root $(dbpass) -f create chess
 
 container:
-	docker build -t $(IMAGE):$(TAG) .
+	rm -rf $(docker-context)
+	mkdir -p $(docker-context)
+	git clone . $(docker-context)
+	docker build -t $(IMAGE):$(TAG) $(docker-context)
 	docker tag $(IMAGE):$(TAG) $(IMAGE):latest
 	docker tag $(IMAGE):latest $(GKE_IMAGE)
+	rm -rf $(docker-context)
 
 
 push: container
