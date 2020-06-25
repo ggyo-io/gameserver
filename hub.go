@@ -12,6 +12,7 @@ type Client interface {
 	ClientID() string
 	Match() chan *Match
 	Send() chan *Message
+	Board() chan *Message
 	Elo(string) int
 	SetElo(int, string)
 }
@@ -72,37 +73,62 @@ func (h *Hub) run() {
 		case rq := <-h.register:
 			switch rq.request {
 			case "connected":
-				b := h.disconnected[rq.player.ClientID()]
-				log.Printf("board user %s connected found board %#v", rq.player.User(), b)
-				if b != nil {
-					b.control <- rq.player
-				}
+				h.connect(rq)
 			case "disconnected":
-				close(rq.player.Match())
-				b := h.boards[rq.player]
-				if b != nil {
-					h.disconnected[rq.player.ClientID()] = b
-				}
-				delete(h.boards, rq.player)
-				delete(h.clients, rq.player)
+				h.disconnect(rq)
 			case "match":
-				if rq.foe == "human" {
-					h.matchHuman(rq)
-				} else {
-					h.matchUCI(rq)
-				}
+				h.match(rq)
 			case "gameover":
-				rq.board.control <- nil
-				h.removeBoardPlayer(rq.board.white)
-				h.removeBoardPlayer(rq.board.black)
+				h.gameover(rq.board)
 			case "reconnected":
-				log.Printf("board reconnected %#v", rq)
-				rq.player.Match() <- rq.match
+				h.reconnect(rq)
 			case "cancel":
 				delete(h.clients, rq.player)
 			}
 		}
 	}
+}
+
+func (h *Hub) reconnect(rq *registerRequest) {
+	log.Printf("board reconnected %#v", rq)
+	rq.player.Match() <- rq.match
+}
+
+func (h *Hub) connect(rq *registerRequest) {
+	b := h.disconnected[rq.player.ClientID()]
+	log.Printf("board user %s connected found board %#v", rq.player.User(), b)
+	if b != nil {
+		b.control <- rq.player
+	}
+}
+
+func (h *Hub) disconnect(rq *registerRequest) {
+	close(rq.player.Match())
+	b := h.boards[rq.player]
+	if b != nil {
+		h.disconnected[rq.player.ClientID()] = b
+	}
+	delete(h.boards, rq.player)
+	delete(h.clients, rq.player)
+}
+
+func (h *Hub) match(rq *registerRequest) {
+	b := h.boards[rq.player]
+	if b != nil {
+		rq.player.Board() <- &Message{Cmd: "outcome", Params: "abandon"}
+	}
+
+	if rq.foe == "human" {
+		h.matchHuman(rq)
+	} else {
+		h.matchUCI(rq)
+	}
+}
+
+func (h *Hub) gameover(board *Board) {
+	board.control <- nil
+	h.removeBoardPlayer(board.white)
+	h.removeBoardPlayer(board.black)
 }
 
 func (h *Hub) removeBoardPlayer(bp *boardPlayer) {

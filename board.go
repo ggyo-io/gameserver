@@ -222,25 +222,34 @@ func (b *Board) updateScores() {
 }
 
 func (b *Board) outcome(bp *boardPlayer, message *Message) error {
-	chessGame := b.chess
 	switch message.Params {
 	case "draw":
-		chessGame.Draw(chess.DrawOffer)
+		b.chess.Draw(chess.DrawOffer)
 	case "resign":
-		if bp == b.black {
-			chessGame.Resign(chess.Black)
-		} else {
-			chessGame.Resign(chess.White)
-		}
+		b.resign(bp)
+	case "abandon":
+		b.resign(bp)
 	default:
-		chessGame.Method()
 		log.Printf("Unknown outcome command params %v\n", message)
 	} // switch outcome command params
 
 	b.game.Active = false
 	b.updateScores()
 	b.recordGame()
-	return b.sendBoth(b.outcomeMsg(chessGame.Method()))
+
+	var reason interface{} = b.chess.Method()
+	if message.Params == "abandon" {
+		reason = "Abandoned"
+	}
+	return b.sendBoth(b.outcomeMsg(reason))
+}
+
+func (b *Board) resign(bp *boardPlayer) {
+	if bp == b.black {
+		b.chess.Resign(chess.Black)
+	} else {
+		b.chess.Resign(chess.White)
+	}
 }
 
 func (b *Board) outcomeMsg(reason interface{}) *Message {

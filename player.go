@@ -35,6 +35,10 @@ func (c *Player) Send() chan *Message {
 	return c.send
 }
 
+func (c *Player) Board() chan *Message {
+	return c.board
+}
+
 // User implements Client's interface
 func (c *Player) User() string {
 	return c.user
