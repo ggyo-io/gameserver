@@ -1,32 +1,32 @@
-# FROM python:3.7-alpine as leela-env
-# RUN apk add -q --update \
-#     && apk add -q \
-#             bash \
-#             git \
-#             curl \
-#             g++ \
-#             libpcap-dev \
-#             make \
-#     && rm -rf /var/cache/apk/*
+#
+# React GUI
+#
+FROM node as npm-env
+WORKDIR npm-build
+COPY package*.json webpack.config.js ./
+COPY src/  ./src/
+RUN npm i && npm run build
 
-# # Leela
-# RUN pip3 install meson
-# RUN pip3 install setuptools
-# RUN pip3 install pyautogui
-# RUN pip3 install ninja
-# RUN git clone https://github.com/LeelaChessZero/lc0.git
-# WORKDIR lc0
-# RUN ./build.sh
+#
+# lc0
+#
+FROM ubuntu as leela-env
 
-FROM golang:alpine AS build-env
-RUN apk add -q --update \
-    && apk add -q \
-            bash \
-            git \
-            curl \
-            g++ \
-            make \
-    && rm -rf /var/cache/apk/*
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -yq install \
+    gcc-8 g++-8 clang-6.0 ninja-build pkg-config \
+    python3 python3-pip \
+    git
+RUN pip3 install meson --user
+RUN git clone https://github.com/LeelaChessZero/lc0.git
+WORKDIR lc0
+RUN CC=clang-6.0 CXX=clang++-6.0 INSTALL_PREFIX=~/.local ./build.sh
+
+
+#
+# stockfish and gameserver
+#
+FROM golang AS build-env
 
 # Stockfish
 RUN git clone https://github.com/official-stockfish/Stockfish.git
@@ -35,22 +35,20 @@ RUN make build ARCH=x86-64
 WORKDIR ../..
 
 # Gameserver
-WORKDIR ./gameserver
-COPY *.go ./
+WORKDIR       ./gameserver
+COPY *.go     ./
+COPY go.*     ./
 COPY Makefile ./
-RUN make deps
-RUN make
+COPY notnil/  ./notnil
+RUN go build .
 
 # final stage - small image
-FROM alpine
-RUN apk add -q --update \
-    && apk add -q \
-            libstdc++ \
-    && rm -rf /var/cache/apk/*
+FROM ubuntu
 
 WORKDIR /app
-COPY ./static/ /app/static/
 COPY ./tmpl/ /app/tmpl/
+COPY --from=npm-env   /npm-build/dist /app/dist
 COPY --from=build-env /go/gameserver /app/
 COPY --from=build-env /go/Stockfish/src/stockfish /app/
+COPY --from=leela-env /lc0/build/release/lc0 /app/
 CMD ./gameserver
