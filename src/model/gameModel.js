@@ -1,6 +1,6 @@
 import { actions } from "./actions";
 import {computed} from "easy-peasy";
-import {turnPosish} from "../utils/turns";
+import {oponentName, oponentPosish, turnPosish} from "../utils/turns";
 
 export const gameModel = {
     game: {
@@ -38,6 +38,8 @@ export const gameModel = {
         },
         gameTurn: computed(state => turnPosish(state.history.length, state.orientation)),
         browseTurn: computed(state => turnPosish(state.browseIndex, state.orientation)),
+        oponentName: computed(state => oponentName(state)),
+
         lastMoveTimestamp: Date.now(),
         result: '',
         user: '',
