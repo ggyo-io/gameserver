@@ -34,14 +34,14 @@ type Hub struct {
 	register     chan *registerRequest       // Register requests from the clients
 	robots       map[string]uciLauncher
 	disconnected map[string]*Board
-	boards       map[Client]*Board
+	boards       map[string]*Board
 }
 
 func newHub(rs ...uciLauncher) *Hub {
 	h := &Hub{
 		clients:      make(map[Client]*registerRequest),
 		register:     make(chan *registerRequest),
-		boards:       make(map[Client]*Board),
+		boards:       make(map[string]*Board),
 		robots:       make(map[string]uciLauncher),
 		disconnected: make(map[string]*Board),
 	}
@@ -104,16 +104,20 @@ func (h *Hub) connect(rq *registerRequest) {
 
 func (h *Hub) disconnect(rq *registerRequest) {
 	close(rq.player.Match())
-	b := h.boards[rq.player]
+	b := h.boards[rq.player.ClientID()]
 	if b != nil {
 		h.disconnected[rq.player.ClientID()] = b
 	}
-	delete(h.boards, rq.player)
+	delete(h.boards, rq.player.ClientID())
 	delete(h.clients, rq.player)
 }
 
 func (h *Hub) match(rq *registerRequest) {
-	b := h.boards[rq.player]
+	b := h.boards[rq.player.ClientID()]
+	if b == nil {
+		b = h.disconnected[rq.player.ClientID()]
+	}
+
 	if b != nil {
 		// reconnect
 		b.control <- rq.player
@@ -135,7 +139,7 @@ func (h *Hub) gameover(board *Board) {
 
 func (h *Hub) removeBoardPlayer(bp *boardPlayer) {
 	delete(h.disconnected, bp.ClientID())
-	delete(h.boards, bp.Client)
+	delete(h.boards, bp.Client.ClientID())
 }
 
 func (h *Hub) matchUCI(rq *registerRequest) {
@@ -166,7 +170,7 @@ func (h *Hub) matchUCI(rq *registerRequest) {
 		rq.player.Match() <- &Match{ch: board.white.ch, color: "white", foe: uciPlayer.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
 	}
 
-	h.boards[rq.player] = board
+	h.boards[rq.player.ClientID()] = board
 
 	go uciPlayer.writePump()
 	go uciPlayer.readPump()
@@ -256,8 +260,8 @@ func (h *Hub) createGameHumans(rq *registerRequest, k Client) {
 	delete(h.clients, white)
 	delete(h.clients, black)
 
-	h.boards[white] = board
-	h.boards[black] = board
+	h.boards[white.ClientID()] = board
+	h.boards[black.ClientID()] = board
 
 	white.Match() <- &Match{ch: board.white.ch, color: "white", foe: black.User(), foeElo: black.Elo(tc.String()),
 		gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
