@@ -115,7 +115,9 @@ func (h *Hub) disconnect(rq *registerRequest) {
 func (h *Hub) match(rq *registerRequest) {
 	b := h.boards[rq.player]
 	if b != nil {
-		rq.player.Board() <- &Message{Cmd: "outcome", Params: "abandon"}
+		// reconnect
+		b.control <- rq.player
+		return
 	}
 
 	if rq.foe == "human" {
