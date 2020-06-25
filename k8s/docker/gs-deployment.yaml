@@ -27,7 +27,7 @@ spec:
       containers:
       - name: gs
         image: gcr.io/ggyo-281409/ggyo
-        imagePullPolicy: Always
+        imagePullPolicy: Never
         env:
         - name: DB_PASS
           value: password
