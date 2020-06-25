@@ -4,7 +4,7 @@ import {wsSend} from "../../../ws/ws";
 export const actionHandlers = () => {
 
     const {dialogLabel} = useStoreState(state => state.game)
-    const {setDialogLabel, update} = useStoreActions(actions => actions.game)
+    const {setDialogLabel} = useStoreActions(actions => actions.game)
 
     return {
         yesClick: () => {
@@ -13,11 +13,16 @@ export const actionHandlers = () => {
                     Cmd: "outcome",
                     Params: "resign"
                 });
-            } else if (dialogLabel === 'dialog_draw') {
+            } else if (dialogLabel === 'dialog_offer_draw') {
                 wsSend({
                     Cmd: "offer",
                     Params: "draw"
                 });
+            } else if (dialogLabel === 'dialog_accept_draw') {
+                wsSend({
+                    Cmd: "outcome",
+                    Params: "draw"
+                })
             }
             setDialogLabel("")
         },

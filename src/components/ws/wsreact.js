@@ -3,7 +3,7 @@ import {useStoreActions} from "easy-peasy";
 import {useRegisterCmd, wsConn} from "./ws";
 
 export const WsReact = () => {
-    const {update, addChatMessage} = useStoreActions(actions => actions.game)
+    const {update, addChatMessage, setDialogLabel} = useStoreActions(actions => actions.game)
 
     useEffect(() => {
         wsConn.connect(update)
@@ -17,6 +17,7 @@ export const WsReact = () => {
     useRegisterCmd("disconnect", ()=>{update({opponentOnline: false})})
     useRegisterCmd("reconnected", ()=>{update({opponentOnline: true})})
     useRegisterCmd("chat", (msg)=>{addChatMessage({message: msg.Params, oponent:true})})
+    useRegisterCmd("offer", (msg)=>{setDialogLabel("dialog_accept_draw")})
 
     return null
 }

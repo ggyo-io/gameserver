@@ -111,6 +111,7 @@ export const actions = {
             serverTime: Color === 'white' ? WhiteClock : BlackClock
         }
         state.lastMoveTimestamp = Date.now()
+        state.chatMessages = []
     }),
 
     setAnalysis: action((state, payload) => {

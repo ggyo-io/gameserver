@@ -16,7 +16,7 @@ export const Dialog = () => {
                 <div className="d-flex flex-column">
                     <ButtonGroup size="sm">
                         <Button name="dialog_resign" onClick={actions.dialogClick}>Resign</Button>
-                        <Button name="dialog_draw" onClick={actions.dialogClick}>Draw</Button>
+                        <Button name="dialog_offer_draw" onClick={actions.dialogClick}>Draw</Button>
                     </ButtonGroup>
                 </div>
             </Card.Body>
