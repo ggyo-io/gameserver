@@ -1,16 +1,5 @@
 package main
 
-import (
-	"html/template"
-)
-
-var templates map[string]*template.Template
-
-func init() {
-	templates = make(map[string]*template.Template)
-	templates["index"] = template.Must(template.ParseFiles("tmpl/chess.html"))
-}
-
 type indexData struct {
 	UserName string
 	IsAnnon  bool
@@ -20,12 +9,12 @@ type indexData struct {
 }
 
 type historyGame struct {
-	PGN     string
-	Time    int64
-	Name    string
-	White   string
-	Black   string
-	Outcome string
+	PGN      string
+	Time     int64
+	Name     string
+	White    string
+	Black    string
+	Outcome  string
 	WhiteElo int
 	BlackElo int
 }
