@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: gs
-        image: gcr.io/deductive-reach-207607/gs
+        image: gcr.io/ggyo-281409/ggyo
         env:
         - name: DB_PASS
           value: password
