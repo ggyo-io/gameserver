@@ -30,3 +30,4 @@ yarn.lock
 /lib/
 /target/
 /.idea/
+yarn-error.log
