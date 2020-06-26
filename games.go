@@ -25,6 +25,11 @@ func findGame(id string) *Game {
 
 // Record the game in DB
 func (b *Board) recordGame() {
+	//do not record empty games
+	if len(b.chess.Moves()) == 0 {
+		db.Delete(b.game)
+		return
+	}
 	game := b.game
 	game.State = b.chess.String()
 	game.WhiteClock = b.clock.timeLeft[whiteColor].Milliseconds()
