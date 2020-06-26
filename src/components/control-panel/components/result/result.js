@@ -9,7 +9,7 @@ import { useHistory } from "react-router-dom";
 export const Result = (props) => {
     const routerHistory = useHistory()
     const { update, newGame } = useStoreActions(actions => actions.game)
-    const { result, opponent, colorPreference, timeControl } = useStoreState(state => state.game)
+    const { result, opponent, colorPreference, timeControl, mode } = useStoreState(state => state.game)
     const doClickPlay = () => playClick(routerHistory, update, newGame, opponent, colorPreference, timeControl)
 
     return (
@@ -24,7 +24,7 @@ export const Result = (props) => {
                     </tr>
                     </tbody>
                 </Table>
-                <Button size="lg" block onClick={doClickPlay}>PLAY AGAIN</Button>
+                {(mode !== "analysis") && <Button size="lg" block onClick={doClickPlay}>PLAY AGAIN</Button>}
             </Card.Body>
         </Card>
     )
