@@ -182,12 +182,6 @@ func (b *Board) move(bp *boardPlayer, message *Message) error {
 	// update the time control
 	numMoves := len(b.chess.Moves()) + 1
 	clk := b.clock.onMove(numMoves)
-	message.WhiteClock = b.clock.timeLeft[whiteColor].Milliseconds()
-	if numMoves > 1 {
-		message.BlackClock = b.clock.timeLeft[blackColor].Milliseconds()
-	} else {
-		message.BlackClock = FirstMoveTimeout.Milliseconds()
-	}
 
 	// Apply the move, check if the move is legal
 	if err := chessGame.MoveStr(message.Params + chess.ClkString(clk)); err != nil {
@@ -211,8 +205,27 @@ func (b *Board) move(bp *boardPlayer, message *Message) error {
 	for _, move := range chessGame.Moves() {
 		message.Moves += " " + move.String()
 	}
-	bp.Send() <- &Message{Cmd: "clock", WhiteClock: message.WhiteClock, BlackClock: message.BlackClock}
+	message.WhiteClock, message.BlackClock = b.whiteTime(), b.blackTime()
+	bp.Send() <- &Message{Cmd: "clock", WhiteClock: b.whiteTime(), BlackClock: b.blackTime()}
 	return b.sendToFoe(bp, message)
+}
+
+func (b *Board) whiteTime() int64 {
+	numMoves := len(b.chess.Moves())
+	whiteClock := b.clock.timeLeft[whiteColor].Milliseconds()
+	if numMoves < 1 {
+		whiteClock = FirstMoveTimeout.Milliseconds()
+	}
+	return whiteClock
+}
+
+func (b *Board) blackTime() int64 {
+	numMoves := len(b.chess.Moves())
+	blackClock := b.clock.timeLeft[blackColor].Milliseconds()
+	if numMoves < 2 {
+		blackClock = FirstMoveTimeout.Milliseconds()
+	}
+	return blackClock
 }
 
 func (b *Board) updateScores() {
@@ -331,7 +344,24 @@ func (b *Board) reconnect(client Client) *Match {
 	// need to remove trailing * cuz it look like diz: \n1.e2e4 d7d5 2.b1c3 c7c6  *
 	position = strings.TrimSuffix(position, " *")
 	position = strings.TrimSpace(position)
-	match := &Match{ch: bp.ch, color: color, foe: foe, foeElo: bp.Elo(b.clock.tc.String()), position: position,
-		whiteClock: b.clock.getClock(whiteColor), blackClock: b.clock.getClock(blackColor), tc: b.clock.tc}
+	match := b.makeMatchPosition(bp, color, foe, position)
 	return match
+}
+
+func (b *Board) makeMatchPosition(bp *boardPlayer, color string, foe string, position string) *Match {
+	return &Match{ch: bp.ch, color: color, foe: foe, foeElo: bp.Elo(b.clock.tc.String()), position: position,
+		whiteClock: b.whiteTime(), blackClock: b.blackTime(), tc: b.clock.tc}
+}
+
+func (b *Board) makeNewMatch(color string) *Match {
+	ch := b.white.ch
+	foe := b.black.User()
+	foeElo := b.black.Elo(b.clock.tc.String())
+	if color == "black" {
+		ch = b.black.ch
+		foe = b.white.User()
+		foeElo = b.white.Elo(b.clock.tc.String())
+	}
+	return &Match{ch: ch, color: color, foe: foe, foeElo: foeElo, gameID: b.game.ID,
+		whiteClock: b.whiteTime(), blackClock: b.blackTime(), tc: b.clock.tc}
 }

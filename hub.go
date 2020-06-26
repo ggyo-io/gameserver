@@ -160,14 +160,13 @@ func (h *Hub) matchUCI(rq *registerRequest) {
 
 	tc := newTimeControl(rq.tc)
 	board := newBoard(h.register, whitePlayer, blackPlayer, tc)
-	cms := tc.time * 1000
 	if uciPlayer == whitePlayer {
-		uciPlayer.onMatch(&Match{ch: board.white.ch, color: "white", foe: rq.player.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc})
-		rq.player.Match() <- &Match{ch: board.black.ch, color: "black", foe: uciPlayer.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
+		uciPlayer.onMatch(board.makeNewMatch("white"))
+		rq.player.Match() <- board.makeNewMatch("black")
 		uciPlayer.Send() <- &Message{Cmd: "move"}
 	} else {
-		uciPlayer.onMatch(&Match{ch: board.black.ch, color: "black", foe: rq.player.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc})
-		rq.player.Match() <- &Match{ch: board.white.ch, color: "white", foe: uciPlayer.User(), gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
+		uciPlayer.onMatch(board.makeNewMatch("black"))
+		rq.player.Match() <- board.makeNewMatch("white")
 	}
 
 	h.boards[rq.player.ClientID()] = board
@@ -256,17 +255,14 @@ func (h *Hub) createGameHumans(rq *registerRequest, k Client) {
 	white, black := choosePlayersColors(rq, h.clients[k])
 	tc := newTimeControl(rq.tc)
 	board := newBoard(h.register, white, black, tc)
-	cms := tc.time * 1000
 	delete(h.clients, white)
 	delete(h.clients, black)
 
 	h.boards[white.ClientID()] = board
 	h.boards[black.ClientID()] = board
 
-	white.Match() <- &Match{ch: board.white.ch, color: "white", foe: black.User(), foeElo: black.Elo(tc.String()),
-		gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
-	black.Match() <- &Match{ch: board.black.ch, color: "black", foe: white.User(), foeElo: white.Elo(tc.String()),
-		gameID: board.game.ID, whiteClock: cms, blackClock: cms, tc: tc}
+	white.Match() <- board.makeNewMatch("white")
+	black.Match() <- board.makeNewMatch("black")
 	go board.run()
 }
 

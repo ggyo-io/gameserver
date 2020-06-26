@@ -107,7 +107,7 @@ func (c *WSPlayer) writePump() {
 			}
 		case match, ok := <-c.match:
 			if !ok {
-				// The hub closed the channel.
+				log.Println("ERROR: The hub closed the channel.")
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
@@ -124,7 +124,7 @@ func (c *WSPlayer) writePump() {
 			}
 
 			c.send <- &Message{Cmd: "start", Color: c.color, User: c.foe, GameID: c.gameID, Params: match.position,
-				WhiteClock: FirstMoveTimeout.Milliseconds(), BlackClock: FirstMoveTimeout.Milliseconds(), WhiteElo: whiteElo, BlackElo: blackElo}
+				WhiteClock: match.whiteClock, BlackClock: match.blackClock, WhiteElo: whiteElo, BlackElo: blackElo}
 		}
 	}
 }
