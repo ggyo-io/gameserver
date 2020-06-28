@@ -3,11 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/notnil/chess"
 	"log"
 	"strconv"
 	"strings"
-
-	"github.com/notnil/chess"
 )
 
 type boardPlayer struct {
@@ -62,10 +61,19 @@ func (b *Board) run() {
 		var err error
 
 		select {
+		case ato := <-b.clock.whiteAbandoned.timer.C:
+			log.Printf("White abandoned timeout %v, clock %v", ato, b.clock)
+			b.abandoned(false)
+			return
+
+		case ato := <-b.clock.blackAbandoned.timer.C:
+			log.Printf("Black abandoned timeout %v, clock %v", ato, b.clock)
+			b.abandoned(true)
+			return
+
 		case to := <-b.clock.flag.timer.C:
 			numMoves := len(b.chess.Moves())
 			log.Printf("Flag on move #%v, timeout %v, clock %v", numMoves, to, b.clock)
-			b.hubChannel <- &registerRequest{request: "gameover", board: b}
 			b.onTimeOut(b.clock.flagReason, b.clock.player)
 			return
 
@@ -91,10 +99,6 @@ func (b *Board) run() {
 		}
 		if err != nil {
 			log.Print(err)
-		}
-		// game over or both clients disconnected -> exit
-		if b.white.ch == nil && b.black.ch == nil || b.game.Active == false {
-			b.hubChannel <- &registerRequest{request: "gameover", board: b}
 		}
 	}
 }
@@ -191,13 +195,6 @@ func (b *Board) move(bp *boardPlayer, message *Message) error {
 
 	// Check is game is over, GG
 	log.Printf("board '%s' after Move command outcome '%s' method '%s'\n", bp.User(), chessGame.Outcome(), chessGame.Method())
-	if chessGame.Outcome() != chess.NoOutcome {
-		game.Active = false
-		b.updateScores()
-		m := b.outcomeMsg(chessGame.Method())
-		b.sendBoth(m)
-	}
-
 	// Record the move in DB
 	b.recordGame()
 
@@ -207,7 +204,13 @@ func (b *Board) move(bp *boardPlayer, message *Message) error {
 	}
 	message.WhiteClock, message.BlackClock = b.whiteTime(), b.blackTime()
 	bp.Send() <- &Message{Cmd: "clock", WhiteClock: b.whiteTime(), BlackClock: b.blackTime()}
-	return b.sendToFoe(bp, message)
+	err := b.sendToFoe(bp, message)
+
+	if chessGame.Outcome() != chess.NoOutcome {
+		return b.gameOver(b.outcomeMsg(chessGame.Method()))
+	}
+	return err
+
 }
 
 func (b *Board) whiteTime() int64 {
@@ -239,26 +242,17 @@ func (b *Board) outcome(bp *boardPlayer, message *Message) error {
 	case "draw":
 		b.chess.Draw(chess.DrawOffer)
 	case "resign":
-		b.resign(bp)
-	case "abandon":
-		b.resign(bp)
+		b.resign(bp == b.black)
 	default:
 		log.Printf("Unknown outcome command params %v\n", message)
 	} // switch outcome command params
 
-	b.game.Active = false
-	b.updateScores()
-	b.recordGame()
-
 	var reason interface{} = b.chess.Method()
-	if message.Params == "abandon" {
-		reason = "Abandoned"
-	}
-	return b.sendBoth(b.outcomeMsg(reason))
+	return b.gameOver(b.outcomeMsg(reason))
 }
 
-func (b *Board) resign(bp *boardPlayer) {
-	if bp == b.black {
+func (b *Board) resign(black bool) {
+	if black {
 		b.chess.Resign(chess.Black)
 	} else {
 		b.chess.Resign(chess.White)
@@ -279,33 +273,35 @@ func (b *Board) sendBoth(message *Message) error {
 }
 
 func (b *Board) onTimeOut(desc string, player int) error {
-	if b.game.Active {
-		if player == whiteColor {
-			b.chess.Resign(chess.White)
-		} else {
-			b.chess.Resign(chess.Black)
-		}
-		m := b.outcomeMsg(desc)
-		b.sendBoth(m)
-		b.game.Active = false
-		b.updateScores()
-		b.recordGame()
+	if !b.game.Active {
+		return nil
 	}
+	b.resign(player == blackColor)
+	return b.gameOver(b.outcomeMsg(desc))
+}
+
+func (b *Board) gameOver(m *Message) error {
+	err := b.sendBoth(m)
+	b.game.Active = false
+	b.updateScores()
+	b.recordGame()
+	b.hubChannel <- &registerRequest{request: "gameover", board: b}
 	b.white.ch = nil
 	b.black.ch = nil
-	return nil
+	return err
 }
 
 func (b *Board) onClose(bp *boardPlayer) error {
 	log.Printf("board onClose %s", bp.User())
 	bp.ch = nil
 	if b.game.Active {
+		if bp == b.white {
+			b.clock.whiteAbandoned.Reset(AbandonTimeout)
+		} else {
+			b.clock.blackAbandoned.Reset(AbandonTimeout)
+		}
 		return b.sendToFoe(bp, &Message{Cmd: "disconnect"})
 	}
-
-	// game over, let the board exit
-	foe := b.foe(bp)
-	foe.ch = nil
 	return nil
 }
 
@@ -334,9 +330,11 @@ func (b *Board) reconnect(client Client) *Match {
 		foe = b.white.User()
 		b.black = newBoardPlayer(client)
 		bp = b.black
+		b.clock.blackAbandoned.Stop()
 	} else {
 		b.white = newBoardPlayer(client)
 		bp = b.white
+		b.clock.whiteAbandoned.Stop()
 	}
 	b.sendToFoe(bp, &Message{Cmd: "reconnected"})
 
@@ -364,4 +362,16 @@ func (b *Board) makeNewMatch(color string) *Match {
 	}
 	return &Match{ch: ch, color: color, foe: foe, foeElo: foeElo, gameID: b.game.ID,
 		whiteClock: b.whiteTime(), blackClock: b.blackTime(), tc: b.clock.tc}
+}
+
+func (b *Board) abandoned(black bool) {
+	b.resign(black)
+	color := "White"
+	if black {
+		color = "Black"
+	}
+	err := b.gameOver(b.outcomeMsg(fmt.Sprintf("%s abandoned", color)))
+	if err != nil {
+		log.Printf("ERROR calling gameOver: %s\n", err)
+	}
 }

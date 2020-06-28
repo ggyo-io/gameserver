@@ -8,6 +8,15 @@ import (
 	"time"
 )
 
+const AbandonTimeout = 30 * time.Second
+const FirstMoveTimeout = 30 * time.Second
+
+const (
+	whiteColor   = iota
+	blackColor   = iota
+	numOfPlayers = iota
+)
+
 // timeControl is measured in seconds
 type timeControl struct {
 	time, increment int64
@@ -27,20 +36,16 @@ func newTimeControl(tc string) timeControl {
 	return t
 }
 
-const (
-	whiteColor   = iota
-	blackColor   = iota
-	numOfPlayers = iota
-)
-
 type chessClock struct {
-	timeLeft      [numOfPlayers]time.Duration
-	increment     [numOfPlayers]time.Duration
-	flag          *reusableTimer
-	flagReason    string
-	player        int
-	lastMoveStart time.Time
-	tc            timeControl
+	timeLeft       [numOfPlayers]time.Duration
+	increment      [numOfPlayers]time.Duration
+	flag           *reusableTimer
+	whiteAbandoned *reusableTimer
+	blackAbandoned *reusableTimer
+	flagReason     string
+	player         int
+	lastMoveStart  time.Time
+	tc             timeControl
 }
 
 func (c *chessClock) String() string {
@@ -48,6 +53,7 @@ func (c *chessClock) String() string {
 }
 
 func playerColor(p int) string {
+
 	color := "White"
 	if p == blackColor {
 		color = "Black"
@@ -89,8 +95,6 @@ func (c *chessClock) onMove(numMoves int) time.Duration {
 	return d
 }
 
-const FirstMoveTimeout = 30 * time.Second
-
 func (c *chessClock) firstMoveFlag(p int) {
 	log.Printf("chessClock firstMoveFlag for player %v now %v\n", playerColor(p), time.Now())
 	c.flag.Reset(FirstMoveTimeout)
@@ -107,6 +111,8 @@ func newChessClock(tc *timeControl) *chessClock {
 
 	cc.player = whiteColor
 	cc.flag = newReusableTimer()
+	cc.whiteAbandoned = newReusableTimer()
+	cc.blackAbandoned = newReusableTimer()
 
 	return &cc
 }
