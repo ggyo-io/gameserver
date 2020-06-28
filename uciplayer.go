@@ -64,8 +64,7 @@ func (c *UCIPlayer) writePump() {
 				return
 
 			case "disconnect":
-				log.Printf("uciplayer '%s' got 'disconnect' (%s), return from writePump(), signal readPump to exit\n", c.user, message.Params)
-				return
+				log.Printf("uciplayer '%s' got 'disconnect, don't exit' (%s)\n", c.user, message.Params)
 
 			case "offer":
 				log.Printf("uciplayer '%s' ignore offer '%s'\n", c.user, message.Params)

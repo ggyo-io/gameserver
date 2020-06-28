@@ -107,7 +107,7 @@ func (c *WSPlayer) writePump() {
 			}
 		case match, ok := <-c.match:
 			if !ok {
-				log.Println("ERROR: The hub closed the channel.")
+				log.Printf("wsplayer '%s' The hub closed the channel.", c.user)
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}

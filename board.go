@@ -55,6 +55,7 @@ func (b *Board) run() {
 	b.clock.firstMoveFlag(b.clock.player)
 	defer func() {
 		b.clock.flag.Stop()
+		log.Print("board exited!!!")
 	}()
 
 	for {
@@ -79,7 +80,6 @@ func (b *Board) run() {
 
 		case client := <-b.control:
 			if client == nil {
-				log.Print("board exited!!!")
 				return
 			}
 			match := b.reconnect(client)
