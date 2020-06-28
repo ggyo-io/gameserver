@@ -1,7 +1,6 @@
 import React from "react";
-import Chess from "../ggboard/chess.js/chess";
+import {chess} from "../../utils/chessref";
 
-const chess = new Chess()
 
 export const serverFetchHistory = (url, setGame) => {
     const sg = setGame

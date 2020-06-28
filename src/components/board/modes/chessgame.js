@@ -109,18 +109,9 @@ export const ChessGame = (props) => {
         })
     }
 
-    const start = (msg) => {
-        if (msg.Params) {
-            game.load_pgn(msg.Params, {sloppy: true})
-            msg = {...msg, History: game.history({verbose:true})}
-        }
-        newGame(msg)
-        update({match: false})
-    }
 
     useRegisterCmd("move", move)
     useRegisterCmd("outcome", outcome)
-    useRegisterCmd("start", start)
     useRegisterCmd("clock", clock)
 
     return (

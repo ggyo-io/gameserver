@@ -22,7 +22,7 @@ export const ChatPanel = () => {
         }
     }
     const renderMessages = (msgs) => (
-        msgs.map(msg => <div key={msg.message}>{msg.oponent ? oponentName + ": " + msg.message:msg.message}</div>)
+        msgs.map(msg => <div key={msg.message}>{msg.oponent ? <><strong>{oponentName}:</strong>  {msg.message}</> : msg.message}</div>)
     )
 
 

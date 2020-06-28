@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
-import fetchHistory, {serverFetchHistory} from "./loader"
+import {serverFetchHistory} from "./loader"
 import {useHistory} from "react-router-dom"
 import {useStoreActions} from "easy-peasy";
 

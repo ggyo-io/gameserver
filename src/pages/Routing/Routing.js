@@ -15,7 +15,7 @@ import {ResetPassword} from "../auth/resetPassword";
 
 const Routing = () => {
     return (
-            <Router>
+            <>
                 <NavigationBar/>
                 <Layout>
                     <Switch>
@@ -30,7 +30,7 @@ const Routing = () => {
                         <Route path="/reset" component={ResetPassword}/>
                     </Switch>
                 </Layout>
-            </Router>
+            </>
     )
 };
 
