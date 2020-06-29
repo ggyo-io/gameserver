@@ -22,7 +22,8 @@ func newRouter(hub *Hub) *mux.Router {
 	router.Methods("GET").Path("/api/auth").HandlerFunc(checkauth)
 
 	/* Static content */
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("dist")))
+	spa := spaHandler{staticPath: "dist", indexPath: "index.html"}
+	router.PathPrefix("/").Handler(spa)
 
 	return router
 }
