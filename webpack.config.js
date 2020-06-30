@@ -1,5 +1,6 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const CopyPlugin = require('copy-webpack-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -106,11 +107,14 @@ module.exports = {
                 use: ["style-loader", "css-loader"]
             },
             {
-                test: /\.(png|jpe?g|gif)$/i,
+                test: /\.(ico|png|jpe?g|gif)$/i,
                 loader: 'file-loader',
                 options: {
-                    name() {
-                        return isDevelopment ? '[path][name].[ext]' : '[contenthash].[ext]';
+                    name(resourcePath) {
+                        if (resourcePath.toString().includes('favicon.ico'))
+                            return '[name].[ext]';
+                        else
+                            return isDevelopment ? '[path][name].[ext]' : '[contenthash].[ext]';
                     },
                 },
             },
@@ -149,6 +153,10 @@ module.exports = {
     devtool: 'inline-source-map',
     plugins: [
         new CleanWebpackPlugin(),
+        new ManifestPlugin({
+            publicPath: '',
+            fileName: 'manifest.json'
+        }),
         new CopyPlugin({
             patterns: [
                 { from: 'src/assets/img/chesspieces/wikipedia/*.png',
