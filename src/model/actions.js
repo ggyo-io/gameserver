@@ -1,6 +1,7 @@
 import {action} from "easy-peasy";
 import {clock2millis, timeMin} from "../utils/time";
 import {turnPosish} from "../utils/turns";
+import {colorResult} from "../utils/outcome"
 import Chess from "../components/ggboard/chess.js/chess";
 
 const chess = new Chess()
@@ -126,8 +127,9 @@ export const actions = {
             name: payload.White,
             elo: payload.WhiteElo
         }
-        state.result = {outcome: payload.Result}
         chess.load_pgn(payload.pgn, {sloppy: true})
+        const { Method } = chess.header()
+        state.result = { outcome: colorResult(payload.Result), method: Method }
         state.history = chess.history({verbose: true})
         state.browseIndex = state.history.length
         setBrowseClocks(state.history.length, state.history, state)

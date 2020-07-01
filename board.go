@@ -3,10 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/notnil/chess"
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/notnil/chess"
 )
 
 type boardPlayer struct {
@@ -284,6 +285,7 @@ func (b *Board) gameOver(m *Message) error {
 	err := b.sendBoth(m)
 	b.game.Active = false
 	b.updateScores()
+	b.chess.AddTagPair("Method", b.chess.Method().String())
 	b.recordGame()
 	b.hubChannel <- &registerRequest{request: "gameover", board: b}
 	b.white.ch = nil

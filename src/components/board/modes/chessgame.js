@@ -12,7 +12,7 @@ const game = new Chess()
 export const ChessGame = (props) => {
 
     // Actions
-    const {onMove, update, newGame, setClocks} = useStoreActions(actions => actions.game)
+    const {onMove, update, setClocks} = useStoreActions(actions => actions.game)
     const {top, bottom, match} = useStoreState(state => state.game)
     const routerHistory = useHistory()
     useEffect(() => {
