@@ -19,6 +19,21 @@ spec:
         env:
         - name: DB_PASS
           value: password
+        - name: MAIL_NAME
+          valueFrom:
+            secretKeyRef:
+              name: mail-secret
+              key: name
+        - name: MAIL_EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: mail-secret
+              key: email
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mail-secret
+              key: password
         ports:
         - containerPort: 8383
           
