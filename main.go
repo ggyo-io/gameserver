@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
-	"net/mail"
 	"os"
+	"time"
 
 	"github.com/gorilla/handlers"
 )
@@ -21,10 +22,7 @@ func main() {
 	initDb()
 	defer db.Close()
 
-	to := mail.Address{"Alexander Indenbaum", "alexander.indenbaum@gmail.com"}
-	subj := "ggyo startup"
-	body := "GG YO server is Starting.\n Good Luck!"
-	SendEmail(to, subj, body)
+	rand.Seed(time.Now().UnixNano())
 
 	port := 8383
 	log.Printf("Listening on %d\n", port)

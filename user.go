@@ -11,6 +11,17 @@ func findUserByName(name string) *User {
 	return &user
 }
 
+func findUserByToken(token string) *User {
+	if token == "" {
+		return nil
+	}
+	var user User
+	if db.Where("token = ?", token).First(&user).RecordNotFound() {
+		return nil
+	}
+	return &user
+}
+
 func findUserByNameAndPass(name string, pass string) *User {
 	if name == "" {
 		return nil

@@ -3,6 +3,8 @@ package main
 import (
 	"crypto/sha256"
 	"fmt"
+	"math/rand"
+
 	"github.com/gorilla/sessions"
 )
 
@@ -17,4 +19,14 @@ func shastr(str string) string {
 	crypt.Write([]byte(str))
 	hashedBytes := crypt.Sum(nil)
 	return fmt.Sprintf("%x", hashedBytes)
+}
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func randSeq(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }

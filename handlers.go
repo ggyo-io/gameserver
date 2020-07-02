@@ -3,18 +3,52 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	uuid "github.com/satori/go.uuid"
 	"log"
 	"net/http"
+	"net/mail"
 	"os"
 	"path/filepath"
 	"strings"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 type credentials struct {
 	Username string
 	Password string
 	Email    string
+}
+
+func passwordReset(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var c credentials
+	err := decoder.Decode(&c)
+	if err != nil {
+		http.Error(w, "invalid input", http.StatusForbidden)
+		return
+	}
+
+	user := findUserByName(c.Username)
+	if user == nil {
+		http.Error(w, "unknown username", http.StatusForbidden)
+		return
+	}
+
+	user.Token = randSeq(64)
+	log.Printf("resetPassword token %s user %s email %s\n", user.Token, user.Name, user.Email)
+
+	if err := db.Save(user).Error; err != nil {
+		panic(err)
+	}
+
+	to := mail.Address{user.Name, user.Email}
+	subj := "GG Yo password reset"
+	body := fmt.Sprintf("Hello %s,\n\nClick on the link bellow to reset your password\nhttp://ggyo.io/resetPassword?token=%s\n\n\tGG Yo bot\n",
+		user.Name, user.Token)
+
+	SendEmail(to, subj, body)
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func register(w http.ResponseWriter, r *http.Request) {

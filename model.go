@@ -35,8 +35,9 @@ type Game struct {
 type User struct {
 	Model
 	Name     string `sql:"index"`
-	Email    string `sql:"index"`
-	Password string
+	Email    string
+	Token    string `sql:"index"`
+	Password string `sql:"index"`
 }
 
 // Rating for ELO
