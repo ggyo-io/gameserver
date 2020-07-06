@@ -11,6 +11,7 @@ import {RandomPage} from "../random/randomPage";
 import {Login} from "../auth/login";
 import {Signup} from "../auth/signup";
 import {ResetPassword} from "../auth/resetPassword";
+import {NewPassword} from '../auth/newPassword';
 
 
 const Routing = () => {
@@ -28,6 +29,7 @@ const Routing = () => {
                         <Route path="/login" component={Login}/>
                         <Route path="/signup" component={Signup}/>
                         <Route path="/reset" component={ResetPassword}/>
+                        <Route path="/newpass" component={NewPassword}/>
                     </Switch>
                 </Layout>
             </>

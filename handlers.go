@@ -17,6 +17,7 @@ type credentials struct {
 	Username string
 	Password string
 	Email    string
+	Token    string
 }
 
 func passwordReset(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +48,38 @@ func passwordReset(w http.ResponseWriter, r *http.Request) {
 		user.Name, user.Token)
 
 	SendEmail(to, subj, body)
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func newPassword(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var c credentials
+	err := decoder.Decode(&c)
+	if err != nil {
+		http.Error(w, "invalid input", http.StatusForbidden)
+		return
+	}
+
+	pass, token := c.Password, c.Token
+
+	if pass == "" || token == "" {
+		http.Error(w, "invalid input", http.StatusForbidden)
+		return
+	}
+
+	user := findUserByToken(token)
+	if user == nil {
+		http.Error(w, "unknown token", http.StatusForbidden)
+		return
+	}
+
+	user.Token = ""
+	user.Password = shastr(pass)
+
+	if err := db.Save(user).Error; err != nil {
+		panic(err)
+	}
 
 	w.WriteHeader(http.StatusOK)
 }

@@ -3,13 +3,22 @@ import {Input} from "../../components/form/input";
 import {AuthForm} from "../../components/auth/authform";
 import {useForm} from "react-hook-form";
 
-export const ResetPassword = () => {
+export const NewPassword = (props) => {
     const [srvErr, setSrvErr] = useState(null)
     const {handleSubmit, register, errors} = useForm();
     const onSubmit = values => {
+        
+        console.log(props)
+        const tokenKey='?token='
+        console.log("search: " + props.location.search)
+        if (props.location.search.startsWith(tokenKey)) {   
+            values.token = props.location.search.substring(tokenKey.length).replace(/\r$/, "")
+            console.log("mached token: " + values.token)
+        } else console.log("no match: " + tokenKey)
         console.log(JSON.stringify(values))
+        
         const message = JSON.stringify(values)
-        fetch("/api/passwordReset", {method: "POST", body: message})
+        fetch("/api/newPassword", {method: "POST", body: message})
             .then(response => {
                 response.text().then(data => {
                     setSrvErr(data)
@@ -19,13 +28,13 @@ export const ResetPassword = () => {
 
     return (
         <AuthForm
-            name="Password reset"
+            name="New password"
             onSubmit={handleSubmit(onSubmit)}
             links={[{to: "/login", name: "Sign in"}, {to: "/signup", name: "Create account"}]}
             srvErr={srvErr}
         >
-            <Input name="username" label="Username"
-                   errors={errors} register={register} required setSrvErr={setSrvErr}/>
+            <Input name="password" type="password" label="Password" setSrvErr={setSrvErr}
+                   errors={errors} register={register} required/>
         </AuthForm>
     )
 }
