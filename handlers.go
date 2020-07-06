@@ -44,7 +44,7 @@ func passwordReset(w http.ResponseWriter, r *http.Request) {
 
 	to := mail.Address{user.Name, user.Email}
 	subj := "GG Yo password reset"
-	body := fmt.Sprintf("Hello %s,\n\nClick on the link bellow to reset your password\nhttp://ggyo.io/resetPassword?token=%s\n\n\tGG Yo bot\n",
+	body := fmt.Sprintf("Hello %s,\n\nClick on the link bellow to reset your password\nhttp://ggyo.io/newpass?token=%s\n\n\tGG Yo bot\n",
 		user.Name, user.Token)
 
 	SendEmail(to, subj, body)
