@@ -40,6 +40,13 @@ type User struct {
 	Password string `sql:"index"`
 }
 
+type UserSettings struct {
+	Model
+	UserID string `sql:"index:idx_uid_mode"`
+	Key    string
+	Value  string
+}
+
 // Rating for ELO
 type Rating struct {
 	Model

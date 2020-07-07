@@ -22,6 +22,8 @@ func newRouter(hub *Hub) *mux.Router {
 	router.HandleFunc("/api/logout", logout)
 	router.Methods("GET").Path("/api/history").HandlerFunc(history)
 	router.Methods("GET").Path("/api/auth").HandlerFunc(checkauth)
+	router.Methods("GET").Path("/api/settings").HandlerFunc(getSettings)
+	router.Methods("POST").Path("/api/settings").HandlerFunc(setSettings)
 
 	/* Static content */
 	spa := spaHandler{staticPath: "dist", indexPath: "index.html"}

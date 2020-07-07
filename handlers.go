@@ -20,6 +20,25 @@ type credentials struct {
 	Token    string
 }
 
+func withUserValidation(w http.ResponseWriter, r *http.Request, loadData func(user string, r *http.Request) interface{}) {
+	user, _ := getUserName(r, true)
+	if user == "" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+
+	data := loadData(user, r)
+	if data != nil {
+		if msgb, err := json.Marshal(data); err == nil {
+			w.Write(msgb)
+		} else {
+			log.Printf("ERROR marshaling object %v, err: %v", data, err)
+		}
+	}
+}
+
 func passwordReset(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var c credentials
@@ -183,21 +202,11 @@ func clearSession(w http.ResponseWriter, r *http.Request) {
 }
 
 func history(w http.ResponseWriter, r *http.Request) {
-	user, _ := getUserName(r, true)
-	if user == "" {
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-
-	idxData := &indexData{}
-	loadLoginData(user, idxData)
-	if msgb, err := json.Marshal(idxData); err == nil {
-		w.Write(msgb)
-	} else {
-		log.Print("ERROR marshaling game history json", err)
-	}
+	withUserValidation(w, r, func(user string, r *http.Request) interface{} {
+		idxData := &indexData{}
+		loadLoginData(user, idxData)
+		return idxData
+	})
 }
 
 func checkauth(w http.ResponseWriter, r *http.Request) {
@@ -250,4 +259,19 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// otherwise, use http.FileServer to serve the static dir
 	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
+}
+
+func getSettings(w http.ResponseWriter, r *http.Request) {
+	withUserValidation(w, r, func(user string, r *http.Request) interface{} {
+		return loadSettings(user)
+	})
+}
+
+func setSettings(w http.ResponseWriter, r *http.Request) {
+	withUserValidation(w, r, func(user string, r *http.Request) interface{} {
+		m := make(map[string]string)
+		json.NewDecoder(r.Body).Decode(&m)
+		saveSettings(user, m)
+		return nil
+	})
 }

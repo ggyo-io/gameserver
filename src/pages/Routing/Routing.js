@@ -12,6 +12,7 @@ import {Login} from "../auth/login";
 import {Signup} from "../auth/signup";
 import {ResetPassword} from "../auth/resetPassword";
 import {NewPassword} from '../auth/newPassword';
+import {Settings} from "../settings/settings";
 
 
 const Routing = () => {
@@ -30,6 +31,7 @@ const Routing = () => {
                         <Route path="/signup" component={Signup}/>
                         <Route path="/reset" component={ResetPassword}/>
                         <Route path="/newpass" component={NewPassword}/>
+                        <Route path="/settings" component={Settings}/>
                     </Switch>
                 </Layout>
             </>
