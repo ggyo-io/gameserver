@@ -5,6 +5,7 @@ import {useForm} from "react-hook-form";
 
 export const NewPassword = (props) => {
     const [srvErr, setSrvErr] = useState(null)
+    const [srvInfo, setSrvInfo] = useState(null)
     const {handleSubmit, register, errors} = useForm();
     const onSubmit = values => {
         console.log(props)
@@ -18,6 +19,11 @@ export const NewPassword = (props) => {
         const message = JSON.stringify(values)
         fetch("/api/newPassword", {method: "POST", body: message})
             .then(response => {
+                setSrvInfo(null)
+                setSrvErr(null)
+                if (response.ok) {
+                    setSrvInfo("The password was reset successfully. Please try to sign in.")
+                }
                 response.text().then(data => {
                     setSrvErr(data)
                 })
@@ -29,7 +35,7 @@ export const NewPassword = (props) => {
             name="New password"
             onSubmit={handleSubmit(onSubmit)}
             links={[{to: "/login", name: "Sign in"}, {to: "/signup", name: "Create account"}]}
-            srvErr={srvErr}
+            srvErr={srvErr} srvInfo={srvInfo}
         >
             <Input name="password" type="password" label="Password" setSrvErr={setSrvErr}
                    errors={errors} register={register} required/>

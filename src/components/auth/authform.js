@@ -7,7 +7,7 @@ const renderLinks = (links) => {
     return links.map(link => <LinkContainer key={link.to} to={link.to}><a>{link.name}</a></LinkContainer>)
 }
 
-export const AuthForm = ({name, onSubmit, children, links, srvErr}) => {
+export const AuthForm = ({name, onSubmit, children, links, srvErr, srvInfo}) => {
     return <div className="container mt-5" style={{maxWidth: '33rem', minWidth: '20rem'}}>
         <div className="row justify-content-center">
             <div className="col-10">
@@ -37,6 +37,13 @@ export const AuthForm = ({name, onSubmit, children, links, srvErr}) => {
                 <Alert style={{width: '100%'}} variant="danger">
                     <strong>Server error: </strong>
                     {srvErr}
+                </Alert>
+            </div>
+        </div>}
+        {srvInfo && <div className="row justify-content-center">
+            <div className="col-10">
+                <Alert style={{width: '100%'}} variant="info">
+                    <strong>{srvInfo}</strong>
                 </Alert>
             </div>
         </div>}
