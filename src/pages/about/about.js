@@ -1,9 +1,13 @@
 import React from "react";
 
 const About = () => {
-    return <><h2><strong>Gg</strong></h2>
+    return <><h1><strong>GG</strong>&nbsp;Yo!</h1>
            <p>
-               "Gg" stands for "Good game". In multiplayer competitive games, Gg is used as a mark of sportsmanship and an acknowledgment that you had fun while battling against your opponents. For many players, it's standard practice to type Gg into the chat at the end of every match.
+               <strong>ggyo.io</strong> is an online chess site. You could play anonymously. However certain features, like game history, are available for registered users only.
+           </p>
+           <h2><strong>GG</strong></h2>
+           <p>
+               <strong>"GG"</strong> stands for "Good Game". In multiplayer competitive games, GG is used as a mark of sportsmanship and an acknowledgment that you had fun while battling against your opponents. For many players, it's standard practice to type GG into the chat at the end of every match.
            </p>
            <h2><strong>lc0</strong></h2>
            <p>
@@ -11,7 +15,7 @@ const About = () => {
            </p>
            <h2><strong>Stockfish</strong></h2>
            <p>
-               Stockfish is a strong <a href="https://stockfishchess.org/">open source</a> chess engine.
+               <strong>Stockfish</strong> is a strong <a href="https://stockfishchess.org/">open source</a> chess engine.
            </p>
            </>
 }

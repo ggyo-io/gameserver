@@ -33,7 +33,7 @@ export const NavigationBar = () => {
 
 
     return <Navbar expand="lg" variant="dark">
-        <Navbar.Brand><Link className="text-decoration-none" to="/"><strong>GgYo</strong></Link>&nbsp;&nbsp;<Badge pill variant={serverConnection.bg}>{serverConnection.text}</Badge></Navbar.Brand>
+        <Navbar.Brand><Link className="text-decoration-none" to="/"><strong>GG</strong>&nbsp;Yo!</Link>&nbsp;&nbsp;<Badge pill variant={serverConnection.bg}>{serverConnection.text}</Badge></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ml-auto">
