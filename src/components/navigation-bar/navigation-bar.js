@@ -33,12 +33,12 @@ export const NavigationBar = () => {
 
 
     return <Navbar expand="lg" variant="dark">
-        <Navbar.Brand><Link className="text-decoration-none" to="/"><strong>Gg</strong>ameserver</Link>&nbsp;&nbsp;<Badge pill variant={serverConnection.bg}>{serverConnection.text}</Badge></Navbar.Brand>
+        <Navbar.Brand><Link className="text-decoration-none" to="/"><strong>GG Yo!</strong></Link>&nbsp;&nbsp;<Badge pill variant={serverConnection.bg}>{serverConnection.text}</Badge></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ml-auto">
                 {/*<LinkContainer to="/analysisboard"><NavLink>Analize</NavLink></LinkContainer>*/}
-                {/*<LinkContainer to="/about"><NavLink>About</NavLink></LinkContainer>*/}
+                {<LinkContainer to="/about"><NavLink>About</NavLink></LinkContainer>}
                 {user === '' ? signedOut : signedIn}
             </Nav>
         </Navbar.Collapse>
