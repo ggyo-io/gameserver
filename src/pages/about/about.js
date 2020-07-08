@@ -1,9 +1,9 @@
 import React from "react";
 
 const About = () => {
-    return <><h2><strong>GG</strong></h2>
+    return <><h2><strong>Gg</strong></h2>
            <p>
-               "GG" stands for "good game". In multiplayer competitive games, GG is used as a mark of sportsmanship and an acknowledgment that you had fun while battling against your opponents. For many players, it's standard practice to type GG into the chat at the end of every match.
+               "Gg" stands for "Good game". In multiplayer competitive games, Gg is used as a mark of sportsmanship and an acknowledgment that you had fun while battling against your opponents. For many players, it's standard practice to type Gg into the chat at the end of every match.
            </p>
            <h2><strong>lc0</strong></h2>
            <p>
