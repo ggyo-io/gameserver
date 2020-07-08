@@ -31,15 +31,28 @@ export const Settings = () => {
     };
 
     return (
-        <Container>
+        //<Container>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Row><label>First Name</label></Row>
-                <Row><input name="firstname" type="text" ref={register}/></Row>
-                <Row className="mt-3"><label>Last Name</label></Row>
-                <Row><input name="lastname" type="text" ref={register}/></Row>
-                <Row className="mt-3"><Button type="submit">Save</Button></Row>
+                <fieldset>
+                    <div className="form-group">
+                        <label htmlFor="firstname" className="col-sm-2 col-form-label">First Name</label>
+                        <div className="col-sm-8">
+                            <input type="text" readOnly="" className="form-control" name="firstname"
+                                   ref={register}/>
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="lastname" className="col-sm-2 col-form-label">Last Name</label>
+                        <div className="col-sm-8">
+                            <input type="text" readOnly="" className="form-control" name="lastname"
+                                   ref={register}/>
+                        </div>
+                    </div>
+                    <Button className="ml-3 mt-3" type="submit">Save</Button>
+                </fieldset>
             </form>
-        </Container>
+        //</Container>
     )
 
 }
