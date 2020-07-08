@@ -1,9 +1,9 @@
 import React from "react";
 
 const About = () => {
-    return <><h1><strong>GG</strong>&nbsp;Yo!</h1>
+    return <><h1>Gg Yo!</h1>
            <p>
-               <strong>ggyo.io</strong> is an online chess site. You could play anonymously. However certain features, like game history, are available for registered users only.
+               <strong>ggyo.io</strong> is an online chess platform. You can play anonymously. However certain features, like game history, rating, and more, are available for registered users only.
            </p>
            <h2><strong>GG</strong></h2>
            <p>
