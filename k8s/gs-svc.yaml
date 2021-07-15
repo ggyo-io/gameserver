@@ -2,9 +2,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gs
+  labels:
+    app: ggyo
+    component: gs
 spec:
   ports:
   - port: 8383
   selector:
-    app: gs
+    app: ggyo
+    component: gs
   type: LoadBalancer
+

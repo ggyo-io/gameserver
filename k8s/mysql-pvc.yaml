@@ -1,7 +1,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pv-claim
+  name: ggyo-db
+  labels:
+    app: ggyo
+    component: db
 spec:
   accessModes:
     - ReadWriteOnce

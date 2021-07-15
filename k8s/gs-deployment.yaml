@@ -1,24 +1,31 @@
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gs
+  labels:
+    app: ggyo
+    component: gs
 spec:
   selector:
     matchLabels:
-      app: gs
+      app: ggyo
+      component: gs
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: gs
+        app: ggyo
+        component: gs
     spec:
       containers:
       - name: gs
-        image: gcr.io/ggyo-281409/ggyo
+        image: gcr.io/ggyo-281409/ggyo:latest
+        imagePullPolicy: IfNotPresent
         env:
         - name: DB_PASS
           value: password
+          env:
         - name: MAIL_NAME
           valueFrom:
             secretKeyRef:
@@ -36,4 +43,3 @@ spec:
               key: password
         ports:
         - containerPort: 8383
-          

@@ -6,23 +6,29 @@ spec:
   ports:
   - port: 3306
   selector:
-    app: mysql
+    app: ggyo
+    component: db
+    type: mysql
   type: ClusterIP
 ---
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
 spec:
   selector:
     matchLabels:
-      app: mysql
+      app: ggyo
+      component: db
+      type: mysql
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: mysql
+        app: ggyo
+        component: db
+        type: mysql
     spec:
       containers:
       - image: mariadb
@@ -40,4 +46,4 @@ spec:
       volumes:
       - name: mysql-persistent-storage
         persistentVolumeClaim:
-          claimName: mysql-pv-claim
+          claimName: ggyo-db
