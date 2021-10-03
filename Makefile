@@ -59,7 +59,7 @@ push: image
 cluster-info:
 	@kubectl get nodes -o wide
 
-deploy: cluster-info
+deploy:
 	@kubectl apply -f k8s/mail-secret.yaml
 	@kubectl apply -f k8s/mysql-pvc.yaml
 	@kubectl apply -f k8s/mysql-deployment.yaml
@@ -75,6 +75,7 @@ uninstall: cluster-info
 	@-kubectl delete -f k8s/mysql-deployment.yaml
 	@-kubectl delete -f k8s/mysql-pvc.yaml
 
-redeploy: cluster-info
-	@kubectl delete -f k8s/gs-deployment.yaml
-	@kubectl apply -f k8s/gs-deployment.yaml
+delete-deploy:
+	@-kubectl delete -f k8s/gs-deployment.yaml
+
+redeploy: delete-deploy deploy

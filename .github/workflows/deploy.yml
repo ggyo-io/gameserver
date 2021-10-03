@@ -1,0 +1,38 @@
+name: Deploy
+
+on: [push, pull_request]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: configure gcloud
+        env:
+           GCP_EMAIL: ${{ secrets.GCP_EMAIL }}
+           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+           GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+           GCP_CLUSTER: ${{ secrets.GCP_CLUSTER }}
+           GCP_ZONE: ${{ secrets.GCP_ZONE }}
+        run: |
+          gcf=$(mktemp)
+          echo "$GCP_CREDENTIALS" > $gcf
+          gcloud auth activate-service-account $GCP_EMAIL --key-file=$gcf --project=$GCP_PROJECT
+          gcloud info
+          gcloud auth configure-docker
+          gcloud container clusters get-credentials $GCP_CLUSTER -z $GCP_ZONE
+
+      - name: publish image
+        env:
+           GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+        run: |
+          make push
+
+      - name: deploy
+        env:
+           MAIL_SECRET: ${{ secrets.MAIL_SECRET }}
+        run: |
+          echo "$MAIL_SECRET" > ./k8s/mail-secret.yaml
+          make redeploy

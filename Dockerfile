@@ -14,6 +14,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -yq install \
     gcc-8 g++-8 clang-6.0 ninja-build pkg-config \
     python3 python3-pip \
+    libeigen3-dev \
     git
 RUN pip3 install meson --user
 RUN git clone https://github.com/LeelaChessZero/lc0.git
