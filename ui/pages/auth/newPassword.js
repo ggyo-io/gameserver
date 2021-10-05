@@ -6,7 +6,7 @@ import {useForm} from "react-hook-form";
 export const NewPassword = (props) => {
     const [srvErr, setSrvErr] = useState(null)
     const [srvInfo, setSrvInfo] = useState(null)
-    const {handleSubmit, register, errors} = useForm();
+    const {handleSubmit, register} = useForm();
     const onSubmit = values => {
         console.log(props)
         const tokenKey='?token='
@@ -38,7 +38,7 @@ export const NewPassword = (props) => {
             srvErr={srvErr} srvInfo={srvInfo}
         >
             <Input name="password" type="password" label="Password" setSrvErr={setSrvErr}
-                   errors={errors} register={register} required/>
+                   register={register} required/>
         </AuthForm>
     )
 }

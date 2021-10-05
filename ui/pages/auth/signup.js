@@ -5,7 +5,7 @@ import {AuthForm} from "../../components/auth/authform";
 
 export const Signup = () => {
     const [srvErr, setSrvErr] = useState(null)
-    const {handleSubmit, register, errors} = useForm();
+    const {handleSubmit, register} = useForm();
     const onSubmit = values => {
         const message = JSON.stringify(values);
         fetch("/api/register", {method: "POST", body: message})
@@ -27,12 +27,12 @@ export const Signup = () => {
             srvErr={srvErr}
         >
             <Input name="username" label="Username"
-                   errors={errors} register={register} required setSrvErr={setSrvErr}/>
+                   register={register} required setSrvErr={setSrvErr}/>
             <Input name="password" type="password" label="Password" setSrvErr={setSrvErr}
-                   errors={errors} register={register} required/>
+                   register={register} required/>
             <Input name="email" type="email" label="Email"
                    small="We'll only use it to reset password."
-                   errors={errors} register={register} required setSrvErr={setSrvErr}/>
+                   register={register} required setSrvErr={setSrvErr}/>
         </AuthForm>
     )
 }

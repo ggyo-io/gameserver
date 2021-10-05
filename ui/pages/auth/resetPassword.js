@@ -6,7 +6,7 @@ import {useForm} from "react-hook-form";
 export const ResetPassword = () => {
     const [srvErr, setSrvErr] = useState(null)
     const [srvInfo, setSrvInfo] = useState(null)
-    const {handleSubmit, register, errors} = useForm();
+    const {handleSubmit, register} = useForm();
     const onSubmit = values => {
         console.log(JSON.stringify(values))
         const message = JSON.stringify(values)
@@ -31,7 +31,7 @@ export const ResetPassword = () => {
             srvErr={srvErr} srvInfo={srvInfo}
         >
             <Input name="username" label="Username"
-                   errors={errors} register={register} required setSrvErr={setSrvErr}/>
+                   register={register} required setSrvErr={setSrvErr}/>
         </AuthForm>
     )
 }
