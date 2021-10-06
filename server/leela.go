@@ -105,8 +105,9 @@ func updateNetwork() (bool, string) {
 func launchLc0(p *uciEngine, l uciLauncher, sha string) {
 	path := filepath.Join(networksDir, sha)
 	weights := fmt.Sprintf("--weights=%s", path)
-	args := make([]string, 1)
+	args := make([]string, 2)
 	args[0] = weights
+	args[1] = "--preload"
 	p.launch(l.name(), args, "50", l.moveRequest())
 }
 
