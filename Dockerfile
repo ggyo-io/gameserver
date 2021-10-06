@@ -18,6 +18,7 @@ RUN apt-get update && \
 RUN pip3 install meson --user
 RUN git clone https://github.com/LeelaChessZero/lc0.git
 WORKDIR lc0
+RUN git checkout v0.28.0
 RUN CC=clang-6.0 CXX=clang++-6.0 INSTALL_PREFIX=~/.local ./build.sh
 
 
