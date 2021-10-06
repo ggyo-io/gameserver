@@ -52,7 +52,12 @@ image:
 	@rm -rf $(docker-context)
 	@echo ✅ BuildDate $(BuildDate) Image $(GKE_IMAGE) Tag $(TAG) Commit $(Commit)
 
-push: image
+
+ucitest:
+	docker run  $(GKE_IMAGE):$(TAG) ./lc0
+	docker run  $(GKE_IMAGE):$(TAG) ./stockfish uci
+
+push: image ucitest
 	@docker push $(GKE_IMAGE):$(TAG)
 	@docker push $(GKE_IMAGE):latest
 
