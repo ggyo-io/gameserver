@@ -35,4 +35,5 @@ jobs:
            MAIL_SECRET: ${{ secrets.MAIL_SECRET }}
         run: |
           echo "$MAIL_SECRET" > ./k8s/mail-secret.yaml
+          sed -i -e 's/imagePullPolicy:.*$/imagePullPolicy: Always/' k8s/gs-deployment.yaml
           make redeploy
