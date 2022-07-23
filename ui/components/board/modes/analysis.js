@@ -2,7 +2,7 @@ import React from "react";
 import Chess from "../../ggboard/chess.js/chess"
 import {useStoreState} from "easy-peasy";
 import { useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {calcPosition, checkSquareStyling, lastMoveSquareStyling} from "./helpers";
 import GGBoard from "../../ggboard";
 
@@ -18,10 +18,10 @@ export const Analysis = (props) => {
     checkSquareStyling(squareStyles, game);
     lastMoveSquareStyling(squareStyles, history, browseIndex)
 
-    const routerHistory = useHistory()
+    const navigate = useNavigate()
     useEffect(() => {
         if (!history || history.length === 0)
-            routerHistory.push('/')
+            navigate('/')
     })
 
     return (

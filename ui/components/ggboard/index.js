@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import './chessboardjs/chessboard-1.0.0.scss'
 import { Chessboard } from './chessboardjs/chessboard-1.0.0'
 import { Promote } from "../board/components/promote";
@@ -80,11 +80,11 @@ const GGBoard = (props) => {
     // modals
     const {promote, match} = useStoreState(state => state.game)
     const {update} = useStoreActions(actions => actions.game)
-    const routerHistory = useHistory()
+    const navigate = useNavigate()
     const closeMatch = () => {
         update({match: false})
         wsSend({Cmd: "cancel"})
-        routerHistory.push('/')
+        navigate('/')
     }
 
     // Render

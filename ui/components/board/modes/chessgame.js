@@ -5,7 +5,7 @@ import {useRegisterCmd, wsSend} from '../../ws/ws'
 import {Gameboard} from "../components/gameboard";
 import {colorResult, outcomeMethod} from "../../../utils/outcome";
 import { useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const game = new Chess()
 
@@ -14,10 +14,10 @@ export const ChessGame = (props) => {
     // Actions
     const {onMove, update, setClocks} = useStoreActions(actions => actions.game)
     const {top, bottom, match} = useStoreState(state => state.game)
-    const routerHistory = useHistory()
+    const navigate = useNavigate()
     useEffect(() => {
         if (top.name === '' && bottom.name === '' && match === false)
-            routerHistory.push('/')
+            navigate('/')
     })
 
     //// dispatch message by type

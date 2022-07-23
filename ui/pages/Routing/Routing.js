@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter as Router, Route, Switch, Redirect} from 'react-router-dom';
+import {Route, Routes} from 'react-router-dom';
 import {Home} from '../home/home';
 import {Layout} from '../../components/layout/layout';
 import {NavigationBar} from '../../components/navigation-bar/navigation-bar';
@@ -20,19 +20,19 @@ const Routing = () => {
             <>
                 <NavigationBar/>
                 <Layout>
-                    <Switch>
-                        <Route exact path="/" component={Home}/>
-                        <Route path="/playboard" component={GamePage}/>
-                        <Route path="/random" component={RandomPage}/>
-                        <Route path="/analysisboard" component={AnalysisPage}/>
-                        <Route path="/contact" component={Contact}/>
-                        <Route path="/about" component={About}/>
-                        <Route path="/login" component={Login}/>
-                        <Route path="/signup" component={Signup}/>
-                        <Route path="/reset" component={ResetPassword}/>
-                        <Route path="/newpass" component={NewPassword}/>
-                        <Route path="/settings" component={Settings}/>
-                    </Switch>
+                    <Routes>
+                        <Route exact path="/" element={<Home/>}/>
+                        <Route path="/playboard" element={<GamePage/>}/>
+                        <Route path="/random" element={<RandomPage/>}/>
+                        <Route path="/analysisboard" element={<AnalysisPage/>}/>
+                        <Route path="/contact" element={<Contact/>}/>
+                        <Route path="/about" element={<About/>}/>
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path="/signup" element={<Signup/>}/>
+                        <Route path="/reset" element={<ResetPassword/>}/>
+                        <Route path="/newpass" element={<NewPassword/>}/>
+                        <Route path="/settings" element={<Settings/>}/>
+                    </Routes>
                 </Layout>
             </>
     )

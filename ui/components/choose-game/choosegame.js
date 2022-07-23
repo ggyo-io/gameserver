@@ -5,16 +5,16 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {playClick} from "../../utils/playClick";
 
 
 export const ChooseGame = () => {
-    const routerHistory = useHistory()
+    const navigate = useNavigate()
     const {colorPreference, opponent, timeControl} = useStoreState(state => state.game)
     const {update, newGame} = useStoreActions(actions => actions.game)
 
-    const doClickPlay = () => playClick(routerHistory, update, newGame, opponent, colorPreference, timeControl)
+    const doClickPlay = () => playClick(navigate, update, newGame, opponent, colorPreference, timeControl)
     const doColorChange = (v) => update({colorPreference: v})
     const doOpponentChange = (v) => update({opponent: v})
     const doTimeControlChange = (v) => {

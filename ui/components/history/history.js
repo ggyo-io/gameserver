@@ -1,19 +1,19 @@
 import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
 import {serverFetchHistory} from "./loader"
-import {useHistory} from "react-router-dom"
+import {useNavigate} from "react-router-dom"
 import {useStoreActions} from "easy-peasy";
 
 const draw = <span>&frac12;-&frac12;</span>
 
 const renderRows = (games) => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const {setAnalysis} = useStoreActions(actions => actions.game)
 
     return games.map((game, index) => {
         const onClick = () => {
             setAnalysis(game)
-            history.push('/analysisboard')
+            navigate('/analysisboard')
         };
 
         return (

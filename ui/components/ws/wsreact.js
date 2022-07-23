@@ -2,11 +2,11 @@ import React, {useEffect} from "react";
 import {useStoreActions} from "easy-peasy";
 import {useRegisterCmd, wsConn} from "./ws";
 import {chess} from "../../utils/chessref";
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 export const WsReact = () => {
     const {update, addChatMessage, setDialogLabel, newGame} = useStoreActions(actions => actions.game)
-    const routerHistory = useHistory()
+    const navigate = useNavigate()
 
     const start = (msg) => {
         if (msg.Params) {
@@ -15,7 +15,7 @@ export const WsReact = () => {
         }
         newGame(msg)
         update({match: false})
-        routerHistory.push('/playboard')
+        navigate('/playboard')
     }
 
 

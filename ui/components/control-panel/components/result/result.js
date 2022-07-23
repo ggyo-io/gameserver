@@ -3,14 +3,14 @@ import {Card, Table} from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import {useStoreState, useStoreActions} from "easy-peasy";
 import {playClick} from '../../../../utils/playClick'
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 
 export const Result = () => {
-    const routerHistory = useHistory()
+    const navigate = useNavigate()
     const { update, newGame } = useStoreActions(actions => actions.game)
     const { result, opponent, colorPreference, timeControl, mode } = useStoreState(state => state.game)
-    const doClickPlay = () => playClick(routerHistory, update, newGame, opponent, colorPreference, timeControl)
+    const doClickPlay = () => playClick(navigate, update, newGame, opponent, colorPreference, timeControl)
 
     return (
         <Card>
