@@ -12,15 +12,13 @@ RUN make ui
 FROM ubuntu as leela-env
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -yq install \
-    gcc-8 g++-8 clang-6.0 ninja-build pkg-config \
+    gcc g++ clang ninja-build pkg-config \
     python3 python3-pip \
     git
 RUN pip3 install meson --user
 RUN git clone https://github.com/LeelaChessZero/lc0.git
 WORKDIR lc0
-RUN git checkout v0.28.0
-RUN CC=clang-6.0 CXX=clang++-6.0 INSTALL_PREFIX=~/.local ./build.sh
-
+RUN CC=clang CXX=clang++ INSTALL_PREFIX=~/.local ./build.sh
 
 #
 # Stockfish 
