@@ -25,7 +25,7 @@ npm-deps:
 	cd ui && npm install --save-dev "@babel/plugin-proposal-class-properties" "@babel/plugin-transform-runtime" "@babel/runtime" "autoprefixer" "babel-loader" "clean-webpack-plugin" "copy-webpack-plugin" "css-loader" "favicons-webpack-plugin" "file-loader" "html-loader" "html-webpack-plugin" "mini-css-extract-plugin" "node-sass" "css-minimizer-webpack-plugin" "path" "postcss-loader" "react-hook-form" "react-svg-loader" "sass-loader" "style-loader" "svg-inline-loader" "svg-url-loader" "terser-webpack-plugin" "url-loader" "webpack" "webpack-cli" "webpack-dev-server" "webpack-manifest-plugin"
 
 ui:
-	cd ui && npm install && npm run build
+	cd ui && npm install && npm run dev
 .PHONY: ui
 
 ui-clean:
@@ -45,7 +45,7 @@ image:
 	@rm -rf $(docker-context)
 	@mkdir -p $(docker-context)
 	@git clone . $(docker-context)
-	@docker build --build-arg tag=$(TAG) -t $(IMAGE):$(TAG) $(docker-context)
+	@docker build --build-arg tag=$(TAG) -t $(IMAGE):$(TAG) --progress plain $(docker-context)
 	@docker tag $(IMAGE):$(TAG) $(IMAGE):latest
 	@docker tag $(IMAGE):latest $(GKE_IMAGE):$(TAG)
 	@docker tag $(GKE_IMAGE):$(TAG) $(GKE_IMAGE):latest
