@@ -65,7 +65,7 @@ export const ChooseGame = () => {
         <p/><br/>
         <Row className="justify-content-md-center">
             <Col sm={9}>
-                <Button size="lg" block onClick={doClickPlay}>PLAY</Button>
+                <Button size="lg" block="true" onClick={doClickPlay}>PLAY</Button>
             </Col>
         </Row>
     </Container>
