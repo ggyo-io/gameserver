@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "webpack": "webpack",
-        "start": "webpack-dev-server --port=9100 --open --watch --mode development",
+        "start": "webpack-dev-server --port=9100 --open --mode development",
         "dev": "npm run webpack -- --mode development",
         "build": "npm run webpack -- --mode production"
     },
