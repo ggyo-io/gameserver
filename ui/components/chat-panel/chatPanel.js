@@ -25,7 +25,7 @@ export const ChatPanel = () => {
         msgs.map(msg => <div key={msg.message}>{msg.oponent ? <><strong>{oponentName}:</strong>  {msg.message}</> : msg.message}</div>)
     )
 
-
+/*
     return (
         <Card style={{minWidth: '10rem'}}>
             <Card.Header>Chat with {oponentName}</Card.Header>
@@ -47,4 +47,8 @@ export const ChatPanel = () => {
             </InputGroup>
         </Card>
     )
+    */
+   return (
+       <div>Chat with </div>
+   )
 }
