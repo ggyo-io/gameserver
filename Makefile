@@ -18,7 +18,7 @@ endif
 #
 all: ui server
 
-clean: ui-clean server-clean
+clean: ui-clean server-clean docker-clean
 
 npm-deps:
 	cd ui && npm install --save "@babel/core" "@babel/polyfill" "@babel/preset-env" "@babel/preset-react" "bootstrap" "bootswatch" "easy-peasy" "ghooks" "jquery" "lodash" "lodash.isequal" "popper.js" "react" "react-bootstrap" "react-dom" "react-resize-detector" "react-router-bootstrap" "react-router-dom" "react-websocket"
@@ -30,6 +30,9 @@ ui:
 
 ui-clean:
 	rm -rf ui/dist ui/node_modules
+
+docker-clean:
+	rm -rf docker.context.*
 
 server:
 	cd server && go build .
