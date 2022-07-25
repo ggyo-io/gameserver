@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Button, InputGroup, Card, FormControl} from "react-bootstrap";
+import {Button, InputGroup, Card, Form} from "react-bootstrap";
 import "./chat.scss"
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {wsSend} from "../ws/ws";
@@ -25,7 +25,6 @@ export const ChatPanel = () => {
         msgs.map(msg => <div key={msg.message}>{msg.oponent ? <><strong>{oponentName}:</strong>  {msg.message}</> : msg.message}</div>)
     )
 
-/*
     return (
         <Card style={{minWidth: '10rem'}}>
             <Card.Header>Chat with {oponentName}</Card.Header>
@@ -33,7 +32,7 @@ export const ChatPanel = () => {
                 {renderMessages(chatMessages)}
             </Card.Body>
             <InputGroup>
-                <FormControl
+                <Form.Control
                     placeholder="message"
                     aria-label="message"
                     aria-describedby="basic-addon"
@@ -41,14 +40,8 @@ export const ChatPanel = () => {
                     onKeyPress={handleKeyPress}
                     value={message}
                 />
-                <InputGroup.Append>
-                    <Button variant="secondary" onClick={onSubmit}>Send</Button>
-                </InputGroup.Append>
+                <Button id="buttonn-send" variant="secondary" onClick={onSubmit}>Send</Button>
             </InputGroup>
         </Card>
     )
-    */
-   return (
-       <div>Chat with </div>
-   )
 }
