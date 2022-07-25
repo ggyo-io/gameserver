@@ -24,7 +24,7 @@ export const Result = () => {
                     </tr>
                     </tbody>
                 </Table>
-                {(mode !== "analysis") && <Button size="lg" block onClick={doClickPlay}>PLAY AGAIN</Button>}
+                {(mode !== "analysis") && <Button size="lg" block="true" onClick={doClickPlay}>PLAY AGAIN</Button>}
             </Card.Body>
         </Card>
     )
