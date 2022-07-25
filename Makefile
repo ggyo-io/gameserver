@@ -7,12 +7,6 @@ BuildDate = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 Commit = $(shell git rev-parse --short HEAD)
 TAG=$(shell git log -1 --pretty=format:"%H")
 docker-context=docker.context.$$PPID
-MACHINE=$(shell uname -m)
-ifeq ($(MACHINE),aarch64)
-  STOCKFISH_ARCH=armv8
-else
-  STOCKFISH_ARCH=x86-64
-endif
 
 dbpass=
 ifdef DB_PASS
@@ -54,7 +48,7 @@ image:
 	@rm -rf $(docker-context)
 	@mkdir -p $(docker-context)
 	@git clone . $(docker-context)
-	@docker build --build-arg tag=$(TAG) --build-arg stockfish_arch=$(STOCKFISH_ARCH) -t $(IMAGE):$(TAG) --progress plain $(docker-context)
+	@docker build --build-arg tag=$(TAG) -t $(IMAGE):$(TAG) --progress plain $(docker-context)
 	@docker tag $(IMAGE):$(TAG) $(IMAGE):latest
 	@docker tag $(IMAGE):latest $(GKE_IMAGE):$(TAG)
 	@docker tag $(GKE_IMAGE):$(TAG) $(GKE_IMAGE):latest

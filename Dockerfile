@@ -1,7 +1,7 @@
 #
 # React GUI
 #
-FROM node as ui-env
+FROM docker.io/library/node as ui-env
 WORKDIR ui-build
 COPY ./ ./
 RUN make ui
@@ -9,7 +9,7 @@ RUN make ui
 #
 # lc0
 #
-FROM ubuntu as leela-env
+FROM docker.io/library/ubuntu as leela-env
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -yq install \
     gcc g++ clang ninja-build pkg-config \
@@ -23,16 +23,19 @@ RUN CC=clang CXX=clang++ INSTALL_PREFIX=~/.local ./build.sh
 #
 # Stockfish 
 #
-FROM golang AS stockfish-env
-ARG stockfish_arch
+FROM docker.io/library/golang AS stockfish-env
 RUN git clone https://github.com/official-stockfish/Stockfish.git
 WORKDIR Stockfish/src
-RUN make build ARCH=$stockfish_arch
+RUN if [ "$(uname -m)" = "aarch64" ]; \
+    then arch=armv8; \
+    else arch=x86-64; \
+    fi; \
+    make build ARCH=$arch
 
 #
 # Gameserver
 #
-FROM golang AS gameserver-env
+FROM docker.io/library/golang AS gameserver-env
 WORKDIR server-build
 COPY ./ ./
 RUN make server
@@ -40,7 +43,7 @@ RUN make server
 #
 # final stage - runtime image
 #
-FROM ubuntu AS run-env
+FROM docker.io/library/ubuntu AS run-env
 ARG LC0_NETWORK_URL=https://training.lczero.org/get_network?sha=47e3f899519dc1bc95496a457b77730fce7b0b89b6187af5c01ecbbd02e88398
 ARG tag
 

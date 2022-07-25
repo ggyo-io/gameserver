@@ -1,0 +1,16 @@
+name: docker
+
+on: [push, pull_request]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: verify docker/makefile image build
+        env:
+           GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+        run: |
+          make image
