@@ -4,3 +4,4 @@
 *.iml
 *.tgz
 gameserver
+node_modules/
