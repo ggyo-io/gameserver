@@ -24,9 +24,10 @@ RUN CC=clang CXX=clang++ INSTALL_PREFIX=~/.local ./build.sh
 # Stockfish 
 #
 FROM golang AS stockfish-env
+ARG stockfish_arch
 RUN git clone https://github.com/official-stockfish/Stockfish.git
 WORKDIR Stockfish/src
-RUN make build ARCH=x86-64
+RUN make build ARCH=$stockfish_arch
 
 #
 # Gameserver
