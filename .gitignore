@@ -5,3 +5,4 @@
 *.tgz
 gameserver
 node_modules/
+docker.context.*/
