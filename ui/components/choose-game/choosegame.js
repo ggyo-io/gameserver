@@ -33,33 +33,33 @@ export const ChooseGame = () => {
         <Row>
             <ToggleButtonGroup
                 size="lg" type="radio" name="timeControl"
-                defaultValue={(timeControl.seconds / 60).toString() + '+' +
+                value={(timeControl.seconds / 60).toString() + '+' +
                 timeControl.increment.toString()}
                 onChange={doTimeControlChange}
             >
-                <ToggleButton value={'5+0'} variant="outline-secondary">5+0</ToggleButton>
-                <ToggleButton value={'10+0'} variant="outline-secondary">10+0</ToggleButton>
-                <ToggleButton value={'10+5'} variant="outline-secondary">10+5</ToggleButton>
-                <ToggleButton value={'15+15'} variant="outline-secondary">15+15</ToggleButton>
+                <ToggleButton id="time-5-0" value={'5+0'} variant="outline-secondary">5+0</ToggleButton>
+                <ToggleButton id="time-10-0" value={'10+0'} variant="outline-secondary">10+0</ToggleButton>
+                <ToggleButton id="time-10-5" value={'10+5'} variant="outline-secondary">10+5</ToggleButton>
+                <ToggleButton id="time-15-15" value={'15+15'} variant="outline-secondary">15+15</ToggleButton>
             </ToggleButtonGroup>
         </Row>
         <p/>
         <Row><h5>Opponent</h5></Row>
         <Row>
-            <ToggleButtonGroup size="lg" type="radio" name="opponent" defaultValue={opponent} onChange={doOpponentChange}>
-                <ToggleButton value="human" variant="outline-secondary">Human</ToggleButton>
-                <ToggleButton value="random" variant="outline-secondary">Random</ToggleButton>
-                <ToggleButton value="stockfish" variant="outline-secondary">Sotckfish</ToggleButton>
-                <ToggleButton value="lc0" variant="outline-secondary">Leela</ToggleButton>
+            <ToggleButtonGroup size="lg" type="radio" name="opponent" value={opponent} onChange={doOpponentChange}>
+                <ToggleButton id="opponent-human" value="human" variant="outline-secondary">Human</ToggleButton>
+                <ToggleButton id="opponent-random" value="random" variant="outline-secondary">Random</ToggleButton>
+                <ToggleButton id="opponent-stockfish" value="stockfish" variant="outline-secondary">Sotckfish</ToggleButton>
+                <ToggleButton id="opponent-lc0" value="lc0" variant="outline-secondary">Leela</ToggleButton>
             </ToggleButtonGroup>
         </Row>
         <p/>
         <Row><h5>Your color</h5></Row>
         <Row>
-            <ToggleButtonGroup size="lg" type="radio" name="color" defaultValue={colorPreference} onChange={doColorChange}>
-                <ToggleButton value='any' variant="outline-secondary">Any</ToggleButton>
-                <ToggleButton value='white' variant="outline-secondary">White</ToggleButton>
-                <ToggleButton value='black' variant="outline-secondary">Black</ToggleButton>
+            <ToggleButtonGroup size="lg" type="radio" name="color" value={colorPreference} onChange={doColorChange}>
+                <ToggleButton id="color-any"   value='any' variant="outline-secondary">Any</ToggleButton>
+                <ToggleButton id="color-white" value='white' variant="outline-secondary">White</ToggleButton>
+                <ToggleButton id="color-black" value='black' variant="outline-secondary">Black</ToggleButton>
             </ToggleButtonGroup>
         </Row>
         <p/><br/>
