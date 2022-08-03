@@ -1565,6 +1565,11 @@ window.jQuery = $;
       widget.position('start', useAnimation)
     }
 
+    widget.calculateSquareSize = calculateSquareSize;
+    widget.boardBorderSize = function() {
+      return boardBorderSize;
+    }
+
     // -------------------------------------------------------------------------
     // Browser Events
     // -------------------------------------------------------------------------
@@ -1581,8 +1586,13 @@ window.jQuery = $;
       var square = $(this).attr('data-square')
       if (!validSquare(square)) return
 
-      if (isFunction(config.onSquareClick))
-        config.onSquareClick(square, currentPosition[square])
+      if (evt.altKey) {
+        if (isFunction(config.onSquareAltClick))
+          config.onSquareAltClick(square, currentPosition[square])
+      } else {
+        if (isFunction(config.onSquareClick))
+            config.onSquareClick(square, currentPosition[square])
+      }
       if (!currentPosition.hasOwnProperty(square)) return
 
       beginDraggingPiece(square, currentPosition[square], evt.pageX, evt.pageY)

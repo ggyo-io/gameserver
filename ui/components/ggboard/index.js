@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import './chessboardjs/chessboard-1.0.0.scss'
 import { Chessboard } from './chessboardjs/chessboard-1.0.0'
 import { Promote } from "../board/components/promote";
 import MatchModal from "../board/components/matchModal";
+import Arrows from "../board/components/arrows";
 import { useStoreState, useStoreActions } from "easy-peasy";
 import { wsSend } from '../../components/ws/ws'
 
@@ -27,11 +28,27 @@ const hl = (props) => {
     }
 }
 
-let board
+let board;
+let squareSize, boardPadding, height;
+
+function arrowsStyle(props) {
+    if (board) {
+        squareSize =  board.calculateSquareSize();
+        boardPadding = board.boardBorderSize()
+        height = ( squareSize * 8 ) + (boardPadding * 2);
+    }
+    return {
+        width: props.style.width,
+        height: height,
+        transform: height ? 'translate(0, -' + height +'px)' : undefined,
+        pointerEvents: 'none',
+    };
+}
 
 const GGBoard = (props) => {
     let element = null;
     const orientation = useStoreState(state => state.game.orientation)
+    const [arrowsState, setArrowsState] = useState({ arrows: [] })
 
     useEffect(() => {
         const config = {
@@ -66,10 +83,47 @@ const GGBoard = (props) => {
         hl(props)
     }, [props.squareStyles]);
 
+    const onSquareAltClick = (square, piece) => {
+        if (arrowsState.arrowStart) {
+            if (arrowsState.arrowStart === square) {
+                // toggle: cancel this start
+                setArrowsState(
+                    {
+                        arrowStart: undefined,
+                        arrows: [...arrowsState.arrows],
+                    }
+                );
+                return;
+            }
+
+            // add new arrow
+            const a = {
+                s: arrowsState.arrowStart,
+                e: square,
+                c: 'olive',
+            };
+            setArrowsState(
+                {
+                    arrowStart: undefined,
+                    arrows: [...arrowsState.arrows, a],
+                }
+            );
+        } else {
+            // set start square
+            setArrowsState(
+                {
+                    arrowStart: square,
+                    arrows: [...arrowsState.arrows],
+                }
+            );
+        }
+    }
+
     if (board)
         board.setConfig({
             onDrop: props.onDrop,
             onSquareClick: props.onSquareClick,
+            onSquareAltClick: onSquareAltClick,
             onMouseoverSquare: props.onMouseoverSquare,
             onMouseoutSquare: props.onMouseoutSquare,
             onDragStart: props.onDragStart,
@@ -88,12 +142,18 @@ const GGBoard = (props) => {
     }
 
     // Render
-    const _props = {style: {...props.style}}
+    const _props = {style: {...props.style}};
     return (
         <>
             {promote? <Promote/> : null}
             {match? <MatchModal handleClose={closeMatch}/> : null}
             <div ref={el => element = el} {..._props} />
+            <Arrows
+                style={arrowsStyle(props)}
+                squareSize={squareSize} boardPadding={boardPadding}
+                arrows={[ ...arrowsState.arrows ]}
+                orientation={orientation}
+            />
         </>
     )
 }
