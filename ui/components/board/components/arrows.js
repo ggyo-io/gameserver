@@ -1,8 +1,18 @@
 import React  from "react";
 
+function arrowsStyle(width, squareSize, boardPadding) {
+    const height = ( squareSize * 8 ) + (boardPadding * 2);
+    return {
+        width: width,
+        height: height,
+        transform: height ? 'translate(0, -' + height +'px)' : undefined,
+        pointerEvents: 'none',
+    };
+}
+
 /* http://thenewcode.com/1068/Making-Arrows-in-SVG */
 function Arrows(props) {
-    const { style, squareSize, boardPadding, arrows, orientation } = props;
+    const { width, squareSize, boardPadding, arrows, orientation } = props;
 
     // square coordinates
     // (0,0)  left - top square
@@ -42,7 +52,7 @@ function Arrows(props) {
     })
 
     return (
-        <svg className={props.className} style={style}>
+        <svg style={arrowsStyle(width, squareSize, boardPadding)}>
             <defs>
             {
             colors.map(c =>

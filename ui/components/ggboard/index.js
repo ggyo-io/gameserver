@@ -29,21 +29,6 @@ const hl = (props) => {
 }
 
 let board;
-let squareSize, boardPadding, height;
-
-function arrowsStyle(props) {
-    if (board) {
-        squareSize =  board.calculateSquareSize();
-        boardPadding = board.boardBorderSize()
-        height = ( squareSize * 8 ) + (boardPadding * 2);
-    }
-    return {
-        width: props.style.width,
-        height: height,
-        transform: height ? 'translate(0, -' + height +'px)' : undefined,
-        pointerEvents: 'none',
-    };
-}
 
 const GGBoard = (props) => {
     let element = null;
@@ -149,8 +134,9 @@ const GGBoard = (props) => {
             {match? <MatchModal handleClose={closeMatch}/> : null}
             <div ref={el => element = el} {..._props} />
             <Arrows
-                style={arrowsStyle(props)}
-                squareSize={squareSize} boardPadding={boardPadding}
+                width={props.style.width}
+                squareSize={board ? board.calculateSquareSize() : undefined}
+                boardPadding={board ? board.boardBorderSize() : undefined}
                 arrows={[ ...arrowsState.arrows ]}
                 orientation={orientation}
             />
