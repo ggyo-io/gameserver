@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from "react-router-dom";
 import './chessboardjs/chessboard-1.0.0.scss'
 import { Chessboard } from './chessboardjs/chessboard-1.0.0'
@@ -33,7 +33,6 @@ let board;
 const GGBoard = (props) => {
     let element = null;
     const orientation = useStoreState(state => state.game.orientation)
-    const [arrowsState, setArrowsState] = useState({ arrows: [] })
 
     useEffect(() => {
         const config = {
@@ -68,47 +67,11 @@ const GGBoard = (props) => {
         hl(props)
     }, [props.squareStyles]);
 
-    const onSquareAltClick = (square, piece) => {
-        if (arrowsState.arrowStart) {
-            if (arrowsState.arrowStart === square) {
-                // toggle: cancel this start
-                setArrowsState(
-                    {
-                        arrowStart: undefined,
-                        arrows: [...arrowsState.arrows],
-                    }
-                );
-                return;
-            }
-
-            // add new arrow
-            const a = {
-                s: arrowsState.arrowStart,
-                e: square,
-                c: 'olive',
-            };
-            setArrowsState(
-                {
-                    arrowStart: undefined,
-                    arrows: [...arrowsState.arrows, a],
-                }
-            );
-        } else {
-            // set start square
-            setArrowsState(
-                {
-                    arrowStart: square,
-                    arrows: [...arrowsState.arrows],
-                }
-            );
-        }
-    }
-
     if (board)
         board.setConfig({
             onDrop: props.onDrop,
             onSquareClick: props.onSquareClick,
-            onSquareAltClick: onSquareAltClick,
+            onSquareAltClick: props.onSquareAltClick,
             onMouseoverSquare: props.onMouseoverSquare,
             onMouseoutSquare: props.onMouseoutSquare,
             onDragStart: props.onDragStart,
@@ -137,7 +100,7 @@ const GGBoard = (props) => {
                 width={props.style.width}
                 squareSize={board ? board.calculateSquareSize() : undefined}
                 boardPadding={board ? board.boardBorderSize() : undefined}
-                arrows={[ ...arrowsState.arrows ]}
+                arrows={[ ...props.arrows ]}
                 orientation={orientation}
             />
         </>

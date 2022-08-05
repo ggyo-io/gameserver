@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import GGBoard from "../../ggboard";
 import {calcPosition, gameSquareStyles} from "../modes/helpers";
 import {useStoreActions, useStoreState} from "easy-peasy";
@@ -16,6 +16,7 @@ export const Gameboard = (props) => {
         useStoreActions(actions => actions.game)
 
     const {onMakeMove, game} = props
+    const [arrowsState, setArrowsState] = useState({ arrows: [] });
 
     //
     // Board mouse/keyboard handlers
@@ -130,6 +131,42 @@ export const Gameboard = (props) => {
         promote(onPromote)
     }
 
+    const onSquareAltClick = (square, piece) => {
+        if (arrowsState.arrowStart) {
+            if (arrowsState.arrowStart === square) {
+                // toggle: cancel this start
+                setArrowsState(
+                    {
+                        arrowStart: undefined,
+                        arrows: [...arrowsState.arrows],
+                    }
+                );
+                return;
+            }
+
+            // add new arrow
+            const a = {
+                s: arrowsState.arrowStart,
+                e: square,
+                c: 'olive',
+            };
+            setArrowsState(
+                {
+                    arrowStart: undefined,
+                    arrows: [...arrowsState.arrows, a],
+                }
+            );
+        } else {
+            // set start square
+            setArrowsState(
+                {
+                    arrowStart: square,
+                    arrows: [...arrowsState.arrows],
+                }
+            );
+        }
+    }
+
     const position = calcPosition(history, browseIndex, game);
     const squareStyles = gameSquareStyles(game, history, pieceSquare, dropSquare, browseIndex)
 
@@ -140,11 +177,13 @@ export const Gameboard = (props) => {
             squareStyles={squareStyles}
             onDrop={onDrop}
             onSquareClick={onSquareClick}
+            onSquareAltClick={onSquareAltClick}
             onMouseoverSquare={onMouseoverSquare}
             onMouseoutSquare={onMouseoutSquare}
             onDragStart={onDragStart}
             onDragMove={onDragMove}
             onSnapbackEnd={onSnapbackEnd}
+            arrows={[ ...arrowsState.arrows ]}
             style={props.style}
         />
     )
