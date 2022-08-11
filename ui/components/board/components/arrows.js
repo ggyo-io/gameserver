@@ -3,8 +3,8 @@ import React  from "react";
 function arrowsStyle(width, squareSize, boardPadding) {
     const height = ( squareSize * 8 ) + (boardPadding * 2);
     return {
-        width: width,
-        height: height,
+        width: width ? width: undefined,
+        height: height ? height : undefined,
         transform: height ? 'translate(0, -' + height +'px)' : undefined,
         pointerEvents: 'none',
     };
